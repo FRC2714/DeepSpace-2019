@@ -1,0 +1,6 @@
+#ignore build folder
+build/*
+.gradle/*
+.settings/*
+.vscode/*
+.project
