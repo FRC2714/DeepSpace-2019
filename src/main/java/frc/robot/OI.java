@@ -77,7 +77,7 @@ public class OI {
 	public OI() {
 		this.buttons.add(new JoystickCommandPair("intake_in -s", this.a));
 		this.buttons.add(new JoystickCommandPair("intake_out -s", this.b));
-		//this.buttons.add(new JoystickCommandPair("follow_spline -s 0,0,0,5,0,2.875,4.875,4.9,5,15", this.x));
+		this.buttons.add(new JoystickCommandPair("add_spline -s 0,0,0,0,0,5,10,15,10,5", this.x));
 		//this.buttons.add(new JoystickCommandPair("target_point -s 1,1", this.y));
 		this.buttons.add(new JoystickCommandPair("shift_high -p", this.lb));
 		this.buttons.add(new JoystickCommandPair("shift_low -s", this.x));

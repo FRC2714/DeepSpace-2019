@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
-
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Encoder;
@@ -12,14 +11,10 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import frc.robot.Robot;
 import frc.robot.RobotMap;
 import frc.robot.util.DrivingController;
-import frc.robot.util.SplineFactory;
 import frc.robot.util.Odometer;
 import frc.robot.util.SubsystemCommand;
 import frc.robot.util.SubsystemModule;
 
-/**
- *
- */
 public class DriveTrain extends SubsystemModule {
 
 	// Motors for DriveTrain
@@ -37,7 +32,8 @@ public class DriveTrain extends SubsystemModule {
 
 	// Encoders for the motors
 	public Encoder leftEncoder = new Encoder(RobotMap.p_leftEncoderA, RobotMap.p_leftEncoderB, true, EncodingType.k4X);
-	public Encoder rightEncoder = new Encoder(RobotMap.p_rightEncoderA, RobotMap.p_rightEncoderB, true, EncodingType.k4X);
+	public Encoder rightEncoder = new Encoder(RobotMap.p_rightEncoderA, RobotMap.p_rightEncoderB, true,
+			EncodingType.k4X);
 
 	// Pneumatic for the gearbox
 	public DoubleSolenoid driveShifter = new DoubleSolenoid(RobotMap.p_driveShifter1, RobotMap.p_driveShifter2);
@@ -62,7 +58,7 @@ public class DriveTrain extends SubsystemModule {
 	};
 
 	// Instantiate point controller for autonomous driving
-	public DrivingController drivingcontroller = new DrivingController() {
+	public DrivingController drivingcontroller = new DrivingController(Robot.ControlsProcessor.periodNanoseconds) {
 
 		// Use output from odometer and pass into autonomous driving controller
 		@Override
@@ -70,6 +66,7 @@ public class DriveTrain extends SubsystemModule {
 			this.currentX = odometer.current_x;
 			this.currentY = odometer.current_y;
 			this.currentAngle = odometer.headingAngle;
+			this.currentAverageVelocity = odometer.currentVelocity;
 		}
 
 		// Link autonomous driving controller to the drive train motor control
@@ -107,60 +104,53 @@ public class DriveTrain extends SubsystemModule {
 	@Override
 	public void registerCommands() {
 
-		// High Gear
-		new SubsystemCommand(this.registeredCommands, "shift_high", 0) {
-			int doneTransition = 0;
+		/*
+		 * 
+		 * // High Gear new SubsystemCommand(this.registeredCommands, "shift_high", 0) {
+		 * int doneTransition = 0;
+		 * 
+		 * @Override public void initialize() {
+		 * Robot.drivetrain.leftEncoder.setDistancePerPulse(-0.0011146); //0.00116
+		 * Robot.drivetrain.rightEncoder.setDistancePerPulse(0.0011181); //.00115
+		 * 
+		 * //Robot.drivetrain.driveShifter.set(DoubleSolenoid.Value.kForward); }
+		 * 
+		 * @Override public void execute() { if(doneTransition <= 0) {
+		 * if((Math.abs(Robot.drivetrain.leftEncoder.getRate() +
+		 * Robot.drivetrain.rightEncoder.getRate())/2)>12){
+		 * Robot.drivetrain.driveShifter.set(DoubleSolenoid.Value.kForward);
+		 * doneTransition = 700; } if((Math.abs(Robot.drivetrain.leftEncoder.getRate() +
+		 * Robot.drivetrain.rightEncoder.getRate())/2)<8){
+		 * Robot.drivetrain.driveShifter.set(DoubleSolenoid.Value.kReverse);
+		 * doneTransition = 700; } } else { doneTransition--; } }
+		 * 
+		 * @Override public void end() {
+		 * Robot.drivetrain.driveShifter.set(DoubleSolenoid.Value.kReverse);
+		 * Robot.drivetrain.leftEncoder.setDistancePerPulse(-0.000623); //0.00116
+		 * Robot.drivetrain.rightEncoder.setDistancePerPulse(0.000610); //.00115 }
+		 * 
+		 * @Override public boolean isFinished() { return false; } };
+		 * 
+		 * // Low Gear new SubsystemCommand(this.registeredCommands, "shift_low", 0) {
+		 * 
+		 * @Override public void initialize() {
+		 * Robot.drivetrain.driveShifter.set(DoubleSolenoid.Value.kReverse); } };
+		 * 
+		 */
+
+		new SubsystemCommand(this.registeredCommands, "add_spline") {
 
 			@Override
 			public void initialize() {
-				Robot.drivetrain.leftEncoder.setDistancePerPulse(-0.0011146); //0.00116
-				Robot.drivetrain.rightEncoder.setDistancePerPulse(0.0011181); //.00115
-
-				//Robot.drivetrain.driveShifter.set(DoubleSolenoid.Value.kForward);
-			}
-
-			@Override
-			public void execute() {
-				if(doneTransition <= 0) {
-					if((Math.abs(Robot.drivetrain.leftEncoder.getRate() + Robot.drivetrain.rightEncoder.getRate())/2)>12){
-						Robot.drivetrain.driveShifter.set(DoubleSolenoid.Value.kForward);
-						doneTransition = 700;
-					}
-					if((Math.abs(Robot.drivetrain.leftEncoder.getRate() + Robot.drivetrain.rightEncoder.getRate())/2)<8){
-						Robot.drivetrain.driveShifter.set(DoubleSolenoid.Value.kReverse);
-						doneTransition = 700;
-					}
-				} else {
-					doneTransition--;
-				}
-			}
-
-			@Override
-			public void end() {
-				Robot.drivetrain.driveShifter.set(DoubleSolenoid.Value.kReverse);
-				Robot.drivetrain.leftEncoder.setDistancePerPulse(-0.000623); //0.00116
-				Robot.drivetrain.rightEncoder.setDistancePerPulse(0.000610); //.00115
-			}
-
-			@Override
-			public boolean isFinished() {
-			  return false;
-			}
-		};
-
-		// Low Gear
-		new SubsystemCommand(this.registeredCommands, "shift_low", 0) {
-			@Override
-			public void initialize() {
-				Robot.drivetrain.driveShifter.set(DoubleSolenoid.Value.kReverse);
-			}
-		};
-
-		new SubsystemCommand(this.registeredCommands, "follow_spline", 10) {
-
-			@Override
-			public void initialize() {
-
+				Robot.drivetrain.drivingcontroller.addSpline(Double.parseDouble(this.args[0]),
+						Double.parseDouble(this.args[1]), Double.parseDouble(this.args[2]),
+						Double.parseDouble(this.args[3]), Double.parseDouble(this.args[4]),
+						Double.parseDouble(this.args[5]), Double.parseDouble(this.args[6]),
+						Double.parseDouble(this.args[7]), Double.parseDouble(this.args[8]),
+						Double.parseDouble(this.args[9]), Double.parseDouble(this.args[10]),
+						Double.parseDouble(this.args[11]));
+				Robot.drivetrain.drivingcontroller.addSplineEnd();
+				Robot.drivetrain.enabled = true;
 			}
 
 			@Override

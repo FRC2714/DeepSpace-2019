@@ -6,7 +6,6 @@ public abstract class SubsystemCommand {
 
     // Store the name of the command and the number of parameters passed into the command
     private String commandName;
-    private int numberParameters;
 
     public boolean firstRun = false;
     public boolean running = false;
@@ -14,27 +13,25 @@ public abstract class SubsystemCommand {
     public String[] args;
 
     // Constructor, set up the command
-    public SubsystemCommand (HashMap<String, SubsystemCommand> commands, String commandName, int numberParameters) {
+    public SubsystemCommand (HashMap<String, SubsystemCommand> commands, String commandName) {
         this.commandName = commandName;
-        this.numberParameters = numberParameters;
 
         commands.put(this.commandName, this);
     }
 
     public void call (String parameters) {
         this.firstRun = true;
-
         this.args = parameters.split(",");
+    }
+
+    public void call () {
+        this.firstRun = true;
     }
 
     public void cancel() {
         end();
 
         this.running = false;
-    }
-
-    public void call () {
-        this.firstRun = true;
     }
 
     // Called once at the beginning
