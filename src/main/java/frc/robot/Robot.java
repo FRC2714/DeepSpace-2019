@@ -9,7 +9,6 @@ import frc.robot.subsystems.DriveTrain;
 // import frc.robot.subsystems.Elevator;
 // import frc.robot.subsystems.Intake;
 import frc.robot.util.ControllerCollection;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -121,10 +120,10 @@ public class Robot extends IterativeRobot {
 			drivetrain.arcadeDrive(0, 0);
 		}
 
-		// System.out.println("enc: " + (Robot.drivetrain.leftEncoder.getRate() + Robot.drivetrain.rightEncoder.getRate()));
-
-		// Process command line
-
+		//System.out.println("encL: " + Robot.drivetrain.leftEncoder.get() + " encR: " + Robot.drivetrain.rightEncoder.get());
+		//System.out.println("gfh: " + Robot.drivetrain.navX.getFusedHeading());
+		System.out.println("X: " + Robot.drivetrain.odometer.current_x+ " Y: " + Robot.drivetrain.odometer.current_y);
+		
 	}
 
 	@Override
@@ -157,20 +156,19 @@ public class Robot extends IterativeRobot {
 		} else {
 			System.out.println("GeneralInit");
 
-			ControlsProcessor = new ControllerCollection(50000, 10);
+			ControlsProcessor = new ControllerCollection(500000, 1);
 			ControlsProcessor.registerController("DriveTrain", Robot.drivetrain);
 			// ControlsProcessor.registerController("Elevator", Robot.elevator);
 			// ControlsProcessor.registerController("Intake", Robot.intake);
 			ControlsProcessor.start();
 		}
-		//System.out.println("hello coders, I'm here");
 		Robot.drivetrain.navX.zeroYaw();
 		Robot.drivetrain.leftEncoder.reset();
 		Robot.drivetrain.rightEncoder.reset();
 		Robot.drivetrain.odometer.reset();
 
-		Robot.drivetrain.driveShifter.set(DoubleSolenoid.Value.kReverse);
-		Robot.drivetrain.leftEncoder.setDistancePerPulse(-0.000623); //0.00116
-		Robot.drivetrain.rightEncoder.setDistancePerPulse(0.000610);
+		//Robot.drivetrain.driveShifter.set(DoubleSolenoid.Value.kReverse);
+		Robot.drivetrain.leftEncoder.setDistancePerPulse(0.0336); //0.00116
+		Robot.drivetrain.rightEncoder.setDistancePerPulse(-0.00105);
 	}
 }

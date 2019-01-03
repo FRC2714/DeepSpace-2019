@@ -36,7 +36,7 @@ public class DriveTrain extends SubsystemModule {
 			EncodingType.k4X);
 
 	// Pneumatic for the gearbox
-	public DoubleSolenoid driveShifter = new DoubleSolenoid(RobotMap.p_driveShifter1, RobotMap.p_driveShifter2);
+	//public DoubleSolenoid driveShifter = new DoubleSolenoid(RobotMap.p_driveShifter1, RobotMap.p_driveShifter2);
 
 	// The NavX gyro
 	public AHRS navX = new AHRS(SPI.Port.kMXP);
@@ -58,7 +58,7 @@ public class DriveTrain extends SubsystemModule {
 	};
 
 	// Instantiate point controller for autonomous driving
-	public DrivingController drivingcontroller = new DrivingController(Robot.ControlsProcessor.periodNanoseconds) {
+	public DrivingController drivingcontroller = new DrivingController(0.0005) {
 
 		// Use output from odometer and pass into autonomous driving controller
 		@Override
@@ -138,7 +138,7 @@ public class DriveTrain extends SubsystemModule {
 		 * 
 		 */
 
-		new SubsystemCommand(this.registeredCommands, "add_spline") {
+		new SubsystemCommand(this.registeredCommands, "add_forwards_spline") {
 
 			@Override
 			public void initialize() {
@@ -148,8 +148,37 @@ public class DriveTrain extends SubsystemModule {
 						Double.parseDouble(this.args[5]), Double.parseDouble(this.args[6]),
 						Double.parseDouble(this.args[7]), Double.parseDouble(this.args[8]),
 						Double.parseDouble(this.args[9]), Double.parseDouble(this.args[10]),
-						Double.parseDouble(this.args[11]));
-				Robot.drivetrain.drivingcontroller.addSplineEnd();
+						Double.parseDouble(this.args[11]), true);
+				Robot.drivetrain.enabled = true;
+			}
+
+			@Override
+			public void execute() {
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {
+
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "add_backwards_spline") {
+
+			@Override
+			public void initialize() {
+				Robot.drivetrain.drivingcontroller.addSpline(Double.parseDouble(this.args[0]),
+						Double.parseDouble(this.args[1]), Double.parseDouble(this.args[2]),
+						Double.parseDouble(this.args[3]), Double.parseDouble(this.args[4]),
+						Double.parseDouble(this.args[5]), Double.parseDouble(this.args[6]),
+						Double.parseDouble(this.args[7]), Double.parseDouble(this.args[8]),
+						Double.parseDouble(this.args[9]), Double.parseDouble(this.args[10]),
+						Double.parseDouble(this.args[11]), false);
 				Robot.drivetrain.enabled = true;
 			}
 

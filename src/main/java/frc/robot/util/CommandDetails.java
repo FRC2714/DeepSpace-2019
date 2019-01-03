@@ -2,10 +2,11 @@ package frc.robot.util;
 
 public class CommandDetails {
 
-    public enum CommandType {PARALLEL, SERIES}
+    public enum CommandType {PARALLEL, SERIES, TIMEDELAY}
     private CommandType commandType = null;
     private String commandName;
     private String commandArgs = "";
+    private double timeDelay;
     
     public CommandDetails (String commandInput) {
         String[] commandParts = commandInput.split(" ");
@@ -15,18 +16,32 @@ public class CommandDetails {
         if (commandParts.length == 1){
             return;
         }
+
         switch (commandParts[1]){
             case "-s":
             this.commandType = CommandType.SERIES;
+            if (commandParts.length == 3) {
+                this.commandArgs = commandParts[2];
+            }
             break;
             case "-p":
             this.commandType = CommandType.PARALLEL;
+            if (commandParts.length == 3) {
+                this.commandArgs = commandParts[2];
+            }
+            break;
+            case "-t":
+            this.commandType = CommandType.TIMEDELAY;
+            this.timeDelay = Double.parseDouble(commandParts[2]);
+            if (commandParts.length == 4) {
+                this.commandArgs = commandParts[3];
+            }
             break;
         }
+    }
 
-        if (commandParts.length == 3) {
-            this.commandArgs = commandParts[2];
-        }
+    public double getDelay(){
+        return this.timeDelay;
     }
 
     public CommandType type() {

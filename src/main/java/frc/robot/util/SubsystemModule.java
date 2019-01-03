@@ -23,7 +23,7 @@ public abstract class SubsystemModule extends Subsystem {
 		registeredCommands.forEach((k,v) ->  {
 
 			// Call the initializer if the first run is active
-			if (v.firstRun) {
+			if (v.firstRun && v.checkDelayExpired()) {
 				v.initialize();
 				v.firstRun = false;
 				v.running = true;

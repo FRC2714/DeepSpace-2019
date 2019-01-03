@@ -140,9 +140,15 @@ public class ControllerCollection extends Thread {
 			SubsystemCommand foundCommand = v.registeredCommands.get(command.name());
 			if (foundCommand != null && command.args().isEmpty()) {
 				System.out.println("found command: " + command.name());
+				if (command.type().equals(CommandDetails.CommandType.TIMEDELAY)){
+					foundCommand.configureDelay(command.getDelay());
+				}
 				foundCommand.call();
 			} else if (foundCommand != null && !command.args().isEmpty()) {
 				System.out.println("found command: " + command.name());
+				if (command.type().equals(CommandDetails.CommandType.TIMEDELAY)){
+					foundCommand.configureDelay(command.getDelay());
+				}
 				foundCommand.call(command.args());
 			}
 		});
@@ -198,7 +204,7 @@ public class ControllerCollection extends Thread {
 		 * the next sequential command.
 		 */
 
-		if (this.commandQueue.size() > 0 && this.commandQueue.get(0).type().equals(CommandDetails.CommandType.SERIES)) {
+		if (this.commandQueue.size() > 0 && (this.commandQueue.get(0).type().equals(CommandDetails.CommandType.SERIES) || this.commandQueue.get(0).type().equals(CommandDetails.CommandType.TIMEDELAY))){
 			System.out.println(this.commandQueue.get(0).name());
 			callCommand(this.commandQueue.get(0));
 			this.commandQueue.remove(0);

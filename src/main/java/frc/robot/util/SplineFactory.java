@@ -4,15 +4,16 @@ import java.util.ArrayList;
 
 public class SplineFactory {
     private double x1, x2, x3, x4, y1, y2, y3, y4, acceleration, velocity;
-    // private ArrayList<Double> xValues = new ArrayList<Double>();
-    // private ArrayList<Double> yValues = new ArrayList<Double>();
 
     private double tolerance = 0.0000001;
     private double tStep = 0.001;
     private double period = 0.0005;
 
-    public SplineFactory(ArrayList<Double> xValues, ArrayList<Double> yValues, double period, double x1, double x2, double x3, double x4, double y1, double y2, double y3,
-            double y4, double acceleration, double maxVelocity, double startVelocity, double endVelocity) {
+    ArrayList<Double> xValues;
+    ArrayList<Double> yValues;
+
+    public SplineFactory(ArrayList<MotionPose> controlPath, double period, double x1, double x2, double x3, double x4, double y1, double y2, double y3,
+            double y4, double acceleration, double maxVelocity, double startVelocity, double endVelocity, boolean forwards) {
 
         this.period = period;
 
@@ -31,7 +32,7 @@ public class SplineFactory {
         // Fill point buffer
         double backT = 1;
         double frontT = 0;
-        int placement = xValues.size();
+        int placement = 0;
         double currentFrontVelocity = startVelocity * this.period;
         double currentBackVelocity = endVelocity * this.period;
 
@@ -58,6 +59,17 @@ public class SplineFactory {
             backT = binaryFind(backT, -currentBackVelocity, placement + 1, xValues, yValues);
             placement++;
 
+        }
+
+        for (int i = 0; i < xValues.size() - 1; i++) {
+            double angle = Math.atan((this.yValues.get(i+1) - this.yValues.get(i))/(this.xValues.get(i+1) - this.xValues.get(i)));
+            double velocity = distanceCalc(this.xValues.get(i+1), this.xValues.get(i), this.yValues.get(i+1), this.yValues.get(i))/period;
+            
+            if(!forwards){
+                velocity *= -1;
+            }
+            
+            controlPath.add(new MotionPose(angle, velocity, (double)this.xValues.get(i), (double)this.yValues.get(i)));
         }
 
     }

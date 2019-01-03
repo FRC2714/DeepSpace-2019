@@ -2,6 +2,8 @@ package frc.robot.util;
 
 import java.util.HashMap;
 
+import edu.wpi.first.wpilibj.Timer;
+
 public abstract class SubsystemCommand {
 
     // Store the name of the command and the number of parameters passed into the command
@@ -9,6 +11,9 @@ public abstract class SubsystemCommand {
 
     public boolean firstRun = false;
     public boolean running = false;
+
+    private double delay = 0;
+    private Timer delayTimer;
 
     public String[] args;
 
@@ -19,9 +24,33 @@ public abstract class SubsystemCommand {
         commands.put(this.commandName, this);
     }
 
+    public void configureDelay(double delay){
+        this.delay = delay;
+
+        if (this.delay > 0) {
+            this.delayTimer.start();
+        }
+
+    }
+
+    public boolean checkDelayExpired() {
+        if (this.delayTimer.get() > this.delay) {
+            this.delayTimer.stop();
+            this.delayTimer.reset();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public void call (String parameters) {
         this.firstRun = true;
         this.args = parameters.split(",");
+
+        if (this.delay > 0) {
+            this.delayTimer.start();
+        }
+        
     }
 
     public void call () {

@@ -5,19 +5,20 @@ import java.util.ArrayList;
 public abstract class DrivingController {
 
 	// Angle and velocity controllers
-	private PID anglePID = new PID(0.035, 0.0, 0.003);
-	private PID velocityPID = new PID(0.6, 0.001, 0.0);
+	private PID orthogonalControl = new PID(0.035, 0.0, 0.003);
+	private PID tangentialControl = new PID(0.2, 0.0001, 0.0001);
+	private PID velocityControl = new PID(0.6, 0.001, 0.0);
 
-	private ArrayList<Double> xValues = new ArrayList<Double>();
-	private ArrayList<Double> yValues = new ArrayList<Double>();
+	// Coefficient for angular correction
+	private double kCC = 25;
+
+	private ArrayList<MotionPose> controlPath;
 
 	protected double currentX;
 	protected double currentY;
 	protected double currentAngle;
 	protected double currentAverageVelocity;
 
-	private double deltaToAngle;
-	private int lookaheadSegments;
 	private int iterator = 0;
 
 	private double period;
@@ -25,10 +26,6 @@ public abstract class DrivingController {
 	private int ahead = 1;
 
 	public DrivingController(double period) {
-
-		// Configure the PID controllers
-		anglePID.setOutputLimits(-1, 1);
-		anglePID.setMaxIOutput(0.7);
 
 		// Set up period
 		this.period = period;
@@ -38,22 +35,19 @@ public abstract class DrivingController {
 	// Run function for Driving Controller uses distance and angle controllers
 	// Iterate over the points in the vector
 	public void run() {
-
-		double velocityScalar, targetAngle;
 		updateVariables();
 
 		// Move to the next point in the spline
 		next();
 
-		// Calculate the next velocity scalar and then calculate the target angle
-		velocityScalar = getVelocityScalar();
-		targetAngle = getAngleVector(this.lookaheadSegments);
-		getAngleCorrection(targetAngle);
+		// Use tangential correction and velocity control cascaded to control velocity and position.
+		// Currently, use square of orthogonal error as a correction to modify angle to reduce error
+		// Need to update to full Samson control algorithm
+		double tangentialOutput = tangentialControl.getOutput(-this.controlPath.get(iterator).getTangentialDisplacement(currentX, currentY), 0);
+		double velocityOutput = velocityControl.getOutput(this.currentAverageVelocity, this.controlPath.get(iterator).velocity + tangentialOutput);
+		double orthogonalOutput = orthogonalControl.getOutput(this.currentAngle, this.controlPath.get(iterator).angle - (this.kCC * Math.pow(this.controlPath.get(iterator).getOrthogonalDisplacement(currentX, currentY), 2)));
 
-		// Use velocity target and angle delta to drive
-		// driveRobot(velocityPID.getOutput(this.currentAverageVelocity, this.ahead * velocityScalar),
-		// 		anglePID.getOutput(-this.deltaToAngle, 0));
-		driveRobot(velocityPID.getOutput(this.currentAverageVelocity, this.ahead * velocityScalar), 0);
+		driveRobot(velocityOutput, orthogonalOutput);
 
 	}
 
@@ -62,34 +56,16 @@ public abstract class DrivingController {
 
 	public abstract void driveRobot(double power, double pivot);
 
-	// Set the lookahead time, this calculates the lookahead distance
-	public void setLookaheadSegments(int segments) {
-		this.lookaheadSegments = segments;
-	}
-
 	// Set the desired position for the robot
 	public void addSpline(double x1, double x2, double x3, double x4, double y1, double y2, double y3, double y4,
-			double acceleration, double maxVelocity, double startVelocity, double endVelocity) {
-		SplineFactory newSpline = new SplineFactory(this.xValues, this.yValues, this.period, x1, x2, x3, x4, y1, y2, y3,
-				y4, acceleration, maxVelocity, startVelocity, endVelocity);
+			double acceleration, double maxVelocity, double startVelocity, double endVelocity, boolean forwards) {
+		new SplineFactory(this.controlPath, this.period, x1, x2, x3, x4, y1, y2, y3,
+				y4, acceleration, maxVelocity, startVelocity, endVelocity, forwards);
 	}
+
+	/*
+
 	
-	public void addSplineEnd() {
-		double xDelta = this.xValues.get(this.xValues.size()-1)-this.xValues.get(this.xValues.size()-2);
-		double yDelta = this.yValues.get(this.yValues.size()-1)-this.yValues.get(this.yValues.size()-2);
-
-		for(int i = 0; i < lookaheadSegments; i++){
-			this.xValues.add(this.xValues.get(this.xValues.size()-1) + (xDelta * i));
-			this.yValues.add(this.yValues.get(this.yValues.size()-1) + (yDelta * i));
-		}
-		
-	}
-
-	// Angle difference utility
-	private double getDifferenceInAngleDegrees(double from, double to) {
-		return boundAngleNeg180to180Degrees(from - to);
-	}
-
 	// Calculate correction angle
 	private void getAngleCorrection(double targetAngle) {
 		this.deltaToAngle = getDifferenceInAngleDegrees(this.currentAngle, targetAngle);
@@ -105,17 +81,7 @@ public abstract class DrivingController {
 		}
 	}
 
-	// Keep it between 180 degrees
-	private double boundAngleNeg180to180Degrees(double angle) {
-		while (angle >= 180.0) {
-			angle -= 360.0;
-		}
-		while (angle < -180.0) {
-			angle += 360.0;
-		}
-		return angle;
-	}
-
+	
 	public double getAngleVector(int segments) {
 		double deltaX, deltaY;
 		double angleVector;
@@ -147,11 +113,7 @@ public abstract class DrivingController {
 
 		return angleVector;
 	}
-
-	public double getVelocityScalar() {
-		return distanceCalc(this.xValues.get(this.iterator), this.xValues.get(this.iterator + 1),
-				this.yValues.get(this.iterator), this.yValues.get(this.iterator + 1)) / this.period;
-	}
+	*/
 
 	public void next() {
 		this.iterator++;
