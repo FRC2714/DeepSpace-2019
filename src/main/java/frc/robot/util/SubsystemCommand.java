@@ -34,6 +34,9 @@ public abstract class SubsystemCommand {
     }
 
     public boolean checkDelayExpired() {
+        if (this.delay == 0) {
+            return true;
+        }
         if (this.delayTimer.get() > this.delay) {
             this.delayTimer.stop();
             this.delayTimer.reset();

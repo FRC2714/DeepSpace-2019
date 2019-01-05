@@ -38,18 +38,6 @@ public abstract class Odometer {
 		
 		updateEncodersAndHeading();
 
-		headingAngle = 90 - headingAngle;
-		if (headingAngle < 0) {
-			headingAngle += 360;
-		}
-		
-		if (direction < 0) {
-			headingAngle += 180;
-			if (headingAngle > 360) {
-				headingAngle -= 360;
-			}
-		}
-
 		leftDistance = (leftPos - lastLeftPos);
 		rightDistance = (rightPos - lastRightPos);
 

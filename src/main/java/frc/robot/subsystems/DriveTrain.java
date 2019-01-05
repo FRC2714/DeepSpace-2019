@@ -49,7 +49,11 @@ public class DriveTrain extends SubsystemModule {
 	// Instantiate odometer and link in encoders and navX
 	public Odometer odometer = new Odometer(0, 0) {
 		public void updateEncodersAndHeading() {
-			this.headingAngle = navX.getFusedHeading();
+
+			this.headingAngle = 450 - navX.getFusedHeading();
+			if(this.headingAngle > 360)
+				this.headingAngle -= 360;
+
 			this.leftPos = leftEncoder.getDistance();
 			this.rightPos = rightEncoder.getDistance();
 
@@ -65,8 +69,9 @@ public class DriveTrain extends SubsystemModule {
 		public void updateVariables() {
 			this.currentX = odometer.current_x;
 			this.currentY = odometer.current_y;
-			this.currentAngle = odometer.headingAngle;
 			this.currentAverageVelocity = odometer.currentVelocity;
+
+			this.currentAngle = Robot.drivetrain.odometer.headingAngle;
 		}
 
 		// Link autonomous driving controller to the drive train motor control

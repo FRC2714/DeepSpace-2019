@@ -121,9 +121,8 @@ public class Robot extends IterativeRobot {
 		}
 
 		//System.out.println("encL: " + Robot.drivetrain.leftEncoder.get() + " encR: " + Robot.drivetrain.rightEncoder.get());
-		//System.out.println("gfh: " + Robot.drivetrain.navX.getFusedHeading());
-		System.out.println("X: " + Robot.drivetrain.odometer.current_x+ " Y: " + Robot.drivetrain.odometer.current_y);
-		
+		//System.out.println("X: " + Robot.drivetrain.odometer.current_x+ " Y: " + Robot.drivetrain.odometer.current_y);
+		//System.out.println(Robot.drivetrain.drivingcontroller.orthogonaldistance);
 	}
 
 	@Override
