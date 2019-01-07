@@ -42,9 +42,12 @@ public abstract class Odometer {
 		rightDistance = (rightPos - lastRightPos);
 
 		hypotenuseDistance = (leftDistance + rightDistance) / 2;
-		
-		change_x = (Math.cos((headingAngle * Math.PI) / 180) * hypotenuseDistance);
-		change_y = (Math.sin((headingAngle * Math.PI) / 180) * hypotenuseDistance);
+
+//		change_x = (Math.cos((headingAngle * Math.PI) / 180) * hypotenuseDistance);
+//		change_y = (Math.sin((headingAngle * Math.PI) / 180) * hypotenuseDistance);
+
+		change_x = (Math.cos(Math.toRadians(headingAngle)) * hypotenuseDistance);
+		change_y = (Math.sin(Math.toRadians(headingAngle)) * hypotenuseDistance);
 		
 		current_x = current_x + change_x;
 		current_y = current_y + change_y;
