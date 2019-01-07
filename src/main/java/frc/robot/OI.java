@@ -76,12 +76,13 @@ public class OI {
 
 	public OI() {
 		this.buttons.add(new JoystickCommandPair("intake_in -s", this.a));
-		this.buttons.add(new JoystickCommandPair("intake_out -s", this.b));
-		this.buttons.add(new JoystickCommandPair("add_forwards_spline -s 0,0,-6,-6,0,3,6,9,10,10,0,0", this.x));
-		this.buttons.add(new JoystickCommandPair("add_forwards_spline -s 0,0,0,0,0,3,6,9,10,10,0,0", this.y));
+		this.buttons.add(new JoystickCommandPair("add_forwards_spline -s 0,0,-1.75,-1.75,0,3,6,15,15,10,0,8", this.x));
+		this.buttons.add(new JoystickCommandPair("add_forwards_spline -s -1.75,-1.75,-1.75,-1.1,15,16,17,18,15,8,8,0", this.y));
+		this.buttons.add(new JoystickCommandPair("add_backwards_spline -s -1.1,-1.1,-1.1,-2.75,18,18,18,15,15,8,0,0", this.a));
 		//this.buttons.add(new JoystickCommandPair("target_point -s 1,1", this.y));
-		this.buttons.add(new JoystickCommandPair("shift_high -p", this.lb));
+		this.buttons.add(new JoystickCommandPair("start_path -s", this.b));
 		//this.buttons.add(new JoystickCommandPair("shift_low -s", this.x));
+
 	}
 
 	public double getLeftJoystick() {
