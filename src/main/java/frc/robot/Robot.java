@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -17,7 +18,7 @@ import frc.robot.util.ControllerCollection;
  * creating this project, you must also update the manifest file in the resource
  * directory.
  */
-public class Robot extends IterativeRobot {
+public class Robot extends TimedRobot {
 
 	public static final DriveTrain drivetrain = new DriveTrain();
 	// public static final Elevator elevator = new Elevator();
@@ -25,9 +26,9 @@ public class Robot extends IterativeRobot {
 
 	public static OI oi;
 
-	public static Command autonomousCommand;
-	SendableChooser<Command> autoChooser;
-	
+	private static Command autonomousCommand;
+	private SendableChooser<Command> autoChooser;
+
 	public static ControllerCollection ControlsProcessor = null;
 	public static double splinePercentage;
 
@@ -43,8 +44,8 @@ public class Robot extends IterativeRobot {
 		Robot.drivetrain.navX.reset();
 		Robot.drivetrain.leftEncoder.setReverseDirection(true);
 
-		autoChooser = new SendableChooser<Command>();
-		
+		autoChooser = new SendableChooser<>();
+
 		SmartDashboard.putData("Autonomous Mode Selector", autoChooser);
 	}
 
@@ -54,14 +55,14 @@ public class Robot extends IterativeRobot {
 	 * the robot is disabled.
 	 */
 	@Override
-	public void disabledInit() {		
+	public void disabledInit() {
 		System.out.println("Disabled init start");
 		Robot.drivetrain.navX.reset();
 		Robot.drivetrain.leftEncoder.reset();
 		Robot.drivetrain.rightEncoder.reset();
 		Robot.drivetrain.drivetrainSetPowerZero();
 		Scheduler.getInstance().removeAll();
-		
+
 		if(ControlsProcessor != null) {
 			System.out.println("Not Null");
 			ControlsProcessor.cancelAll();
@@ -77,15 +78,15 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void autonomousInit() {
-		
-		autonomousCommand = (Command) autoChooser.getSelected();
+
+		autonomousCommand = autoChooser.getSelected();
 
 		if (autonomousCommand != null) {
 			autonomousCommand.start();
 		}
-		
+
 		generalInit();
-		
+
 	}
 
 	/**
@@ -93,7 +94,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		
+
 		Scheduler.getInstance().run();
 
 	}
@@ -102,7 +103,7 @@ public class Robot extends IterativeRobot {
 	public void teleopInit() {
 		if (autonomousCommand != null)
 			autonomousCommand.cancel();
-		
+
 		generalInit();
 	}
 
@@ -112,7 +113,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
-		
+
 		// Arcade Drive
 		if (Math.abs(oi.getLeftJoystick()) > .05 || Math.abs(oi.getRightJoystick()) > .05) {
 			drivetrain.arcadeDrive(-oi.getLeftJoystick(), oi.getRightJoystick());
@@ -127,15 +128,15 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void testInit() {
-		
-		autonomousCommand = (Command) autoChooser.getSelected();
+
+		autonomousCommand = autoChooser.getSelected();
 
 		if (autonomousCommand != null) {
 			autonomousCommand.start();
 		}
-		
+
 		generalInit();
-		
+
 	}
 
 	/**
@@ -143,12 +144,12 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void testPeriodic() {
-		
+
 
 	}
 
 	//Init function that is used for all types of init(Auton, Teleop, etc.)
-	public void generalInit() {
+	private void generalInit() {
 		if(ControlsProcessor != null) {
 			System.out.println("resuming");
 			ControlsProcessor.stopProcessor = false;
