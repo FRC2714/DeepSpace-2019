@@ -154,7 +154,6 @@ public class DriveTrain extends SubsystemModule {
 						Double.parseDouble(this.args[7]), Double.parseDouble(this.args[8]),
 						Double.parseDouble(this.args[9]), Double.parseDouble(this.args[10]),
 						Double.parseDouble(this.args[11]), true);
-				Robot.drivetrain.enabled = true;
 			}
 
 			@Override
@@ -164,7 +163,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return false;
+				return true;
 			}
 
 			@Override
@@ -184,6 +183,28 @@ public class DriveTrain extends SubsystemModule {
 						Double.parseDouble(this.args[7]), Double.parseDouble(this.args[8]),
 						Double.parseDouble(this.args[9]), Double.parseDouble(this.args[10]),
 						Double.parseDouble(this.args[11]), false);
+			}
+
+			@Override
+			public void execute() {
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				return true;
+			}
+
+			@Override
+			public void end() {
+
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "start_path") {
+
+			@Override
+			public void initialize() {
 				Robot.drivetrain.enabled = true;
 			}
 
@@ -194,7 +215,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return false;
+				return true;
 			}
 
 			@Override
