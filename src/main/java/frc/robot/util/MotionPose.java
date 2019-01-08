@@ -18,24 +18,6 @@ public class MotionPose {
         this.y = y;
     }
 
-    /*
-    // Angle difference utility
-	private double getDifferenceInAngleDegrees(double from, double to) {
-		return boundAngleNeg180to180Degrees(from - to);
-    }
-    
-    // Keep it between 180 degrees
-	private double boundAngleNeg180to180Degrees(double angle) {
-		while (angle >= 180.0) {
-			angle -= 360.0;
-		}
-		while (angle < -180.0) {
-			angle += 360.0;
-		}
-		return angle;
-    }
-    */
-
     public double getOrthogonalDisplacement(double currentX, double currentY) {
         double errorDistance = distanceCalc(this.x, currentX, this.y, currentY);
         double errorY = currentY - this.y;
