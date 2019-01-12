@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -123,6 +122,7 @@ public class Robot extends TimedRobot {
 
 		//System.out.println("encL: " + Robot.drivetrain.leftEncoder.get() + " encR: " + Robot.drivetrain.rightEncoder.get());
 		//System.out.println("X: " + Robot.drivetrain.odometer.current_x+ " Y: " + Robot.drivetrain.odometer.current_y);
+		//System.out.println("gfh: " + Robot.drivetrain.navX.getFusedHeading());
 		//System.out.println(Robot.drivetrain.drivingcontroller.orthogonaldistance);
 	}
 
@@ -168,7 +168,7 @@ public class Robot extends TimedRobot {
 		Robot.drivetrain.odometer.reset();
 
 		//Robot.drivetrain.driveShifter.set(DoubleSolenoid.Value.kReverse);
-		Robot.drivetrain.leftEncoder.setDistancePerPulse(0.0336); //0.00116
-		Robot.drivetrain.rightEncoder.setDistancePerPulse(-0.00105);
+		Robot.drivetrain.leftEncoder.setDistancePerPulse(-0.0502); //0.00116
+		Robot.drivetrain.rightEncoder.setDistancePerPulse(0.001560);
 	}
 }
