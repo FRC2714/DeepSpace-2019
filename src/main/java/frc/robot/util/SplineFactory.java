@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class SplineFactory {
     private double x1, x2, x3, x4, y1, y2, y3, y4, acceleration, velocity;
 
-    private double tolerance = 0.0000001;
+    private double tolerance = 0.00001;
     private double tStep = 0.001;
     private double period = 0.0005;
 
