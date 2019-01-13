@@ -5,6 +5,8 @@ public abstract class Odometer {
 	public double headingAngle;
 	double lastHeadingAngle = 0;
 	double direction;
+
+	public double startOffset = 0;
 	
 	protected double leftDistance, leftPos;
 	double lastLeftPos = 0;
@@ -19,10 +21,11 @@ public abstract class Odometer {
 	
 	public double currentVelocity;
 
-	public Odometer(double startX, double startY) {	
+	public Odometer(double startX, double startY, double startOffset) {
 		
 		this.current_x = startX;
 		this.current_y = startY;
+		this.startOffset = startOffset;
 	}
 	
 	public void reset() {
@@ -37,6 +40,14 @@ public abstract class Odometer {
 	public void integratePosition() {
 		
 		updateEncodersAndHeading();
+
+		this.headingAngle = this.headingAngle + this.startOffset;
+		if (this.headingAngle > 360)
+			this.headingAngle -= 360;
+
+		if (this.headingAngle < 0)
+			this.headingAngle += 360;
+
 
 		leftDistance = (leftPos - lastLeftPos);
 		rightDistance = (rightPos - lastRightPos);

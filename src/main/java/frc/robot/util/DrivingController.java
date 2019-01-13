@@ -5,9 +5,9 @@ import java.util.ArrayList;
 public abstract class DrivingController {
 
 	// Angle and velocity controllers
-	private PID orthogonalControl = new PID(0.065, 0.00001, 0.008);
+	private PID orthogonalControl = new PID(0.035, 0, 0);
 	private PID tangentialControl = new PID(0.0, 0.0, 0.0);
-	private PID velocityControl = new PID(0.3, 0.001, 0.0);
+	private PID velocityControl = new PID(0.6, 0.00, 0.0);
 
 	// Coefficient for angular correction
 	private double kCC = 25;
@@ -43,7 +43,7 @@ public abstract class DrivingController {
 
 		// Move to the next point in the spline
 		next();
-
+		this.controlPath.get(iterator).print();
 		//System.out.println("des: " + ((this.controlPath.get(iterator).angle/Math.PI) * 180) + " curr: " + this.currentAngle);
 
 		// Use tangential correction and velocity control cascaded to control velocity and position.

@@ -47,7 +47,7 @@ public class DriveTrain extends SubsystemModule {
 	}
 
 	// Instantiate odometer and link in encoders and navX
-	public Odometer odometer = new Odometer(0, 0) {
+	public Odometer odometer = new Odometer(0, 0, 0) {
 		public void updateEncodersAndHeading() {
 
 			this.headingAngle = 450 - navX.getFusedHeading();
@@ -142,6 +142,29 @@ public class DriveTrain extends SubsystemModule {
 		 * Robot.drivetrain.driveShifter.set(DoubleSolenoid.Value.kReverse); } };
 		 * 
 		 */
+		new SubsystemCommand(this.registeredCommands, "set_angular_offset") {
+
+			@Override
+			public void initialize() {
+				Robot.drivetrain.odometer.startOffset = Double.parseDouble(this.args[0]);
+				Robot.drivetrain.navX.zeroYaw();
+			}
+
+			@Override
+			public void execute() {
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				return true;
+			}
+
+			@Override
+			public void end() {
+
+			}
+		};
 
 		new SubsystemCommand(this.registeredCommands, "add_forwards_spline") {
 

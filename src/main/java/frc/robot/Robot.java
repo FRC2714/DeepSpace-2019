@@ -121,9 +121,9 @@ public class Robot extends TimedRobot {
 			drivetrain.arcadeDrive(0, 0);
 		}
 
-		//System.out.println("encL: " + Robot.drivetrain.leftEncoder.get() + " encR: " + Robot.drivetrain.rightEncoder.get());
-		//System.out.println("X: " + Robot.drivetrain.odometer.current_x+ " Y: " + Robot.drivetrain.odometer.current_y);
-		//System.out.println(Robot.drivetrain.drivingcontroller.orthogonaldistance);
+		System.out.println("encL: " + Robot.drivetrain.leftEncoder.get() + " encR: " + Robot.drivetrain.rightEncoder.get());
+//		System.out.println("X: " + Robot.drivetrain.odometer.current_x+ " Y: " + Robot.drivetrain.odometer.current_y);
+		//System.out.println(Robot.drivetrain.odometer.headingAngle);
 	}
 
 	@Override
@@ -167,8 +167,7 @@ public class Robot extends TimedRobot {
 		Robot.drivetrain.rightEncoder.reset();
 		Robot.drivetrain.odometer.reset();
 
-		//Robot.drivetrain.driveShifter.set(DoubleSolenoid.Value.kReverse);
-		Robot.drivetrain.leftEncoder.setDistancePerPulse(0.0336); //0.00116
-		Robot.drivetrain.rightEncoder.setDistancePerPulse(-0.00105);
+		Robot.drivetrain.leftEncoder.setDistancePerPulse(-0.0495); //0.00116
+		Robot.drivetrain.rightEncoder.setDistancePerPulse(0.00105);
 	}
 }
