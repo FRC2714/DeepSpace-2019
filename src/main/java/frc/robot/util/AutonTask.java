@@ -9,11 +9,6 @@ public class AutonTask {
 
     private ArrayList<CommandDetails> subtasks = new ArrayList<CommandDetails>();
 
-    //Override this task list with all of the subtasks
-    public void registerTaskList () {
-
-    }
-
     public void queueTask (String command) {
         subtasks.add(new CommandDetails(command));
     }
