@@ -43,7 +43,6 @@ public abstract class DrivingController {
 
 		// Move to the next point in the spline
 		next();
-		this.controlPath.get(iterator).print();
 		//System.out.println("des: " + ((this.controlPath.get(iterator).angle/Math.PI) * 180) + " curr: " + this.currentAngle);
 
 		// Use tangential correction and velocity control cascaded to control velocity and position.

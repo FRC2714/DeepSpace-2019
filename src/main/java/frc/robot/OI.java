@@ -79,8 +79,6 @@ public class OI {
 		this.buttons.add(new JoystickCommandPair("set_angular_offset -s -90", this.start));
 		this.buttons.add(new JoystickCommandPair("add_forwards_spline -s 0,0,0,0,0,0,0,10,5,5,0,0", this.y));
 		this.buttons.add(new JoystickCommandPair("add_forwards_spline -s 4.5,8.5,6,9,0,0,4,11,10,3,3,0", this.x));
-//		this.buttons.add(new JoystickCommandPair("add_backwards_spline -s -1.1,-1.1,-1.1,-2.75,18,18,18,15,15,8,0,0", this.a));
-
 		//this.buttons.add(new JoystickCommandPair("target_point -s 1,1", this.y));
 		this.buttons.add(new JoystickCommandPair("start_path -s", this.b));
 		//this.buttons.add(new JoystickCommandPair("shift_low -s", this.x));

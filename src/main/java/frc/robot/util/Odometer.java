@@ -42,6 +42,7 @@ public abstract class Odometer {
 		updateEncodersAndHeading();
 
 		this.headingAngle = this.headingAngle + this.startOffset;
+		
 		if (this.headingAngle > 360)
 			this.headingAngle -= 360;
 
