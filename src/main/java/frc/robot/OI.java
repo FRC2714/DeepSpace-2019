@@ -71,7 +71,6 @@ public class OI {
 	JoystickButton nbbb12 = new JoystickButton(newButtonBoxB, 3);
 	JoystickButton nbbb13 = new JoystickButton(newButtonBoxB, 2);
 	JoystickButton nbbb14 = new JoystickButton(newButtonBoxB, 1);
-
 	public ArrayList<JoystickCommandPair> buttons = new ArrayList<JoystickCommandPair>();
 
 	public OI() {
@@ -80,8 +79,10 @@ public class OI {
 		this.buttons.add(new JoystickCommandPair("add_forwards_spline -s 0,0,0,0,0,0,0,10,5,5,0,0", this.y));
 		this.buttons.add(new JoystickCommandPair("add_forwards_spline -s 4.5,8.5,6,9,0,0,4,11,10,3,3,0", this.x));
 		//this.buttons.add(new JoystickCommandPair("target_point -s 1,1", this.y));
+		this.buttons.add(new JoystickCommandPair("add_forwards_spline -s 0,0,0,0,0,0,4,4,8,3,0,0", this.y));
+		this.buttons.add(new JoystickCommandPair("add_forwards_spline -s 0,0,5.5,8.75,5,7,1.5,9.5,8,3,0,0", this.x));
+		this.buttons.add(new JoystickCommandPair("add_backwards_spline -s 8.75,5.5,8,8,8,1.5,0,-5,8,3,0,0", this.a));
 		this.buttons.add(new JoystickCommandPair("start_path -s", this.b));
-		//this.buttons.add(new JoystickCommandPair("shift_low -s", this.x));
 
 	}
 
