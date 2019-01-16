@@ -5,9 +5,9 @@ import java.util.ArrayList;
 public abstract class DrivingController {
 
 	// Angle and velocity controllers
-	private PID orthogonalControl = new PID(0.035, 0, 0);
+	private PID orthogonalControl = new PID(0.01, 0.0, 0);
 	private PID tangentialControl = new PID(0.0, 0.0, 0.0);
-	private PID velocityControl = new PID(0.6, 0.00, 0.0);
+	private PID velocityControl = new PID(0.55, 0.0005, 0.0);
 
 	// Coefficient for angular correction
 	private double kCC = 25;
@@ -19,7 +19,7 @@ public abstract class DrivingController {
 	protected double currentAngle;
 	protected double currentAverageVelocity;
 
-	public double orthogonaldistance = 0;
+	public String stringout;
 
 	private int iterator = 0;
 
@@ -31,8 +31,9 @@ public abstract class DrivingController {
 
 		// Set up period
 		this.period = period;
-		this.orthogonalControl.setMaxIOutput(0.1);
-		this.orthogonalControl.setOutputLimits(-0.7, 0.7);
+
+		this.velocityControl.setMaxIOutput(0.1);
+		this.velocityControl.setOutputLimits(-1, 1);
 
 	}
 
@@ -52,7 +53,8 @@ public abstract class DrivingController {
 		double velocityOutput = velocityControl.getOutput(this.currentAverageVelocity, this.controlPath.get(iterator).velocity - 0);
 		double orthogonalOutput = orthogonalControl.getOutput(getDifferenceInAngleDegrees(this.currentAngle, this.controlPath.get(iterator).angle), 0);
 
-		this.orthogonaldistance = getDifferenceInAngleDegrees(this.currentAngle, ((this.controlPath.get(iterator).angle/Math.PI) * 180));
+		this.stringout = "output: " + Double.toString(orthogonalOutput) + " currentAngleDel: " + Double.toString(getDifferenceInAngleDegrees(this.currentAngle, this.controlPath.get(iterator).angle));
+		//System.out.println(getDifferenceInAngleDegrees(this.currentAngle, this.controlPath.get(iterator).angle));
 
 		/*- (this.kCC * Math.pow(this.controlPath.get(iterator).getOrthogonalDisplacement(currentX, currentY), 2))*/
 

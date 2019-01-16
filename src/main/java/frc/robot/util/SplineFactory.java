@@ -104,6 +104,7 @@ public class SplineFactory {
                     angle -= 360;
                 }
             }
+            
             controlPath.add(new MotionPose(angle, velocity, (double)this.xValues.get(i), (double)this.yValues.get(i)));
         }
 

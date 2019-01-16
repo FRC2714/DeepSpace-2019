@@ -120,9 +120,12 @@ public class Robot extends TimedRobot {
 			drivetrain.arcadeDrive(0, 0);
 		}
 
-		System.out.println("encL: " + Robot.drivetrain.leftEncoder.get() + " encR: " + Robot.drivetrain.rightEncoder.get());
+		// System.out.println("encL: " + Robot.drivetrain.leftEncoder.getDistance() + " encR: " + Robot.drivetrain.rightEncoder.getDistance());
 //		System.out.println("X: " + Robot.drivetrain.odometer.current_x+ " Y: " + Robot.drivetrain.odometer.current_y);
-		//System.out.println(Robot.drivetrain.odometer.headingAngle);
+		System.out.println(Robot.drivetrain.drivingcontroller.stringout);
+		//System.out.println(Robot.drivetrain.navX.getFusedHeading());
+		
+
 	}
 
 	@Override
