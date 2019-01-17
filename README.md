@@ -1,4 +1,4 @@
-Java
----
+<b>FRC 2714 Public Competition Code</b>
 
-This example involves building and deploying Java sources. This should be all you need to get started, however there are plenty of resources online for building more advanced java projects should you require.
+Current Test Coverage of Master Branch: 70%
+Feel free to submit issues/feature requests to this repository!
