@@ -19,27 +19,24 @@ public class MotionPose {
     }
 
     public double getOrthogonalDisplacement(double currentX, double currentY) {
-        double errorDistance = distanceCalc(this.x, currentX, this.y, currentY);
-        double errorY = currentY - this.y;
-        double errorX = currentX - this.x;
-        double errorAngle = 180 - Math.sinh(((Math.cos(this.angle) * errorX) + (Math.sin(this.angle) * errorY)) / errorDistance) / Math.PI * 180;
+        double errorY = currentY - y;
+        double errorX = currentX - x;
+        double unitX = Math.cos(Math.toRadians(angle+90));
+        double unitY = Math.sin(Math.toRadians(angle+90));
+        double dotProduct = (unitX*errorX) + (unitY*errorY);
 
-        return Math.sin(errorAngle) * errorDistance;
+        return dotProduct;
     }
 
     public double getTangentialDisplacement(double currentX, double currentY) {
-        double errorDistance = distanceCalc(this.x, currentX, this.y, currentY);
-        double errorY = currentY - this.y;
-        double errorX = currentX - this.x;
-        double errorAngle = 180 - Math.sinh(((Math.cos(this.angle) * errorX) + (Math.sin(this.angle) * errorY)) / errorDistance) / Math.PI * 180;
-
-        return Math.cos(errorAngle) * errorDistance;
+        double errorY = currentY - y;
+        double errorX = currentX - x;
+        double unitX = Math.cos(Math.toRadians(angle));
+        double unitY = Math.sin(Math.toRadians(angle));
+        double dotProduct = (unitX*errorX) + (unitY*errorY);
+        
+        return dotProduct;
     }
-
-    public void print(){
-        System.out.println("V: " + this.angle);
-    }
-
 
     // Calculate distance
     public double distanceCalc(double x1, double x2, double y1, double y2) {
