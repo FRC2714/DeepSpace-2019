@@ -1,6 +1,11 @@
 package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
+import com.revrobotics.CANEncoder;
+import com.revrobotics.CANPIDController;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SPI;
@@ -16,33 +21,77 @@ import frc.robot.util.SubsystemModule;
 
 public class DriveTrain extends SubsystemModule {
 
-	// Motors for DriveTrain
-	public Spark leftDrive1 = new Spark(RobotMap.p_leftDrive1);
-	public Spark leftDrive2 = new Spark(RobotMap.p_leftDrive2);
-	public Spark rightDrive1 = new Spark(RobotMap.p_rightDrive1);
-	public Spark rightDrive2 = new Spark(RobotMap.p_rightDrive2);
+	//DriveTrain Motors
+    private CANSparkMax lMotor0 = new CANSparkMax(0, MotorType.kBrushless);
+    private CANSparkMax lMotor1 = new CANSparkMax(1, MotorType.kBrushless);
+    private CANSparkMax lMotor2 = new CANSparkMax(2, MotorType.kBrushless);
+    private CANSparkMax rMotor0 = new CANSparkMax(3, MotorType.kBrushless);
+    private CANSparkMax rMotor1 = new CANSparkMax(4, MotorType.kBrushless);
+    private CANSparkMax rMotor2 = new CANSparkMax(5, MotorType.kBrushless);
 
-	// Left and Right sides for DriveTrain
-	public SpeedControllerGroup left = new SpeedControllerGroup(leftDrive1, leftDrive2);
-	public SpeedControllerGroup right = new SpeedControllerGroup(rightDrive1, rightDrive2);
+    //PID Controllers
+    private CANPIDController lPidController = lMotor0.getPIDController();
+    private CANPIDController rPidController = rMotor0.getPIDController();
 
-	// The DriveTrain drive
-	public DifferentialDrive drive1 = new DifferentialDrive(left, right);
+    //MAX Encoders
+    private CANEncoder lEncoder = lMotor0.getEncoder();
+	private CANEncoder rEncoder = rMotor0.getEncoder();
+	
+	//Differential Drivetrain
+	private DifferentialDrive drive = new DifferentialDrive(lMotor0, rMotor0);
 
+    //PID Coefficients
+	private double kMinOutput;
+	private double kMaxOutput; 
+
+	private double lKP;
+	private double lKI; 
+	private double lKIS;
+	private double lKD;
+	private double lKFF;
+
+	private double rKP;
+	private double rKI; 
+	private double rKIS;
+	private double rKD;
+	private double rKFF;
+	
 	// Encoders for the motors
-	public Encoder leftEncoder = new Encoder(RobotMap.p_leftEncoderA, RobotMap.p_leftEncoderB, true, EncodingType.k4X);
-	public Encoder rightEncoder = new Encoder(RobotMap.p_rightEncoderA, RobotMap.p_rightEncoderB, true,
+	private Encoder leftEncoder = new Encoder(RobotMap.p_leftEncoderA, RobotMap.p_leftEncoderB, true,
+			EncodingType.k4X);
+	private Encoder rightEncoder = new Encoder(RobotMap.p_rightEncoderA, RobotMap.p_rightEncoderB, true,
 			EncodingType.k4X);
 
-	// Pneumatic for the gearbox
-	//public DoubleSolenoid driveShifter = new DoubleSolenoid(RobotMap.p_driveShifter1, RobotMap.p_driveShifter2);
-
 	// The NavX gyro
-	public AHRS navX = new AHRS(SPI.Port.kMXP);
-
+	private AHRS navX = new AHRS(SPI.Port.kMXP);
+	
 	// Initialize your subsystem here
 	public DriveTrain() {
 		registerCommands();
+		
+		//setting up follow mode!
+		lMotor1.follow(lMotor0);
+		lMotor2.follow(lMotor0);
+		rMotor1.follow(rMotor0);
+		rMotor2.follow(rMotor0);
+
+		//setting up PID coefficients!
+		lPidController.setP(lKP);
+		lPidController.setI(lKI);
+		lPidController.setD(lKD);
+		lPidController.setIZone(lKIS);
+		lPidController.setFF(lKFF);
+		lPidController.setOutputRange(kMinOutput, kMaxOutput);
+
+		rPidController.setP(rKP);
+		rPidController.setI(rKI);
+		rPidController.setD(rKD);
+		rPidController.setIZone(rKIS);
+		rPidController.setFF(rKFF);
+		rPidController.setOutputRange(kMinOutput, kMaxOutput);
+
+
+
 	}
 
 	// Instantiate odometer and link in encoders and navX
@@ -76,7 +125,7 @@ public class DriveTrain extends SubsystemModule {
 		// Link autonomous driving controller to the drive train motor control
 		@Override
 		public void driveRobot(double power, double pivot) {
-			drive1.arcadeDrive(power, pivot, false);
+			drive.arcadeDrive(power, pivot, false);
 		}
 	};
 
@@ -96,51 +145,25 @@ public class DriveTrain extends SubsystemModule {
 
 	// General arcade drive
 	public void arcadeDrive(double power, double pivot) {
-		drive1.arcadeDrive(power, pivot);
+		drive.arcadeDrive(power, pivot);
 	}
 
 	// Sets drive train to 0
-	public void drivetrainSetPowerZero() {
-		left.set(0);
-		right.set(0);
+	public void drivetrainDisable() {
+		lMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
+		rMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
+
+		lMotor0.set(0);
+		rMotor0.set(0);
+	}
+
+	public void drivetrainEnable() {
+		lMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
+		rMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
 	}
 
 	@Override
 	public void registerCommands() {
-
-		/*
-		 * 
-		 * // High Gear new SubsystemCommand(this.registeredCommands, "shift_high", 0) {
-		 * int doneTransition = 0;
-		 * 
-		 * @Override public void initialize() {
-		 * Robot.drivetrain.leftEncoder.setDistancePerPulse(-0.0011146); //0.00116
-		 * Robot.drivetrain.rightEncoder.setDistancePerPulse(0.0011181); //.00115
-		 * 
-		 * //Robot.drivetrain.driveShifter.set(DoubleSolenoid.Value.kForward); }
-		 * 
-		 * @Override public void execute() { if(doneTransition <= 0) {
-		 * if((Math.abs(Robot.drivetrain.leftEncoder.getRate() +
-		 * Robot.drivetrain.rightEncoder.getRate())/2)>12){
-		 * Robot.drivetrain.driveShifter.set(DoubleSolenoid.Value.kForward);
-		 * doneTransition = 700; } if((Math.abs(Robot.drivetrain.leftEncoder.getRate() +
-		 * Robot.drivetrain.rightEncoder.getRate())/2)<8){
-		 * Robot.drivetrain.driveShifter.set(DoubleSolenoid.Value.kReverse);
-		 * doneTransition = 700; } } else { doneTransition--; } }
-		 * 
-		 * @Override public void end() {
-		 * Robot.drivetrain.driveShifter.set(DoubleSolenoid.Value.kReverse);
-		 * Robot.drivetrain.leftEncoder.setDistancePerPulse(-0.000623); //0.00116
-		 * Robot.drivetrain.rightEncoder.setDistancePerPulse(0.000610); //.00115 }
-		 * 
-		 * @Override public boolean isFinished() { return false; } };
-		 * 
-		 * // Low Gear new SubsystemCommand(this.registeredCommands, "shift_low", 0) {
-		 * 
-		 * @Override public void initialize() {
-		 * Robot.drivetrain.driveShifter.set(DoubleSolenoid.Value.kReverse); } };
-		 * 
-		 */
 		new SubsystemCommand(this.registeredCommands, "set_angular_offset") {
 
 			@Override
