@@ -4,6 +4,7 @@ import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
@@ -55,7 +56,10 @@ public class DriveTrain extends SubsystemModule {
 	private double rKIS;
 	private double rKD;
 	private double rKFF;
-	
+
+	private double wheelSeparation = 2;
+
+
 	// Encoders for the motors
 	private Encoder leftEncoder = new Encoder(RobotMap.p_leftEncoderA, RobotMap.p_leftEncoderB, true,
 			EncodingType.k4X);
@@ -146,6 +150,24 @@ public class DriveTrain extends SubsystemModule {
 	// General arcade drive
 	public void arcadeDrive(double power, double pivot) {
 		drive.arcadeDrive(power, pivot);
+	}
+
+	//closed loop velocity based tank
+	public void closedLoopTank(double leftVelocity, double rightVelocity){
+		lPidController.setReference(leftVelocity, ControlType.kVelocity);
+		rPidController.setReference(rightVelocity, ControlType.kVelocity);
+	}
+
+	//closed loop arcade based tank
+	public void closedLoopArcade(double velocity, double rps){
+		double pivot = Math.PI * wheelSeparation * rps;
+		closedLoopTank(velocity - pivot, velocity + pivot);
+	}
+
+	public void getEncoderValues(){
+
+		System.out.println("LE: " + lEncoder.getPosition() + " RE: " + rEncoder.getPosition());
+
 	}
 
 	// Sets drive train to 0
