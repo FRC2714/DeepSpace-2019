@@ -38,10 +38,6 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		oi = new OI();
-		Robot.drivetrain.leftEncoder.reset();
-		Robot.drivetrain.rightEncoder.reset();
-		Robot.drivetrain.navX.reset();
-		Robot.drivetrain.leftEncoder.setReverseDirection(true);
 
 		autoChooser = new SendableChooser<>();
 
@@ -169,7 +165,7 @@ public class Robot extends TimedRobot {
 		Robot.drivetrain.rightEncoder.reset();
 		Robot.drivetrain.odometer.reset();
 
-		Robot.drivetrain.leftEncoder.setDistancePerPulse(-0.0495); // 0.00116
+		Robot.drivetrain.lEncoder.setDistancePerPulse(-0.0495); // 0.00116
 		Robot.drivetrain.rightEncoder.setDistancePerPulse(0.00105);
 	}
 }

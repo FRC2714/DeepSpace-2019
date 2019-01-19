@@ -143,6 +143,16 @@ public class DriveTrain extends SubsystemModule {
 		}
 	}
 
+	// 
+	public void initializeDriveTrain() {
+		leftEncoder.reset();
+		rightEncoder.reset();
+		navX.reset();
+
+		lMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
+		rMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
+	}
+
 	// General arcade drive
 	public void arcadeDrive(double power, double pivot) {
 		drive.arcadeDrive(power, pivot);
@@ -166,18 +176,12 @@ public class DriveTrain extends SubsystemModule {
 	}
 
 	// Disable drivetrain
-	public void drivetrainDisable() {
+	public void drivetrainDestruct() {
 		lMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		rMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
 		lMotor0.set(0);
 		rMotor0.set(0);
-	}
-
-	// Enable drivetrain
-	public void drivetrainEnable() {
-		lMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
-		rMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
 	}
 
 	@Override
