@@ -27,15 +27,15 @@ public class SplineFactory {
         this.y3 = y3;
         this.y4 = y4;
 
-        this.acceleration = acceleration * period;
-        this.velocity = maxVelocity * period;
+        this.acceleration = acceleration  period;
+        this.velocity = maxVelocity  period;
 
         // Fill point buffer
         double backT = 1;
         double frontT = 0;
         int placement = 0;
-        double currentFrontVelocity = startVelocity * this.period;
-        double currentBackVelocity = endVelocity * this.period;
+        double currentFrontVelocity = startVelocity  this.period;
+        double currentBackVelocity = endVelocity  this.period;
 
         while (frontT < backT) {
 
@@ -48,11 +48,11 @@ public class SplineFactory {
             // A is the profile acceleration
 
             if (currentFrontVelocity < this.velocity) {
-                currentFrontVelocity += this.acceleration * this.period;
+                currentFrontVelocity += this.acceleration  this.period;
             }
 
             if (currentBackVelocity < this.velocity) {
-                currentBackVelocity += this.acceleration * this.period;
+                currentBackVelocity += this.acceleration  this.period;
             }
 
             // Find front and back position
@@ -87,18 +87,18 @@ public class SplineFactory {
             }
 
             if (changeX < 0) {
-                angle = (Math.atan(changeY / changeX) / Math.PI * 180) + 180;
+                angle = (Math.atan(changeY / changeX) / Math.PI  180) + 180;
             } else if (changeY > 0) {
-                angle = Math.atan(changeY / changeX) / Math.PI * 180;
+                angle = Math.atan(changeY / changeX) / Math.PI  180;
             } else {
-                angle = (Math.atan(changeY / changeX) / Math.PI * 180) + 360;
+                angle = (Math.atan(changeY / changeX) / Math.PI  180) + 360;
             }
 
             double velocity = distanceCalc(this.xValues.get(i + 1), this.xValues.get(i), this.yValues.get(i + 1),
                     this.yValues.get(i)) / period;
 
             if (!forwards) {
-                velocity *= -1;
+                velocity = -1;
                 angle += 180;
                 if (angle > 360) {
                     angle -= 360;
@@ -134,21 +134,21 @@ public class SplineFactory {
 
         do {
 
-            if (distanceDelta * inverted < 0) {
+            if (distanceDelta  inverted < 0) {
                 // Past target
                 direction = -1;
                 if (direction != lastDirection) {
-                    tStep_modified *= 0.5;
+                    tStep_modified = 0.5;
                 }
             } else {
                 // Not past target
                 direction = 1;
                 if (direction != lastDirection) {
-                    tStep_modified *= 0.5;
+                    tStep_modified = 0.5;
                 }
             }
 
-            internalT += tStep_modified * direction;
+            internalT += tStep_modified  direction;
 
             newX = quarticCalc(internalT, this.x1, this.x2, this.x3, this.x4);
             newY = quarticCalc(internalT, this.y1, this.y2, this.y3, this.y4);
@@ -168,8 +168,8 @@ public class SplineFactory {
 
     // Calculate quartic spline point with 4 controls
     public double quarticCalc(double t, double c1, double c2, double c3, double c4) {
-        return (Math.pow(1 - t, 3) * c1) + 3 * (Math.pow(1 - t, 2) * t * c2) + 3 * (Math.pow(t, 2) * (1 - t) * c3)
-                + (Math.pow(t, 3) * c4);
+        return (Math.pow(1 - t, 3)  c1) + 3  (Math.pow(1 - t, 2)  t  c2) + 3  (Math.pow(t, 2)  (1 - t)  c3)
+                + (Math.pow(t, 3)  c4);
     }
 
     // Calculate distance

@@ -45,7 +45,7 @@ public abstract class DrivingController {
 		// Move to the next point in the spline
 		next();
 		// System.out.println("des: " + ((this.controlPath.get(iterator).angle/Math.PI)
-		// * 180) + " curr: " + this.currentAngle);
+		//  180) + " curr: " + this.currentAngle);
 
 		// Use tangential correction and velocity control cascaded to control velocity
 		// and position.
@@ -64,7 +64,7 @@ public abstract class DrivingController {
 		// System.out.println(getDifferenceInAngleDegrees(this.currentAngle,
 		// this.controlPath.get(iterator).angle));
 
-		/*- (this.kCC * Math.pow(this.controlPath.get(iterator).getOrthogonalDisplacement(currentX, currentY), 2))*/
+		/- (this.kCC  Math.pow(this.controlPath.get(iterator).getOrthogonalDisplacement(currentX, currentY), 2))/
 
 		driveRobot(velocityOutput, -orthogonalOutput);
 
@@ -98,36 +98,36 @@ public abstract class DrivingController {
 				startVelocity, endVelocity, forwards);
 	}
 
-	/*
-	 * 
-	 * 
-	 * // Calculate correction angle private void getAngleCorrection(double
-	 * targetAngle) { this.deltaToAngle =
-	 * getDifferenceInAngleDegrees(this.currentAngle, targetAngle);
-	 * 
-	 * if (this.deltaToAngle < -90) { this.deltaToAngle += 180; this.ahead = -1; }
-	 * else if (this.deltaToAngle > 90) { this.deltaToAngle -= 180; this.ahead = -1;
-	 * } else { this.ahead = 1; } }
-	 * 
-	 * 
-	 * public double getAngleVector(int segments) { double deltaX, deltaY; double
-	 * angleVector;
-	 * 
-	 * deltaX = this.xValues.get(this.iterator + segments) -
-	 * this.xValues.get(this.iterator); deltaY = this.yValues.get(this.iterator +
-	 * segments) - this.yValues.get(this.iterator);
-	 * 
-	 * if (deltaY == 0) { if (deltaX > 0) { angleVector = 0; } else { angleVector =
-	 * 180; } } else if (deltaX == 0) { if (deltaY > 0) { angleVector = 90; } else {
-	 * angleVector = 270; } }
-	 * 
-	 * if (deltaX < 0) { angleVector = (Math.atan(deltaY / deltaX) / Math.PI * 180)
-	 * + 180; } else if (deltaY > 0) { angleVector = (Math.atan(deltaY / deltaX) /
-	 * Math.PI * 180); } else { angleVector = (Math.atan(deltaY / deltaX) / Math.PI
-	 * * 180) + 360; }
-	 * 
-	 * return angleVector; }
-	 */
+	/
+	  
+	  
+	  // Calculate correction angle private void getAngleCorrection(double
+	  targetAngle) { this.deltaToAngle =
+	  getDifferenceInAngleDegrees(this.currentAngle, targetAngle);
+	  
+	  if (this.deltaToAngle < -90) { this.deltaToAngle += 180; this.ahead = -1; }
+	  else if (this.deltaToAngle > 90) { this.deltaToAngle -= 180; this.ahead = -1;
+	  } else { this.ahead = 1; } }
+	  
+	  
+	  public double getAngleVector(int segments) { double deltaX, deltaY; double
+	  angleVector;
+	  
+	  deltaX = this.xValues.get(this.iterator + segments) -
+	  this.xValues.get(this.iterator); deltaY = this.yValues.get(this.iterator +
+	  segments) - this.yValues.get(this.iterator);
+	  
+	  if (deltaY == 0) { if (deltaX > 0) { angleVector = 0; } else { angleVector =
+	  180; } } else if (deltaX == 0) { if (deltaY > 0) { angleVector = 90; } else {
+	  angleVector = 270; } }
+	  
+	  if (deltaX < 0) { angleVector = (Math.atan(deltaY / deltaX) / Math.PI  180)
+	  + 180; } else if (deltaY > 0) { angleVector = (Math.atan(deltaY / deltaX) /
+	  Math.PI  180); } else { angleVector = (Math.atan(deltaY / deltaX) / Math.PI
+	   180) + 360; }
+	  
+	  return angleVector; }
+	 /
 
 	public void next() {
 		this.iterator++;

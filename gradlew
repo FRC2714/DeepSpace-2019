@@ -2,7 +2,7 @@
 
 ##############################################################################
 ##
-##  Gradle start up script for UN*X
+##  Gradle start up script for UNX
 ##
 ##############################################################################
 
@@ -12,8 +12,8 @@ PRG="$0"
 # Need this for relative symlinks.
 while [ -h "$PRG" ] ; do
     ls=`ls -ld "$PRG"`
-    link=`expr "$ls" : '.*-> \(.*\)$'`
-    if expr "$link" : '/.*' > /dev/null; then
+    link=`expr "$ls" : '.-> \(.\)$'`
+    if expr "$link" : '/.' > /dev/null; then
         PRG="$link"
     else
         PRG=`dirname "$PRG"`"/$link"
@@ -34,12 +34,12 @@ DEFAULT_JVM_OPTS='"-Xmx64m"'
 MAX_FD="maximum"
 
 warn () {
-    echo "$*"
+    echo "$"
 }
 
 die () {
     echo
-    echo "$*"
+    echo "$"
     echo
     exit 1
 }
@@ -50,16 +50,16 @@ msys=false
 darwin=false
 nonstop=false
 case "`uname`" in
-  CYGWIN* )
+  CYGWIN )
     cygwin=true
     ;;
-  Darwin* )
+  Darwin )
     darwin=true
     ;;
-  MINGW* )
+  MINGW )
     msys=true
     ;;
-  NONSTOP* )
+  NONSTOP )
     nonstop=true
     ;;
 esac

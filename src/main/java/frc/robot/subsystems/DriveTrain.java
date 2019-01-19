@@ -10,9 +10,8 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.Spark;
-import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import frc.robot.RobotMap;
 import frc.robot.util.DrivingController;
@@ -57,6 +56,8 @@ public class DriveTrain extends SubsystemModule {
 	private double rKD;
 	private double rKFF;
 
+	private int debugMode;
+
 	// Robot characteristics
 	private double wheelSeparation = 2;
 
@@ -92,45 +93,56 @@ public class DriveTrain extends SubsystemModule {
 		rPidController.setIZone(rKIS);
 		rPidController.setFF(rKFF);
 		rPidController.setOutputRange(kMinOutput, kMaxOutput);
+
+		// SmartDashboard configuration
+		SmartDashboard.putNumber("Left P Gain", lKP);
+		SmartDashboard.putNumber("Left I Gain", lKI);
+		SmartDashboard.putNumber("Left D Gain", lKD);
+		SmartDashboard.putNumber("Left I Zone", lKIS);
+		SmartDashboard.putNumber("Left Feed Forward", lKFF);
+
+		SmartDashboard.putNumber("Right P Gain", rKP);
+		SmartDashboard.putNumber("Right I Gain", rKI);
+		SmartDashboard.putNumber("Right D Gain", rKD);
+		SmartDashboard.putNumber("Right I Zone", rKIS);
+		SmartDashboard.putNumber("Right Feed Forward", rKFF);
+
+		SmartDashboard.putNumber("Max Output", kMaxOutput);
+		SmartDashboard.putNumber("Min Output", kMinOutput);
+		SmartDashboard.putNumber("Debug Mode", debugMode);
 	}
 
 	// Instantiate odometer and link in encoders and navX
-	public Odometer odometer = new Odometer(0, 0, 0) {
+	public Odometer odometer = new Odometer(0,0,0) {
+
 		public void updateEncodersAndHeading() {
-
-			this.headingAngle = 450 - navX.getFusedHeading();
-			if (this.headingAngle > 360)
-				this.headingAngle -= 360;
-
-			this.leftPos = leftEncoder.getDistance();
-			this.rightPos = rightEncoder.getDistance();
-
-			this.currentVelocity = 0.5 * (leftEncoder.getRate() + rightEncoder.getRate());
+			this.headingAngle = 450-navX.getFusedHeading();if(this.headingAngle>360)this.headingAngle-=360;
+			this.leftPos=leftEncoder.getDistance();this.rightPos=rightEncoder.getDistance();
+			this.currentVelocity = 0.5(leftEncoder.getRate()+rightEncoder.getRate());
 		}
+
 	};
 
 	// Instantiate point controller for autonomous driving
-	public DrivingController drivingcontroller = new DrivingController(0.0005) {
+	public DrivingController drivingcontroller=new DrivingController(0.0005) {
 
 		// Use output from odometer and pass into autonomous driving controller
 		@Override
-		public void updateVariables() {
+		public void updateVariables(){
 			this.currentX = odometer.current_x;
 			this.currentY = odometer.current_y;
 			this.currentAverageVelocity = odometer.currentVelocity;
-
-			this.currentAngle = Robot.drivetrain.odometer.headingAngle;
+			this.currentAngle = odometer.headingAngle;
 		}
 
 		// Link autonomous driving controller to the drive train motor control
 		@Override
-		public void driveRobot(double power, double pivot) {
-			drive.arcadeDrive(power, pivot, false);
+		public void driveRobot(double power,double pivot) {
+			drive.arcadeDrive(power,pivot,false);
 		}
 	};
-
-	// Subsystem run function, use controller collection (multi-threaded at fast
-	// period)
+	
+	// Subsystem run function, use controller collection (multi-threaded at fast period)
 	@Override
 	public void run() {
 
@@ -143,14 +155,54 @@ public class DriveTrain extends SubsystemModule {
 		}
 	}
 
-	// 
-	public void initializeDriveTrain() {
+	// Setup initial state of the drivetrain
+	public void drivetrainInit() {
 		leftEncoder.reset();
 		rightEncoder.reset();
 		navX.reset();
+		navX.zeroYaw();
+
+		leftEncoder.setDistancePerPulse(0);
+		rightEncoder.setDistancePerPulse(0);
 
 		lMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
 		rMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
+	}
+
+	// Pull values from SmartDashboard
+	public void configureCoefficients() {
+		double lP = SmartDashboard.getNumber("Left P Gain", 0);
+		double lI = SmartDashboard.getNumber("Left I Gain", 0);
+		double lD = SmartDashboard.getNumber("Left D Gain", 0);
+		double lIS = SmartDashboard.getNumber("Left I Saturation", 0);
+		double lFF = SmartDashboard.getNumber("Left Feed Forward", 0);
+
+		double rP = SmartDashboard.getNumber("Right P Gain", 0);
+		double rI = SmartDashboard.getNumber("Right I Gain", 0);
+		double rD = SmartDashboard.getNumber("Right D Gain", 0);
+		double rIS = SmartDashboard.getNumber("Right I Saturation", 0);
+		double rFF = SmartDashboard.getNumber("Right Feed Forward", 0);
+						
+		double max = SmartDashboard.getNumber("Max Output", 0);
+		double min = SmartDashboard.getNumber("Min Output", 0);
+	
+		// If PID coefficients on SmartDashboard have changed, write new values to controller
+		if (lP != lKP) { lPidController.setP(lP); lKP = lP; }						
+		if (lI != lKI) { lPidController.setI(lI); lKI = lI; }
+		if (lD != lKD) { lPidController.setD(lD); lKD = lD; }			
+		if (lIS != lKIS) { lPidController.setIZone(lIS); lKIS = lIS; }
+		if (lFF != lKFF) { lPidController.setFF(lFF); lKFF = lFF; }
+
+		if (rP != rKP) { rPidController.setP(rP); rKP = rP; }
+		if (rI != rKI) { rPidController.setI(rI); rKI = rI; }
+		if (rD != rKD) { rPidController.setD(rD); rKD = rD; }
+		if (rIS != rKIS) { rPidController.setIZone(rIS); rKIS = rIS;}
+		if (rFF != rKFF) { rPidController.setFF(rFF); rKFF = rFF; }
+						
+		if ((max != kMaxOutput) || (min != kMinOutput)) { 
+			lPidController.setOutputRange(min, max); 
+			kMinOutput = min; kMaxOutput = max;
+		}
 	}
 
 	// General arcade drive
@@ -160,13 +212,23 @@ public class DriveTrain extends SubsystemModule {
 
 	// Closed loop velocity based tank
 	public void closedLoopTank(double leftVelocity, double rightVelocity) {
+
+		debugMode = SmartDashboard.getNumber("DebugMode," 0);			
+		
+		if(debugMode == 0){
+			configureCoefficients();																			
+		}
+		else if(debugMode == 1){
+			debugMode.reset();
+		}
+				
 		lPidController.setReference(leftVelocity, ControlType.kVelocity);
 		rPidController.setReference(rightVelocity, ControlType.kVelocity);
 	}
 
 	// Closed loop arcade based tank
 	public void closedLoopArcade(double velocity, double rps) {
-		double pivot = Math.PI * wheelSeparation * rps;
+		double pivot = Math.PI  wheelSeparation  rps;
 		closedLoopTank(velocity - pivot, velocity + pivot);
 	}
 
@@ -190,8 +252,8 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				Robot.drivetrain.odometer.startOffset = Double.parseDouble(this.args[0]);
-				Robot.drivetrain.navX.zeroYaw();
+				odometer.startOffset = Double.parseDouble(this.args[0]);
+				navX.zeroYaw();
 			}
 
 			@Override
@@ -214,13 +276,12 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				Robot.drivetrain.drivingcontroller.addSpline(Double.parseDouble(this.args[0]),
-						Double.parseDouble(this.args[1]), Double.parseDouble(this.args[2]),
-						Double.parseDouble(this.args[3]), Double.parseDouble(this.args[4]),
-						Double.parseDouble(this.args[5]), Double.parseDouble(this.args[6]),
-						Double.parseDouble(this.args[7]), Double.parseDouble(this.args[8]),
-						Double.parseDouble(this.args[9]), Double.parseDouble(this.args[10]),
-						Double.parseDouble(this.args[11]), true);
+				drivingcontroller.addSpline(Double.parseDouble(this.args[0]), Double.parseDouble(this.args[1]),
+						Double.parseDouble(this.args[2]), Double.parseDouble(this.args[3]),
+						Double.parseDouble(this.args[4]), Double.parseDouble(this.args[5]),
+						Double.parseDouble(this.args[6]), Double.parseDouble(this.args[7]),
+						Double.parseDouble(this.args[8]), Double.parseDouble(this.args[9]),
+						Double.parseDouble(this.args[10]), Double.parseDouble(this.args[11]), true);
 			}
 
 			@Override
@@ -243,13 +304,12 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				Robot.drivetrain.drivingcontroller.addSpline(Double.parseDouble(this.args[0]),
-						Double.parseDouble(this.args[1]), Double.parseDouble(this.args[2]),
-						Double.parseDouble(this.args[3]), Double.parseDouble(this.args[4]),
-						Double.parseDouble(this.args[5]), Double.parseDouble(this.args[6]),
-						Double.parseDouble(this.args[7]), Double.parseDouble(this.args[8]),
-						Double.parseDouble(this.args[9]), Double.parseDouble(this.args[10]),
-						Double.parseDouble(this.args[11]), false);
+				drivingcontroller.addSpline(Double.parseDouble(this.args[0]), Double.parseDouble(this.args[1]),
+						Double.parseDouble(this.args[2]), Double.parseDouble(this.args[3]),
+						Double.parseDouble(this.args[4]), Double.parseDouble(this.args[5]),
+						Double.parseDouble(this.args[6]), Double.parseDouble(this.args[7]),
+						Double.parseDouble(this.args[8]), Double.parseDouble(this.args[9]),
+						Double.parseDouble(this.args[10]), Double.parseDouble(this.args[11]), false);
 			}
 
 			@Override
@@ -272,7 +332,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				Robot.drivetrain.enabled = true;
+				enabled = true;
 			}
 
 			@Override

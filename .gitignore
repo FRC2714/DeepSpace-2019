@@ -9,9 +9,9 @@ sysProps.xml
 workbench.xmi
 
 # IDE
-*.ipr
-*.iml
-*.iws
+.ipr
+.iml
+.iws
 out/
 tmp/
 .settings/
@@ -28,7 +28,7 @@ gradle/.launch/
 # OS Files
 .DS_Store
 .DS_Store?
-._*
+._
 .Spotlight-V100
 .AppleDouble
 .LSOverride
@@ -37,7 +37,7 @@ ehthumbs.db
 Thumbs.db
 
 # backup files
-*~
+~
 
 # directory for XML generated after running junit tests through ant
 junit/
@@ -45,8 +45,8 @@ junit/
 
 
 # ignore build folder
-# build/*
-# .gradle/*
-# .settings/*
-# .vscode/*
+# build/
+# .gradle/
+# .settings/
+# .vscode/
 # .project

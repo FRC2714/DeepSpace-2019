@@ -33,7 +33,7 @@ public abstract class Odometer {
 		this.current_y = 0;
 	}
 
-	// Update with getFusedHeading, leftPos, rightPos, and velocity (0.5 * rates)
+	// Update with getFusedHeading, leftPos, rightPos, and velocity (0.5  rates)
 	public abstract void updateEncodersAndHeading();
 
 	// Integrate the position of the robot using the distance from each encoder.
@@ -54,11 +54,11 @@ public abstract class Odometer {
 
 		hypotenuseDistance = (leftDistance + rightDistance) / 2;
 
-		// change_x = (Math.cos((headingAngle * Math.PI) / 180) * hypotenuseDistance);
-		// change_y = (Math.sin((headingAngle * Math.PI) / 180) * hypotenuseDistance);
+		// change_x = (Math.cos((headingAngle  Math.PI) / 180)  hypotenuseDistance);
+		// change_y = (Math.sin((headingAngle  Math.PI) / 180)  hypotenuseDistance);
 
-		change_x = (Math.cos(Math.toRadians(headingAngle)) * hypotenuseDistance);
-		change_y = (Math.sin(Math.toRadians(headingAngle)) * hypotenuseDistance);
+		change_x = (Math.cos(Math.toRadians(headingAngle))  hypotenuseDistance);
+		change_y = (Math.sin(Math.toRadians(headingAngle))  hypotenuseDistance);
 
 		current_x = current_x + change_x;
 		current_y = current_y + change_y;

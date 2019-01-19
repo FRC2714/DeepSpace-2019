@@ -13,10 +13,12 @@ public class AutonTask {
         subtasks.add(new CommandDetails(command));
     }
 
+    /*
     public void run() {
         for (CommandDetails v : subtasks) {
             Robot.ControlsProcessor.commandQueue.add(v);
         }
     }
+    */
 
 }
