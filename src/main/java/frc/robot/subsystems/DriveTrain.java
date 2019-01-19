@@ -123,6 +123,9 @@ public class DriveTrain extends SubsystemModule {
 
 			this.leftPos=leftEncoder.getDistance();
 			this.rightPos=rightEncoder.getDistance();
+
+			this.currentAverageVelocity = (leftEncoder.getRate() + rightEncoder.getRate()) / 2;
+	
 		}
 
 	};
@@ -136,6 +139,7 @@ public class DriveTrain extends SubsystemModule {
 			this.currentX = odometer.getCurrentX();
 			this.currentY = odometer.getCurrentY();
 			this.currentAngle = odometer.getHeadingAngle();
+			this.currentAverageVelocity = odometer.getCurrentAverageVelocity();
 		}
 
 		// Link autonomous driving controller to the drive train motor control
@@ -152,8 +156,8 @@ public class DriveTrain extends SubsystemModule {
 		navX.reset();
 		navX.zeroYaw();
 
-		leftEncoder.setDistancePerPulse(0);
-		rightEncoder.setDistancePerPulse(0);
+		leftEncoder.setDistancePerPulse(-0.0495);
+		rightEncoder.setDistancePerPulse(0.00105);
 
 		lMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
 		rMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
@@ -294,7 +298,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
-
+				
 			}
 		};
 

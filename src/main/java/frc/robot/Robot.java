@@ -33,7 +33,13 @@ public class Robot extends TimedRobot {
 		autoChooser = new SendableChooser<>();
 		SmartDashboard.putData("Autonomous Mode Selector", autoChooser);
 
-		ControlsProcessor = new ControlsProcessor(500000, 1);
+		ControlsProcessor = new ControlsProcessor(500000, 1) {
+			@Override
+			public void registerOperatorControls() {
+				append("add_forwards_spline -s 0,0,0,0,0,0,0,2,8,8,0,0", this.y);
+				append("start_path -s", this.b);
+			}
+		};
 		ControlsProcessor.registerController("DriveTrain", drivetrain);
 		ControlsProcessor.start();
 	}
@@ -87,6 +93,11 @@ public class Robot extends TimedRobot {
 
 		Scheduler.getInstance().run();
 
+		if(Math.abs(ControlsProcessor.getLeftJoystick()) >= 0.1 || Math.abs(ControlsProcessor.getRightJoystick()) >= 0.1){
+			System.out.println("teleop control");
+			drivetrain.arcadeDrive(-ControlsProcessor.getLeftJoystick(), ControlsProcessor.getRightJoystick());
+		}
+
 	}
 
 	@Override
@@ -111,8 +122,6 @@ public class Robot extends TimedRobot {
 	private void generalInit() {
 		if (ControlsProcessor != null) {
 			ControlsProcessor.enable();
-		} else {
-
 		}
 
 		drivetrain.init();

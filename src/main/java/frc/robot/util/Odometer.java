@@ -14,6 +14,7 @@ public abstract class Odometer {
 	private double lastRightPos = 0;
 
 	private double hypotenuseDistance;
+	protected double currentAverageVelocity;
 
 	private double change_x, change_y;
 	private double current_x, current_y;
@@ -75,5 +76,9 @@ public abstract class Odometer {
 
 	public double getHeadingAngle() {
 		return headingAngle;
+	}
+
+	public double getCurrentAverageVelocity() {
+		return currentAverageVelocity;
 	}
 }

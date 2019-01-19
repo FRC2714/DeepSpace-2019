@@ -8,6 +8,9 @@ public class SplineFactory {
     private boolean forwards;
     private ArrayList<MotionPose> controlPath;
 
+    private double frontT = 0;
+    private double backT = 1;
+
     private double tolerance = 0.00001;
     private double tStep = 0.001;
     private double period = 0.0005;
@@ -39,13 +42,13 @@ public class SplineFactory {
         this.controlPath = controlPath;
         this.forwards = forwards;
 
+        generate();
+
     }
 
     public void generate() {
 
         // Fill point buffer
-        double backT = 1;
-        double frontT = 0;
         int placement = 0;
 
         while (frontT < backT) {
@@ -58,12 +61,12 @@ public class SplineFactory {
             // PT and VT, are the position and velocity at time T
             // A is the profile acceleration
 
-            if (currentFrontVelocity < velocity) {
-                currentFrontVelocity += acceleration * period;
+            if (currentFrontVelocity < this.velocity) {
+                currentFrontVelocity += this.acceleration * this.period;
             }
 
-            if (currentBackVelocity < velocity) {
-                currentBackVelocity += acceleration * period;
+            if (currentBackVelocity < this.velocity) {
+                currentBackVelocity += this.acceleration * this.period;
             }
 
             // Find front and back position
@@ -71,9 +74,10 @@ public class SplineFactory {
             backT = binaryFind(backT, -currentBackVelocity, placement + 1, xValues, yValues);
             placement++;
 
+
         }
 
-        System.out.println("done generating");
+        System.out.println("done");
 
         for (int i = 0; i < xValues.size() - 1; i++) {
 
@@ -122,8 +126,7 @@ public class SplineFactory {
 
     }
 
-    public double binaryFind(double startT, double distance, int location, ArrayList<Double> xValues,
-            ArrayList<Double> yValues) {
+    public double binaryFind(double startT, double distance, int location, ArrayList<Double> xValues, ArrayList<Double> yValues) {
         double internalT = startT;
         double tStep_modified = this.tStep;
         double inverted = 1;
@@ -149,13 +152,13 @@ public class SplineFactory {
                 // Past target
                 direction = -1;
                 if (direction != lastDirection) {
-                    tStep_modified = 0.5;
+                    tStep_modified *= 0.5;
                 }
             } else {
                 // Not past target
                 direction = 1;
                 if (direction != lastDirection) {
-                    tStep_modified = 0.5;
+                    tStep_modified *= 0.5;
                 }
             }
 
