@@ -53,7 +53,7 @@ public abstract class DrivingController {
 
 		samsonOutput = samsonControl.getOutput(samsonCorrection2 + samsonCorrection3, 0);
 		tangentialOutput = tangentialControl.getOutput(tangentialError, 0);
-
+		
 		driveRobot(refVelocity + tangentialOutput, -(samsonOutput / period));
 	}
 
