@@ -144,8 +144,8 @@ public class DriveTrain extends SubsystemModule {
 
 		// Link autonomous driving controller to the drive train motor control
 		@Override
-		public void driveRobot(double power,double pivot) {
-			drive.arcadeDrive(power,pivot,false);
+		public void driveRobot(double power, double pivot) {
+			closedLoopArcade(power, pivot);
 		}
 	};
 

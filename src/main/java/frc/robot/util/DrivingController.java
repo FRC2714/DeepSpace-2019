@@ -5,13 +5,12 @@ import java.util.ArrayList;
 public abstract class DrivingController {
 
 	// Angle and velocity controllers
-	private PID orthogonalControl = new PID(0.01, 0.0, 0);
+	private PID samsonControl = new PID(0.01, 0.0, 0);
 	private PID tangentialControl = new PID(0.0, 0.0, 0.0);
-	private PID velocityControl = new PID(0.55, 0.0005, 0.0);
 
 	// Coefficients for the kinematic control algorithm
-	private double k1 = 0.5;
-	private double k2 = 1.0;
+	private double k2 = 0.0;
+	private double k3 = 1.0;
 
 	private ArrayList<MotionPose> controlPath = new ArrayList<MotionPose>();
 
@@ -20,6 +19,9 @@ public abstract class DrivingController {
 	protected double currentAngle;
 	protected double currentAverageVelocity;
 
+	private double samsonOutput;
+	private double tangentialOutput;
+
 	private int iterator = 0;
 	private double period;
 
@@ -27,9 +29,6 @@ public abstract class DrivingController {
 
 		// Set up period
 		this.period = period;
-
-		this.velocityControl.setMaxIOutput(0.1);
-		this.velocityControl.setOutputLimits(-1, 1);
 
 	}
 
@@ -42,16 +41,20 @@ public abstract class DrivingController {
 		// Move to the next point in the spline
 		next();
 
-		// Use tangential correction and velocity control cascaded to control velocity
-		// and position.
-		double tangentialOutput = tangentialControl
-				.getOutput(-this.controlPath.get(iterator).getTangentialDisplacement(currentX, currentY), 0);
-		double velocityOutput = velocityControl.getOutput(this.currentAverageVelocity,
-				this.controlPath.get(iterator).velocity - 0);
-		double orthogonalOutput = orthogonalControl
-				.getOutput(getDifferenceInAngleDegrees(this.currentAngle, this.controlPath.get(iterator).angle), 0);
+		// Use tangential correction and velocity control cascaded to control velocity and position.
+		double orthogonalError = controlPath.get(iterator).getOrthogonalDisplacement(currentX, currentY);
+		double tangentialError = controlPath.get(iterator).getTangentialDisplacement(currentX, currentY);
+		
+		double refVelocity = controlPath.get(iterator).velocity;
+		double angleDifference = getDifferenceInAngleDegrees(currentAngle, controlPath.get(iterator).angle);
 
-		driveRobot(velocityOutput, -orthogonalOutput);
+		double samsonCorrection2 = (k2 * orthogonalError * refVelocity) / angleDifference;
+		double samsonCorrection3 = k3 * angleDifference;
+
+		samsonOutput = samsonControl.getOutput(samsonCorrection2 + samsonCorrection3, 0);
+		tangentialOutput = tangentialControl.getOutput(tangentialError, 0);
+
+		driveRobot(refVelocity + tangentialOutput, -(samsonOutput / period));
 	}
 
 	// Abstract functions to move and get position of the robot
