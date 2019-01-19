@@ -6,32 +6,29 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.DriveTrain;
-// import frc.robot.subsystems.Elevator;
-// import frc.robot.subsystems.Intake;
 import frc.robot.util.ControllerCollection;
 
-/
+/*
   The VM is configured to automatically run this class, and to call the
   functions corresponding to each mode, as described in the IterativeRobot
   documentation. If you change the name of this class or the package after
   creating this project, you must also update the manifest file in the resource
   directory.
- /
+*/
 public class Robot extends TimedRobot {
 
-	//Initialize 
+	// Initialize subsystems
 	public DriveTrain drivetrain = new DriveTrain();
 
-	private static Command autonomousCommand;
+	// Initialize auton mode selector
+	private Command autonomousCommand;
 	private SendableChooser<Command> autoChooser;
 
-	public static ControllerCollection ControlsProcessor = null;
-	public static double splinePercentage;
+	// Initialize robot control systems
+	public ControllerCollection ControlsProcessor;
+	public OI ControlInterface;
 
-	/
-	  This function is run when the robot is first started up and should be used
-	  for any initialization code.
-	 /
+	// Init and Periodic functions
 	@Override
 	public void robotInit() {
 
@@ -40,23 +37,16 @@ public class Robot extends TimedRobot {
 		SmartDashboard.putData("Autonomous Mode Selector", autoChooser);
 	}
 
-	/
-	  This function is called once each time the robot enters Disabled mode. You
-	  can use it to reset any subsystem information you want to clear when the
-	  robot is disabled.
-	 /
 	@Override
 	public void disabledInit() {
-		System.out.println("Disabled init start");
 		drivetrain.drivetrainDestruct();
 		Scheduler.getInstance().removeAll();
 
 		if (ControlsProcessor != null) {
-			System.out.println("Not Null");
 			ControlsProcessor.cancelAll();
-			ControlsProcessor.stopProcessor();
+			ControlsProcessor.disable();
 		}
-		System.out.println("Disabled init end");
+		
 	}
 
 	@Override
@@ -77,9 +67,6 @@ public class Robot extends TimedRobot {
 
 	}
 
-	/
-	  This function is called periodically during autonomous
-	 /
 	@Override
 	public void autonomousPeriodic() {
 
@@ -95,9 +82,6 @@ public class Robot extends TimedRobot {
 		generalInit();
 	}
 
-	/
-	  This function is called periodically during operator control
-	 /
 	@Override
 	public void teleopPeriodic() {
 
@@ -118,9 +102,6 @@ public class Robot extends TimedRobot {
 
 	}
 
-	/
-	  This function is called periodically during autonomous
-	 /
 	@Override
 	public void testPeriodic() {
 
@@ -129,11 +110,13 @@ public class Robot extends TimedRobot {
 	// Init function that is used for all types of init(Auton, Teleop, etc.)
 	private void generalInit() {
 		if (ControlsProcessor != null) {
-			ControlsProcessor.stopProcessor = false;
+			ControlsProcessor.enable();
 		} else {
 			ControlsProcessor = new ControllerCollection(500000, 1);
-			ControlsProcessor.registerController("DriveTrain", Robot.drivetrain);
+			ControlsProcessor.registerController("DriveTrain", drivetrain);
 			ControlsProcessor.start();
+
+			ControlInterface = new OI(ControlsProcessor);
 		}
 
 		drivetrain.drivetrainInit();

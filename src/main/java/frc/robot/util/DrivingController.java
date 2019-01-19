@@ -9,8 +9,9 @@ public abstract class DrivingController {
 	private PID tangentialControl = new PID(0.0, 0.0, 0.0);
 	private PID velocityControl = new PID(0.55, 0.0005, 0.0);
 
-	// Coefficient for angular correction
-	private double kCC = 25;
+	// Coefficients for the kinematic control algorithm
+	private double k1 = 0.5;
+	private double k2 = 1.0;
 
 	private ArrayList<MotionPose> controlPath = new ArrayList<MotionPose>();
 
@@ -19,13 +20,8 @@ public abstract class DrivingController {
 	protected double currentAngle;
 	protected double currentAverageVelocity;
 
-	public String stringout;
-
 	private int iterator = 0;
-
 	private double period;
-
-	private int ahead = 1;
 
 	public DrivingController(double period) {
 
@@ -38,20 +34,16 @@ public abstract class DrivingController {
 	}
 
 	// Run function for Driving Controller uses distance and angle controllers
-	// Iterate over the points in the vector
 	public void run() {
+
+		// Update using abstracted functions from the calling class
 		updateVariables();
 
 		// Move to the next point in the spline
 		next();
-		// System.out.println("des: " + ((this.controlPath.get(iterator).angle/Math.PI)
-		//  180) + " curr: " + this.currentAngle);
 
 		// Use tangential correction and velocity control cascaded to control velocity
 		// and position.
-		// Currently, use square of orthogonal error as a correction to modify angle to
-		// reduce error
-		// Need to update to full Samson control algorithm
 		double tangentialOutput = tangentialControl
 				.getOutput(-this.controlPath.get(iterator).getTangentialDisplacement(currentX, currentY), 0);
 		double velocityOutput = velocityControl.getOutput(this.currentAverageVelocity,
@@ -59,16 +51,12 @@ public abstract class DrivingController {
 		double orthogonalOutput = orthogonalControl
 				.getOutput(getDifferenceInAngleDegrees(this.currentAngle, this.controlPath.get(iterator).angle), 0);
 
-		this.stringout = "output: " + Double.toString(orthogonalOutput) + " currentAngleDel: "
-				+ Double.toString(getDifferenceInAngleDegrees(this.currentAngle, this.controlPath.get(iterator).angle));
-		// System.out.println(getDifferenceInAngleDegrees(this.currentAngle,
-		// this.controlPath.get(iterator).angle));
-
-		/- (this.kCC  Math.pow(this.controlPath.get(iterator).getOrthogonalDisplacement(currentX, currentY), 2))/
-
 		driveRobot(velocityOutput, -orthogonalOutput);
-
 	}
+
+	// Abstract functions to move and get position of the robot
+	public abstract void updateVariables();
+	public abstract void driveRobot(double power, double pivot);
 
 	// Angle difference utility
 	private double getDifferenceInAngleDegrees(double from, double to) {
@@ -86,11 +74,6 @@ public abstract class DrivingController {
 		return angle;
 	}
 
-	// Abstract functions to move and get position of the robot
-	public abstract void updateVariables();
-
-	public abstract void driveRobot(double power, double pivot);
-
 	// Set the desired position for the robot
 	public void addSpline(double x1, double x2, double x3, double x4, double y1, double y2, double y3, double y4,
 			double acceleration, double maxVelocity, double startVelocity, double endVelocity, boolean forwards) {
@@ -98,37 +81,7 @@ public abstract class DrivingController {
 				startVelocity, endVelocity, forwards);
 	}
 
-	/
-	  
-	  
-	  // Calculate correction angle private void getAngleCorrection(double
-	  targetAngle) { this.deltaToAngle =
-	  getDifferenceInAngleDegrees(this.currentAngle, targetAngle);
-	  
-	  if (this.deltaToAngle < -90) { this.deltaToAngle += 180; this.ahead = -1; }
-	  else if (this.deltaToAngle > 90) { this.deltaToAngle -= 180; this.ahead = -1;
-	  } else { this.ahead = 1; } }
-	  
-	  
-	  public double getAngleVector(int segments) { double deltaX, deltaY; double
-	  angleVector;
-	  
-	  deltaX = this.xValues.get(this.iterator + segments) -
-	  this.xValues.get(this.iterator); deltaY = this.yValues.get(this.iterator +
-	  segments) - this.yValues.get(this.iterator);
-	  
-	  if (deltaY == 0) { if (deltaX > 0) { angleVector = 0; } else { angleVector =
-	  180; } } else if (deltaX == 0) { if (deltaY > 0) { angleVector = 90; } else {
-	  angleVector = 270; } }
-	  
-	  if (deltaX < 0) { angleVector = (Math.atan(deltaY / deltaX) / Math.PI  180)
-	  + 180; } else if (deltaY > 0) { angleVector = (Math.atan(deltaY / deltaX) /
-	  Math.PI  180); } else { angleVector = (Math.atan(deltaY / deltaX) / Math.PI
-	   180) + 360; }
-	  
-	  return angleVector; }
-	 /
-
+	// Move to next motion pose in the sequence
 	public void next() {
 		this.iterator++;
 	}

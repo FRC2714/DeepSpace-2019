@@ -1,8 +1,6 @@
 package frc.robot.util;
 
 import java.util.ArrayList;
-
-import frc.robot.Robot;
 import frc.robot.util.CommandDetails;
 
 public class AutonTask {

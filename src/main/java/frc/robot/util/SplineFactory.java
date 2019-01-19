@@ -4,6 +4,9 @@ import java.util.ArrayList;
 
 public class SplineFactory {
     private double x1, x2, x3, x4, y1, y2, y3, y4, acceleration, velocity;
+    private double currentFrontVelocity, currentBackVelocity;
+    private boolean forwards;
+    private ArrayList<MotionPose> controlPath;
 
     private double tolerance = 0.00001;
     private double tStep = 0.001;
@@ -27,15 +30,23 @@ public class SplineFactory {
         this.y3 = y3;
         this.y4 = y4;
 
-        this.acceleration = acceleration  period;
-        this.velocity = maxVelocity  period;
+        this.acceleration = acceleration * period;
+        this.velocity = maxVelocity * period;
+
+        this.currentFrontVelocity = startVelocity * this.period;
+        this.currentBackVelocity = endVelocity * this.period;
+
+        this.controlPath = controlPath;
+        this.forwards = forwards;
+
+    }
+
+    public void generate() {
 
         // Fill point buffer
         double backT = 1;
         double frontT = 0;
         int placement = 0;
-        double currentFrontVelocity = startVelocity  this.period;
-        double currentBackVelocity = endVelocity  this.period;
 
         while (frontT < backT) {
 
@@ -47,12 +58,12 @@ public class SplineFactory {
             // PT and VT, are the position and velocity at time T
             // A is the profile acceleration
 
-            if (currentFrontVelocity < this.velocity) {
-                currentFrontVelocity += this.acceleration  this.period;
+            if (currentFrontVelocity < velocity) {
+                currentFrontVelocity += acceleration * period;
             }
 
-            if (currentBackVelocity < this.velocity) {
-                currentBackVelocity += this.acceleration  this.period;
+            if (currentBackVelocity < velocity) {
+                currentBackVelocity += acceleration * period;
             }
 
             // Find front and back position
@@ -68,8 +79,8 @@ public class SplineFactory {
 
             double angle;
 
-            double changeY = (this.yValues.get(i + 1) - this.yValues.get(i));
-            double changeX = (this.xValues.get(i + 1) - this.xValues.get(i));
+            double changeY = (yValues.get(i + 1) - yValues.get(i));
+            double changeX = (xValues.get(i + 1) - xValues.get(i));
 
             if (changeY == 0) {
                 if (changeX > 0) {
@@ -87,15 +98,15 @@ public class SplineFactory {
             }
 
             if (changeX < 0) {
-                angle = (Math.atan(changeY / changeX) / Math.PI  180) + 180;
+                angle = Math.toDegrees(Math.atan(changeY / changeX)) + 180;
             } else if (changeY > 0) {
-                angle = Math.atan(changeY / changeX) / Math.PI  180;
+                angle = Math.toDegrees(Math.atan(changeY / changeX));
             } else {
-                angle = (Math.atan(changeY / changeX) / Math.PI  180) + 360;
+                angle = Math.toDegrees(Math.atan(changeY / changeX)) + 360;
             }
 
-            double velocity = distanceCalc(this.xValues.get(i + 1), this.xValues.get(i), this.yValues.get(i + 1),
-                    this.yValues.get(i)) / period;
+            double velocity = distanceCalc(xValues.get(i + 1), xValues.get(i), yValues.get(i + 1),
+                    yValues.get(i)) / period;
 
             if (!forwards) {
                 velocity = -1;
@@ -105,8 +116,8 @@ public class SplineFactory {
                 }
             }
 
-            controlPath
-                    .add(new MotionPose(angle, velocity, (double) this.xValues.get(i), (double) this.yValues.get(i)));
+            controlPath.add(new MotionPose(angle, velocity, xValues.get(i), yValues.get(i)));
+
         }
 
     }
@@ -134,7 +145,7 @@ public class SplineFactory {
 
         do {
 
-            if (distanceDelta  inverted < 0) {
+            if (distanceDelta * inverted < 0) {
                 // Past target
                 direction = -1;
                 if (direction != lastDirection) {
@@ -148,7 +159,7 @@ public class SplineFactory {
                 }
             }
 
-            internalT += tStep_modified  direction;
+            internalT += tStep_modified * direction;
 
             newX = quarticCalc(internalT, this.x1, this.x2, this.x3, this.x4);
             newY = quarticCalc(internalT, this.y1, this.y2, this.y3, this.y4);
@@ -168,8 +179,8 @@ public class SplineFactory {
 
     // Calculate quartic spline point with 4 controls
     public double quarticCalc(double t, double c1, double c2, double c3, double c4) {
-        return (Math.pow(1 - t, 3)  c1) + 3  (Math.pow(1 - t, 2)  t  c2) + 3  (Math.pow(t, 2)  (1 - t)  c3)
-                + (Math.pow(t, 3)  c4);
+        return (Math.pow(1 - t, 3) * c1) + 3 * (Math.pow(1 - t, 2) * t * c2) + 3 * (Math.pow(t, 2) * (1 - t) * c3)
+                + (Math.pow(t, 3) * c4);
     }
 
     // Calculate distance

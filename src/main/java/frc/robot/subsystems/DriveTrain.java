@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Robot;
 import frc.robot.RobotMap;
 import frc.robot.util.DrivingController;
 import frc.robot.util.Odometer;
@@ -116,9 +115,15 @@ public class DriveTrain extends SubsystemModule {
 	public Odometer odometer = new Odometer(0,0,0) {
 
 		public void updateEncodersAndHeading() {
-			this.headingAngle = 450-navX.getFusedHeading();if(this.headingAngle>360)this.headingAngle-=360;
-			this.leftPos=leftEncoder.getDistance();this.rightPos=rightEncoder.getDistance();
-			this.currentVelocity = 0.5(leftEncoder.getRate()+rightEncoder.getRate());
+
+			this.headingAngle = 450 - navX.getFusedHeading();
+			if(this.headingAngle>360) {
+				this.headingAngle-=360;
+			}	
+			this.leftPos=leftEncoder.getDistance();
+			this.rightPos=rightEncoder.getDistance();
+			this.currentVelocity = 0.5 * (leftEncoder.getRate()+rightEncoder.getRate());
+
 		}
 
 	};
@@ -212,14 +217,9 @@ public class DriveTrain extends SubsystemModule {
 
 	// Closed loop velocity based tank
 	public void closedLoopTank(double leftVelocity, double rightVelocity) {
-
-		debugMode = SmartDashboard.getNumber("DebugMode," 0);			
 		
-		if(debugMode == 0){
+		if(SmartDashboard.getNumber("DebugMode", 0) > 0){
 			configureCoefficients();																			
-		}
-		else if(debugMode == 1){
-			debugMode.reset();
 		}
 				
 		lPidController.setReference(leftVelocity, ControlType.kVelocity);
@@ -228,7 +228,7 @@ public class DriveTrain extends SubsystemModule {
 
 	// Closed loop arcade based tank
 	public void closedLoopArcade(double velocity, double rps) {
-		double pivot = Math.PI  wheelSeparation  rps;
+		double pivot = Math.PI * wheelSeparation * rps;
 		closedLoopTank(velocity - pivot, velocity + pivot);
 	}
 

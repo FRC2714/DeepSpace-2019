@@ -4,7 +4,9 @@ import java.util.ArrayList;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
+import frc.robot.util.ControllerCollection;
 import frc.robot.util.JoystickCommandPair;
+import frc.robot.util.JoystickInterface;
 
 public class OI {
 
@@ -71,13 +73,26 @@ public class OI {
 	JoystickButton nbbb13 = new JoystickButton(newButtonBoxB, 2);
 	JoystickButton nbbb14 = new JoystickButton(newButtonBoxB, 1);
 
-	public ArrayList<JoystickCommandPair> buttons = new ArrayList<JoystickCommandPair>();
+	private ArrayList<JoystickCommandPair> controls;
+    private ControllerCollection cc_reference;
+
+    public OI(ControllerCollection cc_ref) {
+        this.cc_reference = cc_ref;
+    }
+
+    public void append(String command, JoystickButton button) {
+        controls.add(new JoystickCommandPair(this.cc_reference, command, button));
+    }
+
+    public void checkButtons() {
+		controls.forEach((k) -> k.checkButton());
+    }
 
 	public OI() {
-		this.buttons.add(new JoystickCommandPair("set_angular_offset -s -90", this.start));
-		this.buttons.add(new JoystickCommandPair("add_forwards_spline -s 0,0,0,0,0,0,0,10,8,8,0,0", this.y));
-		this.buttons.add(new JoystickCommandPair("add_forwards_spline -s 0,0,-6,-6,0,3.3,6.6,10,5,5,0,0", this.x));
-		this.buttons.add(new JoystickCommandPair("start_path -s", this.b));
+		append("set_angular_offset -s -90", this.start);
+		append("add_forwards_spline -s 0,0,0,0,0,0,0,10,8,8,0,0", this.y);
+		append("add_forwards_spline -s 0,0,-6,-6,0,3.3,6.6,10,5,5,0,0", this.x);
+		append("start_path -s", this.b);
 	}
 
 	public double getLeftJoystick() {

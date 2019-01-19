@@ -2,19 +2,11 @@ package frc.robot.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import frc.robot.OI;
-import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
-import java.util.Iterator;
-import java.util.Set;
 
 public class ControllerCollection extends Thread {
 
-	private OI oi = new OI();
 	private double periodNanoseconds = 0;
 	private boolean stopProcessor = false;
 
@@ -29,11 +21,6 @@ public class ControllerCollection extends Thread {
 	public ControllerCollection(double periodNanoseconds, int commandDivider) {
 		this.periodNanoseconds = periodNanoseconds;
 		this.commandDivider = commandDivider;
-	}
-
-	// Stop the controller
-	public void stopProcessor() {
-		stopProcessor = true;
 	}
 
 	// Function to add the subsystem into the collection
@@ -55,9 +42,7 @@ public class ControllerCollection extends Thread {
 				}
 				counter++;
 
-				// Process buttons
-				oi.buttons.forEach((k) -> k.checkButton());
-
+				controlInterface.checkButtons();
 				commandQueue();
 
 				while (System.nanoTime() < timestamp_ + periodNanoseconds) {
@@ -155,5 +140,13 @@ public class ControllerCollection extends Thread {
 			this.commandQueue.remove(0);
 		}
 
+	}
+
+	public void enable() {
+		stopProcessor = false;
+	}
+
+	public void disable() {
+		stopProcessor = true;
 	}
 }
