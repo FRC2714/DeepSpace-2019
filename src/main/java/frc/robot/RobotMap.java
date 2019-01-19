@@ -14,7 +14,7 @@ public class RobotMap {
 	public static int p_newButtonBoxA = 1;
 	public static int p_newButtonBoxB = 2;
 
-	// DriveTrain Motors
+	// Drivetrain Motors
 	public static int p_leftDrive1 = 0;
 	public static int p_leftDrive2 = 1;
 	public static int p_rightDrive1 = 2;

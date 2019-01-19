@@ -94,7 +94,7 @@ public class ControllerCollection extends Thread {
 
 		while (true) {
 
-			if (!stopProcessor){
+			if (!stopProcessor) {
 				Controllers.forEach((k, v) -> v.run());
 
 				if (counter % this.commandDivider == 0) {
@@ -128,11 +128,10 @@ public class ControllerCollection extends Thread {
 	}
 
 	/*
-	Split the command input to get the command name and pull the arguments off of the command input, 
-	the args will always come last.
-	ex: target_point -s 2,3
-	ex: target_point 2,3
-	*/
+	 * Split the command input to get the command name and pull the arguments off of
+	 * the command input, the args will always come last. ex: target_point -s 2,3
+	 * ex: target_point 2,3
+	 */
 	public void callCommand(CommandDetails command) {
 		System.out.println("Received command: " + command.toString());
 
@@ -140,13 +139,13 @@ public class ControllerCollection extends Thread {
 			SubsystemCommand foundCommand = v.registeredCommands.get(command.name());
 			if (foundCommand != null && command.args().isEmpty()) {
 				System.out.println("found command: " + command.name());
-				if (command.type().equals(CommandDetails.CommandType.TIMEDELAY)){
+				if (command.type().equals(CommandDetails.CommandType.TIMEDELAY)) {
 					foundCommand.configureDelay(command.getDelay());
 				}
 				foundCommand.call();
 			} else if (foundCommand != null && !command.args().isEmpty()) {
 				System.out.println("found command: " + command.name());
-				if (command.type().equals(CommandDetails.CommandType.TIMEDELAY)){
+				if (command.type().equals(CommandDetails.CommandType.TIMEDELAY)) {
 					foundCommand.configureDelay(command.getDelay());
 				}
 				foundCommand.call(command.args());
@@ -154,7 +153,7 @@ public class ControllerCollection extends Thread {
 		});
 	}
 
-	//cancel a command
+	// Cancel a command
 	public void cancelCommand(CommandDetails command) {
 		Controllers.forEach((k, v) -> {
 			SubsystemCommand foundCommand = v.registeredCommands.get(command.name());
@@ -164,6 +163,7 @@ public class ControllerCollection extends Thread {
 		});
 	}
 
+	// Cancels all commands
 	public void cancelAll() {
 		Controllers.forEach((k, v) -> {
 			v.registeredCommands.forEach((k1, v1) -> {
@@ -179,7 +179,8 @@ public class ControllerCollection extends Thread {
 		 * the list.
 		 */
 
-		if (this.commandQueue.size() > 0 && this.commandQueue.get(0).type().equals(CommandDetails.CommandType.PARALLEL)) {
+		if (this.commandQueue.size() > 0
+				&& this.commandQueue.get(0).type().equals(CommandDetails.CommandType.PARALLEL)) {
 			System.out.println(this.commandQueue.get(0).name());
 			callCommand(this.commandQueue.get(0));
 			this.commandQueue.remove(0);
@@ -204,7 +205,8 @@ public class ControllerCollection extends Thread {
 		 * the next sequential command.
 		 */
 
-		if (this.commandQueue.size() > 0 && (this.commandQueue.get(0).type().equals(CommandDetails.CommandType.SERIES) || this.commandQueue.get(0).type().equals(CommandDetails.CommandType.TIMEDELAY))){
+		if (this.commandQueue.size() > 0 && (this.commandQueue.get(0).type().equals(CommandDetails.CommandType.SERIES)
+				|| this.commandQueue.get(0).type().equals(CommandDetails.CommandType.TIMEDELAY))) {
 			System.out.println(this.commandQueue.get(0).name());
 			callCommand(this.commandQueue.get(0));
 			this.commandQueue.remove(0);

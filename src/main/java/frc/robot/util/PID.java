@@ -32,15 +32,12 @@ public class PID {
 	 * Create a MiniPID class object. See setP, setI, setD methods for more detailed
 	 * parameters.
 	 * 
-	 * @param p
-	 *            Proportional gain. Large if large difference between setpoint and
-	 *            target.
-	 * @param i
-	 *            Integral gain. Becomes large if setpoint cannot reach target
-	 *            quickly.
-	 * @param d
-	 *            Derivative gain. Responds quickly to large changes in error. Small
-	 *            values prevents P and I terms from causing overshoot.
+	 * @param p Proportional gain. Large if large difference between setpoint and
+	 *          target.
+	 * @param i Integral gain. Becomes large if setpoint cannot reach target
+	 *          quickly.
+	 * @param d Derivative gain. Responds quickly to large changes in error. Small
+	 *          values prevents P and I terms from causing overshoot.
 	 */
 	public PID(double p, double i, double d) {
 		P = p;
@@ -57,7 +54,6 @@ public class PID {
 		checkSigns();
 	}
 
-
 	public void setP(double p) {
 		P = p;
 		checkSigns();
@@ -73,8 +69,7 @@ public class PID {
 	 * 
 	 * @see {@link #setMaxIOutput(double) setMaxIOutput} for how to restrict
 	 *
-	 * @param i
-	 *            New gain value for the Integral term
+	 * @param i New gain value for the Integral term
 	 */
 	public void setI(double i) {
 		if (I != 0) {
@@ -104,8 +99,7 @@ public class PID {
 	 * Affects output through <b>output += -D*(current_input_value -
 	 * last_input_value)</b>
 	 *
-	 * @param d
-	 *            New gain value for the Derivative term
+	 * @param d New gain value for the Derivative term
 	 */
 	public void setD(double d) {
 		D = d;
@@ -120,8 +114,7 @@ public class PID {
 	 * Affects output according to <b>output+=F*Setpoint</b>. Note, that a F-only
 	 * system is actually open loop.
 	 * 
-	 * @param f
-	 *            Feed forward gain.
+	 * @param f Feed forward gain.
 	 */
 	public void setF(double f) {
 		F = f;
@@ -132,15 +125,12 @@ public class PID {
 	 * Configure the PID object. See setP, setI, setD methods for more detailed
 	 * parameters.
 	 * 
-	 * @param p
-	 *            Proportional gain. Large if large difference between setpoint and
-	 *            target.
-	 * @param i
-	 *            Integral gain. Becomes large if setpoint cannot reach target
-	 *            quickly.
-	 * @param d
-	 *            Derivative gain. Responds quickly to large changes in error. Small
-	 *            values prevents P and I terms from causing overshoot.
+	 * @param p Proportional gain. Large if large difference between setpoint and
+	 *          target.
+	 * @param i Integral gain. Becomes large if setpoint cannot reach target
+	 *          quickly.
+	 * @param d Derivative gain. Responds quickly to large changes in error. Small
+	 *          values prevents P and I terms from causing overshoot.
 	 */
 	public void setPID(double p, double i, double d) {
 		P = p;
@@ -155,18 +145,14 @@ public class PID {
 	 * Configure the PID object. See setP, setI, setD, setF methods for more
 	 * detailed parameters.
 	 * 
-	 * @param p
-	 *            Proportional gain. Large if large difference between setpoint and
-	 *            target.
-	 * @param i
-	 *            Integral gain. Becomes large if setpoint cannot reach target
-	 *            quickly.
-	 * @param d
-	 *            Derivative gain. Responds quickly to large changes in error. Small
-	 *            values prevents P and I terms from causing overshoot.
-	 * @param f
-	 *            Feed-forward gain. Open loop "best guess" for the output should
-	 *            be. Only useful if setpoint represents a rate.
+	 * @param p Proportional gain. Large if large difference between setpoint and
+	 *          target.
+	 * @param i Integral gain. Becomes large if setpoint cannot reach target
+	 *          quickly.
+	 * @param d Derivative gain. Responds quickly to large changes in error. Small
+	 *          values prevents P and I terms from causing overshoot.
+	 * @param f Feed-forward gain. Open loop "best guess" for the output should be.
+	 *          Only useful if setpoint represents a rate.
 	 */
 	public void setPID(double p, double i, double d, double f) {
 		P = p;
@@ -182,8 +168,7 @@ public class PID {
 	 * Set the maximum output value contributed by the I component of the system
 	 * This can be used to prevent large windup issues and make tuning simpler
 	 * 
-	 * @param maximum.
-	 *            Units are the same as the expected output value
+	 * @param maximum. Units are the same as the expected output value
 	 */
 	public void setMaxIOutput(double maximum) {
 		// Internally maxError and Izone are similar, but scaled for different purposes.
@@ -210,10 +195,8 @@ public class PID {
 	 * Specify a maximum output. When two inputs specified, output range is
 	 * configured to <b>[minimum, maximum]</b>
 	 * 
-	 * @param minimum
-	 *            possible output value
-	 * @param maximum
-	 *            possible output value
+	 * @param minimum possible output value
+	 * @param maximum possible output value
 	 */
 	public void setOutputLimits(double minimum, double maximum) {
 		if (maximum < minimum)
@@ -231,8 +214,7 @@ public class PID {
 	/**
 	 * Set the operating direction of the PID controller
 	 * 
-	 * @param reversed
-	 *            Set true to reverse PID output
+	 * @param reversed Set true to reverse PID output
 	 */
 	public void setDirection(boolean reversed) {
 		this.reversed = reversed;
@@ -257,10 +239,8 @@ public class PID {
 	/**
 	 * Calculate the output value for the current PID cycle.<br>
 	 * 
-	 * @param actual
-	 *            The monitored value, typically as a sensor input.
-	 * @param setpoint
-	 *            The target value for the system
+	 * @param actual   The monitored value, typically as a sensor input.
+	 * @param setpoint The target value for the system
 	 * @return calculated output value for driving the system
 	 */
 	public double getOutput(double actual, double setpoint) {
@@ -373,10 +353,8 @@ public class PID {
 	 * In one parameter mode, the last configured setpoint will be used.<br>
 	 * 
 	 * @see PID#setSetpoint()
-	 * @param actual
-	 *            The monitored value, typically as a sensor input.
-	 * @param setpoint
-	 *            The target value for the system
+	 * @param actual   The monitored value, typically as a sensor input.
+	 * @param setpoint The target value for the system
 	 * @return calculated output value for driving the system
 	 */
 	public double getOutput(double actual) {
@@ -402,8 +380,7 @@ public class PID {
 	 * Can be very useful for fast-reacting control loops, such as ones with large P
 	 * or D values and feed-forward systems.
 	 * 
-	 * @param rate,
-	 *            with units being the same as the output
+	 * @param rate, with units being the same as the output
 	 */
 	public void setOutputRampRate(double rate) {
 		outputRampRate = rate;
@@ -417,8 +394,7 @@ public class PID {
 	 * during large setpoint adjustments. Increases lag and I term if range is too
 	 * small.
 	 * 
-	 * @param range,
-	 *            with units being the same as the expected sensor range.
+	 * @param range, with units being the same as the expected sensor range.
 	 */
 	public void setSetpointRange(double range) {
 		setpointRange = range;
@@ -439,9 +415,8 @@ public class PID {
 	 * 
 	 * algorithm.
 	 * 
-	 * @param output
-	 *            valid between [0..1), meaning [current output only.. historical
-	 *            output only)
+	 * @param output valid between [0..1), meaning [current output only.. historical
+	 *               output only)
 	 */
 	public void setOutputFilter(double strength) {
 		if (strength == 0 || bounded(strength, 0, 1)) {
@@ -456,12 +431,9 @@ public class PID {
 	/**
 	 * Forces a value into a specific range
 	 * 
-	 * @param value
-	 *            input value
-	 * @param min
-	 *            maximum returned value
-	 * @param max
-	 *            minimum value in range
+	 * @param value input value
+	 * @param min   maximum returned value
+	 * @param max   minimum value in range
 	 * @return Value if it's within provided range, min or max otherwise
 	 */
 	private double constrain(double value, double min, double max) {
@@ -477,12 +449,9 @@ public class PID {
 	/**
 	 * Test if the value is within the min and max, inclusive
 	 * 
-	 * @param value
-	 *            to test
-	 * @param min
-	 *            Minimum value of range
-	 * @param max
-	 *            Maximum value of range
+	 * @param value to test
+	 * @param min   Minimum value of range
+	 * @param max   Maximum value of range
 	 * @return true if value is within range, false otherwise
 	 */
 	private boolean bounded(double value, double min, double max) {

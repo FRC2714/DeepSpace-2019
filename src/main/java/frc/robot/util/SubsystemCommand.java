@@ -6,7 +6,8 @@ import edu.wpi.first.wpilibj.Timer;
 
 public abstract class SubsystemCommand {
 
-    // Store the name of the command and the number of parameters passed into the command
+    // Store the name of the command and the number of parameters passed into the
+    // command
     private String commandName;
 
     public boolean firstRun = false;
@@ -18,13 +19,13 @@ public abstract class SubsystemCommand {
     public String[] args;
 
     // Constructor, set up the command
-    public SubsystemCommand (HashMap<String, SubsystemCommand> commands, String commandName) {
+    public SubsystemCommand(HashMap<String, SubsystemCommand> commands, String commandName) {
         this.commandName = commandName;
 
         commands.put(this.commandName, this);
     }
 
-    public void configureDelay(double delay){
+    public void configureDelay(double delay) {
         this.delay = delay;
 
         if (this.delay > 0) {
@@ -46,17 +47,17 @@ public abstract class SubsystemCommand {
         }
     }
 
-    public void call (String parameters) {
+    public void call(String parameters) {
         this.firstRun = true;
         this.args = parameters.split(",");
 
         if (this.delay > 0) {
             this.delayTimer.start();
         }
-        
+
     }
 
-    public void call () {
+    public void call() {
         this.firstRun = true;
     }
 
@@ -67,22 +68,22 @@ public abstract class SubsystemCommand {
     }
 
     // Called once at the beginning
-    public void initialize () {
+    public void initialize() {
 
     }
 
     // Called once each iteration of the subsystem module
-    public void execute () {
+    public void execute() {
 
     }
 
     // Redefine to check if the condition for exit is met
-    public boolean isFinished () {
+    public boolean isFinished() {
         return true;
     }
 
     // Called once at the end of the command
-    public void end () {
+    public void end() {
 
     }
 

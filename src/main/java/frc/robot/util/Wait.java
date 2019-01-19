@@ -37,6 +37,6 @@ public class Wait extends Command {
   // subsystems is scheduled to run
   @Override
   protected void interrupted() {
-    //ALL YOUR BASE ARE BELONG TO US
+    // ALL YOUR BASE ARE BELONG TO US
   }
 }

@@ -32,8 +32,8 @@ public class Robot extends TimedRobot {
 	public static double splinePercentage;
 
 	/**
-	 * This function is run when the robot is first started up and should be
-	 * used for any initialization code.
+	 * This function is run when the robot is first started up and should be used
+	 * for any initialization code.
 	 */
 	@Override
 	public void robotInit() {
@@ -49,9 +49,9 @@ public class Robot extends TimedRobot {
 	}
 
 	/**
-	 * This function is called once each time the robot enters Disabled mode.
-	 * You can use it to reset any subsystem information you want to clear when
-	 * the robot is disabled.
+	 * This function is called once each time the robot enters Disabled mode. You
+	 * can use it to reset any subsystem information you want to clear when the
+	 * robot is disabled.
 	 */
 	@Override
 	public void disabledInit() {
@@ -62,7 +62,7 @@ public class Robot extends TimedRobot {
 		Robot.drivetrain.drivetrainSetPowerZero();
 		Scheduler.getInstance().removeAll();
 
-		if(ControlsProcessor != null) {
+		if (ControlsProcessor != null) {
 			System.out.println("Not Null");
 			ControlsProcessor.cancelAll();
 			ControlsProcessor.stopProcessor();
@@ -120,11 +120,12 @@ public class Robot extends TimedRobot {
 			drivetrain.arcadeDrive(0, 0);
 		}
 
-		// System.out.println("encL: " + Robot.drivetrain.leftEncoder.getDistance() + " encR: " + Robot.drivetrain.rightEncoder.getDistance());
-//		System.out.println("X: " + Robot.drivetrain.odometer.current_x+ " Y: " + Robot.drivetrain.odometer.current_y);
+		// System.out.println("encL: " + Robot.drivetrain.leftEncoder.getDistance() + "
+		// encR: " + Robot.drivetrain.rightEncoder.getDistance());
+		// System.out.println("X: " + Robot.drivetrain.odometer.current_x+ " Y: " +
+		// Robot.drivetrain.odometer.current_y);
 		System.out.println(Robot.drivetrain.drivingcontroller.stringout);
-		//System.out.println(Robot.drivetrain.navX.getFusedHeading());
-		
+		// System.out.println(Robot.drivetrain.navX.getFusedHeading());
 
 	}
 
@@ -147,12 +148,11 @@ public class Robot extends TimedRobot {
 	@Override
 	public void testPeriodic() {
 
-
 	}
 
-	//Init function that is used for all types of init(Auton, Teleop, etc.)
+	// Init function that is used for all types of init(Auton, Teleop, etc.)
 	private void generalInit() {
-		if(ControlsProcessor != null) {
+		if (ControlsProcessor != null) {
 			System.out.println("resuming");
 			ControlsProcessor.stopProcessor = false;
 		} else {
@@ -169,7 +169,7 @@ public class Robot extends TimedRobot {
 		Robot.drivetrain.rightEncoder.reset();
 		Robot.drivetrain.odometer.reset();
 
-		Robot.drivetrain.leftEncoder.setDistancePerPulse(-0.0495); //0.00116
+		Robot.drivetrain.leftEncoder.setDistancePerPulse(-0.0495); // 0.00116
 		Robot.drivetrain.rightEncoder.setDistancePerPulse(0.00105);
 	}
 }

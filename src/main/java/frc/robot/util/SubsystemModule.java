@@ -9,18 +9,19 @@ public abstract class SubsystemModule extends Subsystem {
 
 	public boolean enabled = false;
 	protected HashMap<String, SubsystemCommand> registeredCommands = new HashMap<String, SubsystemCommand>();
-	
+
 	@Override
 	protected void initDefaultCommand() {
 
 	}
-	
+
 	public abstract void run();
+
 	public abstract void registerCommands();
 
 	public void runCommands() {
 
-		registeredCommands.forEach((k,v) ->  {
+		registeredCommands.forEach((k, v) -> {
 
 			// Call the initializer if the first run is active
 			if (v.firstRun && v.checkDelayExpired()) {

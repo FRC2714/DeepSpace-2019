@@ -22,64 +22,63 @@ import frc.robot.util.SubsystemModule;
 
 public class DriveTrain extends SubsystemModule {
 
-	//DriveTrain Motors
-    private CANSparkMax lMotor0 = new CANSparkMax(0, MotorType.kBrushless);
-    private CANSparkMax lMotor1 = new CANSparkMax(1, MotorType.kBrushless);
-    private CANSparkMax lMotor2 = new CANSparkMax(2, MotorType.kBrushless);
-    private CANSparkMax rMotor0 = new CANSparkMax(3, MotorType.kBrushless);
-    private CANSparkMax rMotor1 = new CANSparkMax(4, MotorType.kBrushless);
-    private CANSparkMax rMotor2 = new CANSparkMax(5, MotorType.kBrushless);
+	// Drivetrain motors
+	private CANSparkMax lMotor0 = new CANSparkMax(0, MotorType.kBrushless);
+	private CANSparkMax lMotor1 = new CANSparkMax(1, MotorType.kBrushless);
+	private CANSparkMax lMotor2 = new CANSparkMax(2, MotorType.kBrushless);
+	private CANSparkMax rMotor0 = new CANSparkMax(3, MotorType.kBrushless);
+	private CANSparkMax rMotor1 = new CANSparkMax(4, MotorType.kBrushless);
+	private CANSparkMax rMotor2 = new CANSparkMax(5, MotorType.kBrushless);
 
-    //PID Controllers
-    private CANPIDController lPidController = lMotor0.getPIDController();
-    private CANPIDController rPidController = rMotor0.getPIDController();
+	// PID controllers
+	private CANPIDController lPidController = lMotor0.getPIDController();
+	private CANPIDController rPidController = rMotor0.getPIDController();
 
-    //MAX Encoders
-    private CANEncoder lEncoder = lMotor0.getEncoder();
+	// MAX encoders
+	private CANEncoder lEncoder = lMotor0.getEncoder();
 	private CANEncoder rEncoder = rMotor0.getEncoder();
-	
-	//Differential Drivetrain
+
+	// Differential drivetrain
 	private DifferentialDrive drive = new DifferentialDrive(lMotor0, rMotor0);
 
-    //PID Coefficients
+	// PID coefficients
 	private double kMinOutput;
-	private double kMaxOutput; 
+	private double kMaxOutput;
 
 	private double lKP;
-	private double lKI; 
+	private double lKI;
 	private double lKIS;
 	private double lKD;
 	private double lKFF;
 
 	private double rKP;
-	private double rKI; 
+	private double rKI;
 	private double rKIS;
 	private double rKD;
 	private double rKFF;
 
+	// Robot characteristics
 	private double wheelSeparation = 2;
 
-
-	// Encoders for the motors
-	private Encoder leftEncoder = new Encoder(RobotMap.p_leftEncoderA, RobotMap.p_leftEncoderB, true,
-			EncodingType.k4X);
+	// Gearbox encoders
+	private Encoder leftEncoder = new Encoder(RobotMap.p_leftEncoderA, RobotMap.p_leftEncoderB, true, EncodingType.k4X);
 	private Encoder rightEncoder = new Encoder(RobotMap.p_rightEncoderA, RobotMap.p_rightEncoderB, true,
 			EncodingType.k4X);
 
-	// The NavX gyro
+	// NavX gyro
 	private AHRS navX = new AHRS(SPI.Port.kMXP);
-	
-	// Initialize your subsystem here
+
+	// Drivetrain initialization
 	public DriveTrain() {
 		registerCommands();
-		
-		//setting up follow mode!
+
+		// Configure follow mode
 		lMotor1.follow(lMotor0);
 		lMotor2.follow(lMotor0);
 		rMotor1.follow(rMotor0);
 		rMotor2.follow(rMotor0);
 
-		//setting up PID coefficients!
+		// Setup up PID coefficients
 		lPidController.setP(lKP);
 		lPidController.setI(lKI);
 		lPidController.setD(lKD);
@@ -93,9 +92,6 @@ public class DriveTrain extends SubsystemModule {
 		rPidController.setIZone(rKIS);
 		rPidController.setFF(rKFF);
 		rPidController.setOutputRange(kMinOutput, kMaxOutput);
-
-
-
 	}
 
 	// Instantiate odometer and link in encoders and navX
@@ -103,7 +99,7 @@ public class DriveTrain extends SubsystemModule {
 		public void updateEncodersAndHeading() {
 
 			this.headingAngle = 450 - navX.getFusedHeading();
-			if(this.headingAngle > 360)
+			if (this.headingAngle > 360)
 				this.headingAngle -= 360;
 
 			this.leftPos = leftEncoder.getDistance();
@@ -152,25 +148,24 @@ public class DriveTrain extends SubsystemModule {
 		drive.arcadeDrive(power, pivot);
 	}
 
-	//closed loop velocity based tank
-	public void closedLoopTank(double leftVelocity, double rightVelocity){
+	// Closed loop velocity based tank
+	public void closedLoopTank(double leftVelocity, double rightVelocity) {
 		lPidController.setReference(leftVelocity, ControlType.kVelocity);
 		rPidController.setReference(rightVelocity, ControlType.kVelocity);
 	}
 
-	//closed loop arcade based tank
-	public void closedLoopArcade(double velocity, double rps){
+	// Closed loop arcade based tank
+	public void closedLoopArcade(double velocity, double rps) {
 		double pivot = Math.PI * wheelSeparation * rps;
 		closedLoopTank(velocity - pivot, velocity + pivot);
 	}
 
-	public void getEncoderValues(){
-
+	// Output encoder values
+	public void getEncoderValues() {
 		System.out.println("LE: " + lEncoder.getPosition() + " RE: " + rEncoder.getPosition());
-
 	}
 
-	// Sets drive train to 0
+	// Disable drivetrain
 	public void drivetrainDisable() {
 		lMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		rMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
@@ -179,6 +174,7 @@ public class DriveTrain extends SubsystemModule {
 		rMotor0.set(0);
 	}
 
+	// Enable drivetrain
 	public void drivetrainEnable() {
 		lMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
 		rMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);

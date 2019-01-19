@@ -9,11 +9,11 @@ public class AutonTask {
 
     private ArrayList<CommandDetails> subtasks = new ArrayList<CommandDetails>();
 
-    public void queueTask (String command) {
+    public void queueTask(String command) {
         subtasks.add(new CommandDetails(command));
     }
 
-    public void run () {
+    public void run() {
         for (CommandDetails v : subtasks) {
             Robot.ControlsProcessor.commandQueue.add(v);
         }

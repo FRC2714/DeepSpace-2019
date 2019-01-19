@@ -12,8 +12,9 @@ public class SplineFactory {
     private ArrayList<Double> xValues = new ArrayList<Double>();
     private ArrayList<Double> yValues = new ArrayList<Double>();
 
-    public SplineFactory(ArrayList<MotionPose> controlPath, double period, double x1, double x2, double x3, double x4, double y1, double y2, double y3,
-            double y4, double acceleration, double maxVelocity, double startVelocity, double endVelocity, boolean forwards) {
+    public SplineFactory(ArrayList<MotionPose> controlPath, double period, double x1, double x2, double x3, double x4,
+            double y1, double y2, double y3, double y4, double acceleration, double maxVelocity, double startVelocity,
+            double endVelocity, boolean forwards) {
 
         this.period = period;
 
@@ -59,7 +60,6 @@ public class SplineFactory {
             backT = binaryFind(backT, -currentBackVelocity, placement + 1, xValues, yValues);
             placement++;
 
-
         }
 
         System.out.println("done generating");
@@ -68,8 +68,8 @@ public class SplineFactory {
 
             double angle;
 
-            double changeY = (this.yValues.get(i+1) - this.yValues.get(i));
-            double changeX = (this.xValues.get(i+1) - this.xValues.get(i));
+            double changeY = (this.yValues.get(i + 1) - this.yValues.get(i));
+            double changeX = (this.xValues.get(i + 1) - this.xValues.get(i));
 
             if (changeY == 0) {
                 if (changeX > 0) {
@@ -83,10 +83,9 @@ public class SplineFactory {
                 } else {
                     angle = 270;
                 }
-                
-                
+
             }
-    
+
             if (changeX < 0) {
                 angle = (Math.atan(changeY / changeX) / Math.PI * 180) + 180;
             } else if (changeY > 0) {
@@ -95,22 +94,25 @@ public class SplineFactory {
                 angle = (Math.atan(changeY / changeX) / Math.PI * 180) + 360;
             }
 
-            double velocity = distanceCalc(this.xValues.get(i+1), this.xValues.get(i), this.yValues.get(i+1), this.yValues.get(i))/period;
-            
-            if(!forwards){
+            double velocity = distanceCalc(this.xValues.get(i + 1), this.xValues.get(i), this.yValues.get(i + 1),
+                    this.yValues.get(i)) / period;
+
+            if (!forwards) {
                 velocity *= -1;
                 angle += 180;
                 if (angle > 360) {
                     angle -= 360;
                 }
             }
-            
-            controlPath.add(new MotionPose(angle, velocity, (double)this.xValues.get(i), (double)this.yValues.get(i)));
+
+            controlPath
+                    .add(new MotionPose(angle, velocity, (double) this.xValues.get(i), (double) this.yValues.get(i)));
         }
 
     }
 
-    public double binaryFind(double startT, double distance, int location, ArrayList<Double> xValues, ArrayList<Double> yValues) {
+    public double binaryFind(double startT, double distance, int location, ArrayList<Double> xValues,
+            ArrayList<Double> yValues) {
         double internalT = startT;
         double tStep_modified = this.tStep;
         double inverted = 1;

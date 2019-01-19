@@ -8,10 +8,10 @@
 package frc.robot.util;
 
 public class MotionPose {
-    
+
     double angle, velocity, x, y;
 
-    public MotionPose (double angle, double velocity, double x, double y) {
+    public MotionPose(double angle, double velocity, double x, double y) {
         this.angle = angle;
         this.velocity = velocity;
         this.x = x;
@@ -21,9 +21,9 @@ public class MotionPose {
     public double getOrthogonalDisplacement(double currentX, double currentY) {
         double errorY = currentY - y;
         double errorX = currentX - x;
-        double unitX = Math.cos(Math.toRadians(angle+90));
-        double unitY = Math.sin(Math.toRadians(angle+90));
-        double dotProduct = (unitX*errorX) + (unitY*errorY);
+        double unitX = Math.cos(Math.toRadians(angle + 90));
+        double unitY = Math.sin(Math.toRadians(angle + 90));
+        double dotProduct = (unitX * errorX) + (unitY * errorY);
 
         return dotProduct;
     }
@@ -33,8 +33,8 @@ public class MotionPose {
         double errorX = currentX - x;
         double unitX = Math.cos(Math.toRadians(angle));
         double unitY = Math.sin(Math.toRadians(angle));
-        double dotProduct = (unitX*errorX) + (unitY*errorY);
-        
+        double dotProduct = (unitX * errorX) + (unitY * errorY);
+
         return dotProduct;
     }
 
