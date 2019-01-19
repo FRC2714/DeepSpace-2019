@@ -234,7 +234,7 @@ public class DriveTrain extends SubsystemModule {
 		}
 				
 		lPidController.setReference(leftVelocity, ControlType.kVelocity);
-		rPidController.setReference(rightVelocity, ControlType.kVelocity);
+		rPidController.setReference(-rightVelocity, ControlType.kVelocity);
 	}
 
 	// Closed loop arcade based tank
