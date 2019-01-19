@@ -6,11 +6,11 @@ public class JoystickCommandPair {
 
     private JoystickButton thisButton;
     private CommandDetails commandDetails;
-    private ControllerCollection cc;
+    private ControlsProcessor cc;
 
     private boolean lastState = false;
 
-    public JoystickCommandPair(ControllerCollection cc, String commandInput, JoystickButton buttonToPair) {
+    public JoystickCommandPair(ControlsProcessor cc, String commandInput, JoystickButton buttonToPair) {
         this.thisButton = buttonToPair;
         this.commandDetails = new CommandDetails(commandInput);
         this.cc = cc;

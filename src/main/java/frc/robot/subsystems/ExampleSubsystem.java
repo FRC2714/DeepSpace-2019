@@ -38,4 +38,14 @@ public class ExampleSubsystem extends SubsystemModule {
 			}
 		};
     }
+
+	@Override
+	public void init() {
+
+	}
+
+	@Override
+	public void destruct() {
+
+	}
 }

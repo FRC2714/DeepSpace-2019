@@ -2,13 +2,15 @@ package frc.robot.util;
 
 public abstract class Odometer {
 
-	private double headingAngle;
+	protected double headingAngle;
 	private double startOffset = 0;
 
-	private double leftDistance, leftPos;
+	private double leftDistance;
+	protected double leftPos;
 	private double lastLeftPos = 0;
 
-	private double rightDistance, rightPos;
+	private double rightDistance;
+	protected double rightPos;
 	private double lastRightPos = 0;
 
 	private double hypotenuseDistance;
@@ -57,5 +59,21 @@ public abstract class Odometer {
 		lastLeftPos = leftPos;
 		lastRightPos = rightPos;
 
+	}
+
+	public void setOffset(double offset) {
+		startOffset = offset;
+	}
+
+	public double getCurrentX() {
+		return current_x;
+	}
+
+	public double getCurrentY() {
+		return current_y;
+	}
+
+	public double getHeadingAngle() {
+		return headingAngle;
 	}
 }

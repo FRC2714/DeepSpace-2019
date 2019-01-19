@@ -114,30 +114,28 @@ public class DriveTrain extends SubsystemModule {
 	// Instantiate odometer and link in encoders and navX
 	public Odometer odometer = new Odometer(0,0,0) {
 
+		@Override
 		public void updateEncodersAndHeading() {
-
 			this.headingAngle = 450 - navX.getFusedHeading();
 			if(this.headingAngle>360) {
 				this.headingAngle-=360;
 			}	
+
 			this.leftPos=leftEncoder.getDistance();
 			this.rightPos=rightEncoder.getDistance();
-			this.currentVelocity = 0.5 * (leftEncoder.getRate()+rightEncoder.getRate());
-
 		}
 
 	};
 
 	// Instantiate point controller for autonomous driving
-	public DrivingController drivingcontroller=new DrivingController(0.0005) {
+	public DrivingController drivingcontroller = new DrivingController(0.0005) {
 
 		// Use output from odometer and pass into autonomous driving controller
 		@Override
 		public void updateVariables(){
-			this.currentX = odometer.current_x;
-			this.currentY = odometer.current_y;
-			this.currentAverageVelocity = odometer.currentVelocity;
-			this.currentAngle = odometer.headingAngle;
+			this.currentX = odometer.getCurrentX();
+			this.currentY = odometer.getCurrentY();
+			this.currentAngle = odometer.getHeadingAngle();
 		}
 
 		// Link autonomous driving controller to the drive train motor control
@@ -146,6 +144,29 @@ public class DriveTrain extends SubsystemModule {
 			drive.arcadeDrive(power,pivot,false);
 		}
 	};
+
+	@Override
+	public void init() {
+		leftEncoder.reset();
+		rightEncoder.reset();
+		navX.reset();
+		navX.zeroYaw();
+
+		leftEncoder.setDistancePerPulse(0);
+		rightEncoder.setDistancePerPulse(0);
+
+		lMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
+		rMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
+	}
+
+	@Override
+	public void destruct() {
+		lMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
+		rMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
+
+		lMotor0.set(0);
+		rMotor0.set(0);
+	}
 	
 	// Subsystem run function, use controller collection (multi-threaded at fast period)
 	@Override
@@ -158,20 +179,6 @@ public class DriveTrain extends SubsystemModule {
 		if (this.enabled) {
 			this.drivingcontroller.run();
 		}
-	}
-
-	// Setup initial state of the drivetrain
-	public void drivetrainInit() {
-		leftEncoder.reset();
-		rightEncoder.reset();
-		navX.reset();
-		navX.zeroYaw();
-
-		leftEncoder.setDistancePerPulse(0);
-		rightEncoder.setDistancePerPulse(0);
-
-		lMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
-		rMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
 	}
 
 	// Pull values from SmartDashboard
@@ -237,22 +244,13 @@ public class DriveTrain extends SubsystemModule {
 		System.out.println("LE: " + lEncoder.getPosition() + " RE: " + rEncoder.getPosition());
 	}
 
-	// Disable drivetrain
-	public void drivetrainDestruct() {
-		lMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
-		rMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
-
-		lMotor0.set(0);
-		rMotor0.set(0);
-	}
-
 	@Override
 	public void registerCommands() {
 		new SubsystemCommand(this.registeredCommands, "set_angular_offset") {
 
 			@Override
 			public void initialize() {
-				odometer.startOffset = Double.parseDouble(this.args[0]);
+				odometer.setOffset(Double.parseDouble(this.args[0]));
 				navX.zeroYaw();
 			}
 

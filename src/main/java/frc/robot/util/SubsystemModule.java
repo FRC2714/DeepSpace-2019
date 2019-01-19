@@ -16,8 +16,9 @@ public abstract class SubsystemModule extends Subsystem {
 	}
 
 	public abstract void run();
-
 	public abstract void registerCommands();
+	public abstract void init();
+	public abstract void destruct();
 
 	public void runCommands() {
 

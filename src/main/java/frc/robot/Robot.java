@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.DriveTrain;
-import frc.robot.util.ControllerCollection;
+import frc.robot.util.ControlsProcessor;
 
 /*
   The VM is configured to automatically run this class, and to call the
@@ -25,28 +25,28 @@ public class Robot extends TimedRobot {
 	private SendableChooser<Command> autoChooser;
 
 	// Initialize robot control systems
-	public ControllerCollection ControlsProcessor;
-	public OI ControlInterface;
+	public ControlsProcessor ControlsProcessor;
 
 	// Init and Periodic functions
 	@Override
 	public void robotInit() {
-
 		autoChooser = new SendableChooser<>();
-
 		SmartDashboard.putData("Autonomous Mode Selector", autoChooser);
+
+		ControlsProcessor = new ControlsProcessor(500000, 1);
+		ControlsProcessor.registerController("DriveTrain", drivetrain);
+		ControlsProcessor.start();
 	}
 
 	@Override
 	public void disabledInit() {
-		drivetrain.drivetrainDestruct();
+		drivetrain.destruct();
 		Scheduler.getInstance().removeAll();
 
 		if (ControlsProcessor != null) {
 			ControlsProcessor.cancelAll();
 			ControlsProcessor.disable();
 		}
-		
 	}
 
 	@Override
@@ -107,18 +107,14 @@ public class Robot extends TimedRobot {
 
 	}
 
-	// Init function that is used for all types of init(Auton, Teleop, etc.)
+	// General init 
 	private void generalInit() {
 		if (ControlsProcessor != null) {
 			ControlsProcessor.enable();
 		} else {
-			ControlsProcessor = new ControllerCollection(500000, 1);
-			ControlsProcessor.registerController("DriveTrain", drivetrain);
-			ControlsProcessor.start();
 
-			ControlInterface = new OI(ControlsProcessor);
 		}
 
-		drivetrain.drivetrainInit();
+		drivetrain.init();
 	}
 }
