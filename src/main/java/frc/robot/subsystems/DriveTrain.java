@@ -144,8 +144,8 @@ public class DriveTrain extends SubsystemModule {
 
 		// Link autonomous driving controller to the drive train motor control
 		@Override
-		public void driveRobot(double power,double pivot) {
-			drive.arcadeDrive(power,pivot,false);
+		public void driveRobot(double power, double pivot) {
+			closedLoopArcade(power, pivot);
 		}
 	};
 
@@ -234,7 +234,7 @@ public class DriveTrain extends SubsystemModule {
 		}
 				
 		lPidController.setReference(leftVelocity, ControlType.kVelocity);
-		rPidController.setReference(rightVelocity, ControlType.kVelocity);
+		rPidController.setReference(-rightVelocity, ControlType.kVelocity);
 	}
 
 	// Closed loop arcade based tank
