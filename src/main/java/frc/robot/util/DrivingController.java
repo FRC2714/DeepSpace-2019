@@ -10,7 +10,7 @@ public abstract class DrivingController {
 
 	// Coefficients for the kinematic control algorithm
 	private double k2 = 0.0;
-	private double k3 = 1.0;
+	private double k3 = 0.9;
 
 	private ArrayList<MotionPose> controlPath = new ArrayList<MotionPose>();
 
