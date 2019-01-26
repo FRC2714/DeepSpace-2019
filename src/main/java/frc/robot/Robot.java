@@ -20,7 +20,7 @@ import frc.robot.util.ControlsProcessor;
 public class Robot extends TimedRobot {
 
 	// Initialize subsystems
-	private DriveTrain drivetrain = new DriveTrain();
+	private DriveTrain drivetrain;
 
 	// Initialize auton mode selector
 	private Command autonomousCommand;
@@ -36,11 +36,14 @@ public class Robot extends TimedRobot {
 		SmartDashboard.putData("Autonomous Mode Selector", autoChooser);
 
 		// Controls processor only gets created ONCE when code is run
-		controlsProcessor = new ControlsProcessor(500000, 1) {
+		controlsProcessor = new ControlsProcessor(2000000, 10) {
 			@Override
 			public void registerOperatorControls() {
-				append("add_forwards_spline -s 0,0,-6,-6,0,3,6,9,8,8,0,0", this.y);
-				append("start_path -s", this.b);
+				append("closed_loop_tank -s 5", this.x);
+				append("closed_loop_tank -s -5", this.a);
+				append("driver_control -p", this.rightStick);
+				//append("add_forwards_spline -s 0,0,-6,-6,0,3,6,9,8,8,0,0", this.y);
+				//append("start_path -s", this.b);
 			}
 		};
 
@@ -109,14 +112,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-
 		Scheduler.getInstance().run();
-
-		if(Math.abs(controlsProcessor.getLeftJoystick()) >= 0.1 || Math.abs(controlsProcessor.getRightJoystick()) >= 0.1){
-			System.out.println("Teleop control");
-			drivetrain.arcadeDrive(-controlsProcessor.getLeftJoystick(), controlsProcessor.getRightJoystick());
-		}
-
 	}
 
 	/**

@@ -34,6 +34,8 @@ public abstract class ControlsProcessor extends Thread {
 	protected JoystickButton rb = new JoystickButton(xbox1, 6);
 	protected JoystickButton back = new JoystickButton(xbox1, 7);
 	protected JoystickButton start = new JoystickButton(xbox1, 8);
+	protected JoystickButton leftStick = new JoystickButton(xbox1, 9);
+	protected JoystickButton rightStick = new JoystickButton(xbox1, 10);
 
 	// Array list that holds all of the operator controls
 	private ArrayList<JoystickCommandPair> operatorControls = new ArrayList<JoystickCommandPair>();
