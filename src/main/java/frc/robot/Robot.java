@@ -36,8 +36,8 @@ public class Robot extends TimedRobot {
 		ControlsProcessor = new ControlsProcessor(2000000, 1) {
 			@Override
 			public void registerOperatorControls() {
-				append("closed_loop_tank -s 5", this.a);
-				System.out.println("Controls reg");
+				append("closed_loop_tank -s 10", this.x);
+				append("closed_loop_tank -s 10", this.a);
 				//append("add_forwards_spline -s 0,0,-6,-6,0,3,6,9,8,8,0,0", this.y);
 				//append("start_path -s", this.b);
 			}
