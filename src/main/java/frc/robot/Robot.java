@@ -20,7 +20,7 @@ import frc.robot.util.ControlsProcessor;
 public class Robot extends TimedRobot {
 
 	// Initialize subsystems
-	public DriveTrain drivetrain;
+	private DriveTrain drivetrain;
 
 	// Initialize auton mode selector
 	private Command autonomousCommand;
