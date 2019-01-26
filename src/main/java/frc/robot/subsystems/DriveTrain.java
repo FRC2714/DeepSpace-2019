@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import frc.robot.RobotMap;
+import frc.robot.util.ControlsProcessor;
 import frc.robot.util.DrivingController;
 import frc.robot.util.Odometer;
 import frc.robot.util.SubsystemCommand;
@@ -51,7 +52,7 @@ public class DriveTrain extends SubsystemModule {
 	private final double lKFF = 1.77e-4;
 	private final double rKFF = 1.78e-4;
 
-	private final double convFactor = 100; // Convert ft/s to RPM
+	private final double convFactor = 322.2; // Convert ft/s to RPM
 	private final double sensitivity = 5;
 	private final double maxVelocity = 13;
 
@@ -59,6 +60,10 @@ public class DriveTrain extends SubsystemModule {
 
 	// Robot characteristics
 	private double wheelSeparation = 2;
+
+	private boolean driverControlled = false;
+
+	private ControlsProcessor controlsProcessor;
 
 	// Gearbox encoders
 	private Encoder leftEncoder = new Encoder(RobotMap.p_leftEncoderA, RobotMap.p_leftEncoderB, true, EncodingType.k4X);
@@ -69,8 +74,10 @@ public class DriveTrain extends SubsystemModule {
 	private AHRS navX = new AHRS(SPI.Port.kMXP);
 
 	// Drivetrain initializations
-	public DriveTrain() {
+	public DriveTrain(ControlsProcessor controlsProcessor) {
 		registerCommands();
+
+		this.controlsProcessor = controlsProcessor;
 
 		drive.setSafetyEnabled(false);
 		// Configure follow mode
@@ -149,6 +156,8 @@ public class DriveTrain extends SubsystemModule {
 
 	@Override
 	public void destruct() {
+		driverControlled = false;
+
 		lMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		rMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
@@ -184,7 +193,7 @@ public class DriveTrain extends SubsystemModule {
 
 	// Closed loop arcade based tank
 	public void closedLoopArcade(double velocity, double pivot) {
-		pivot = pivot * convFactor * sensitivity;
+		pivot = pivot * sensitivity;
 		closedLoopTank(velocity - pivot, velocity + pivot);
 	}
 
@@ -199,10 +208,45 @@ public class DriveTrain extends SubsystemModule {
 
 	@Override
 	public void registerCommands() {
+		new SubsystemCommand(this.registeredCommands, "driver_control") {
+
+			@Override
+			public void initialize() {
+				driverControlled = true;
+			}
+
+			@Override
+			public void execute() {
+				double power = 0;
+				double pivot = 0;
+
+				if (Math.abs(controlsProcessor.getLeftJoystick()) > .1)	
+					power = controlsProcessor.getLeftJoystick();
+				if (Math.abs(controlsProcessor.getRightJoystick()) > .1)
+					pivot = controlsProcessor.getRightJoystick();
+
+				closedLoopArcade(-power * maxVelocity, -pivot);
+
+				// System.out.println("Power: " + power + " Pivot: " + pivot);
+			}
+
+			@Override
+			public boolean isFinished() {
+				return !driverControlled;
+			}
+
+			@Override
+			public void end() {
+				closedLoopArcade(0, 0);
+			}
+		};
+
 		new SubsystemCommand(this.registeredCommands, "closed_loop_tank") {
 
 			@Override
 			public void initialize() {
+				driverControlled = false;
+
 				double velocity = Double.parseDouble(this.args[0]);
 				closedLoopTank(velocity, velocity);
 			}

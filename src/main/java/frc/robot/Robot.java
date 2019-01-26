@@ -18,7 +18,7 @@ import frc.robot.util.ControlsProcessor;
 public class Robot extends TimedRobot {
 
 	// Initialize subsystems
-	public DriveTrain drivetrain = new DriveTrain();
+	public DriveTrain drivetrain;
 
 	// Initialize auton mode selector
 	private Command autonomousCommand;
@@ -33,15 +33,19 @@ public class Robot extends TimedRobot {
 		autoChooser = new SendableChooser<>();
 		SmartDashboard.putData("Autonomous Mode Selector", autoChooser);
 
-		ControlsProcessor = new ControlsProcessor(2000000, 1) {
+		ControlsProcessor = new ControlsProcessor(2000000, 10) {
 			@Override
 			public void registerOperatorControls() {
-				append("closed_loop_tank -s 10", this.x);
-				append("closed_loop_tank -s 10", this.a);
+				append("closed_loop_tank -s 5", this.x);
+				append("closed_loop_tank -s -5", this.a);
+				append("driver_control -p", this.rightStick);
 				//append("add_forwards_spline -s 0,0,-6,-6,0,3,6,9,8,8,0,0", this.y);
 				//append("start_path -s", this.b);
 			}
 		};
+
+		drivetrain = new DriveTrain(ControlsProcessor);
+
 		ControlsProcessor.registerController("DriveTrain", drivetrain);
 		ControlsProcessor.start();
 	}
@@ -93,15 +97,6 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
-
-
-		// if(Math.abs(ControlsProcessor.getLeftJoystick()) >= 0.07 || Math.abs(ControlsProcessor.getRightJoystick()) >= 0.07){
-		// 	drivetrain.closedLoopArcade(-ControlsProcessor.getLeftJoystick() * drivetrain.getMaxVelocity(),
-		// 			ControlsProcessor.getRightJoystick());
-		// } else {
-		// 	drivetrain.closedLoopArcade(0,0);
-		// }
-
 	}
 
 	@Override
