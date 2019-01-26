@@ -4,52 +4,72 @@ import java.util.ArrayList;
 
 public abstract class DrivingController {
 
-	// Angle and velocity controllers
+	/**
+	 * Controls the magnitude of angular correction
+	 * Corrects both the anglular and perpendicular error
+	 */
 	private PID samsonControl = new PID(0.01, 0.0, 0);
-	private PID tangentialControl = new PID(0.0, 0.0, 0.0);
+	private double samsonOutput;
 
-	// Coefficients for the kinematic control algorithm
+	/**
+	 * Controls the magnitude of tangential correction
+	 */
+	private PID tangentialControl = new PID(0.0, 0.0, 0.0);
+	private double tangentialOutput;
+
+	/**
+	 * k2: For perpendicular error
+	 * k3: For angular error
+	 */
 	private double k2 = 0.0;
 	private double k3 = 0.9;
 
+	/**
+	 * Populates an array list from the SplineFactory
+	 */
 	private ArrayList<MotionPose> controlPath = new ArrayList<MotionPose>();
+	private int iterator = 0;
 
 	protected double currentX;
 	protected double currentY;
 	protected double currentAngle;
 	protected double currentAverageVelocity;
 
-	private double samsonOutput;
-	private double tangentialOutput;
-
-	private int iterator = 0;
+	/**
+	 * Time separation between points in the controlPath in seconds
+	 */
 	private double period;
 
+	/**
+	 * Initializes DrivingController and sets the period
+	 * @param period In seconds
+	 */
 	public DrivingController(double period) {
 
-		// Set up period
 		this.period = period;
 
 	}
 
-	// Run function for Driving Controller uses distance and angle controllers
+	/**
+	 * Run function for Driving Controller uses distance and angle controllers
+	 */
 	public void run() {
 
 		// Update using abstracted functions from the calling class
 		updateVariables();
 
 		// Move to the next point in the spline
-		next();
+		if(iterator < controlPath.size()) { this.iterator++; }
 
 		// Use tangential correction and velocity control cascaded to control velocity and position.
 		double orthogonalError = controlPath.get(iterator).getOrthogonalDisplacement(currentX, currentY);
 		double tangentialError = controlPath.get(iterator).getTangentialDisplacement(currentX, currentY);
-		
-		double refVelocity = controlPath.get(iterator).velocity;
-		double angleDifference = getDifferenceInAngleDegrees(currentAngle, controlPath.get(iterator).angle);
+		double angularError = controlPath.get(iterator).getAngularDisplacement(currentAngle);
 
-		double samsonCorrection2 = (k2 * orthogonalError * refVelocity) / angleDifference;
-		double samsonCorrection3 = k3 * angleDifference;
+		double refVelocity = controlPath.get(iterator).velocity;
+
+		double samsonCorrection2 = (k2 * orthogonalError * refVelocity) / angularError;
+		double samsonCorrection3 = k3 * angularError;
 
 		samsonOutput = samsonControl.getOutput(samsonCorrection2 + samsonCorrection3, 0);
 		tangentialOutput = tangentialControl.getOutput(tangentialError, 0);
@@ -61,36 +81,32 @@ public abstract class DrivingController {
 	public abstract void updateVariables();
 	public abstract void driveRobot(double power, double pivot);
 
-	// Angle difference utility
-	private double getDifferenceInAngleDegrees(double from, double to) {
-		return boundAngleNeg180to180Degrees(from - to);
-	}
-
-	// Keep it between 180 degrees
-	private double boundAngleNeg180to180Degrees(double angle) {
-		while (angle >= 180.0) {
-			angle -= 360.0;
-		}
-		while (angle < -180.0) {
-			angle += 360.0;
-		}
-		return angle;
-	}
-
-	// Set the desired position for the robot
+	/**
+	 * Creates the cubic spline between these points
+	 * @param x1
+	 * @param x2
+	 * @param x3
+	 * @param x4
+	 * @param y1
+	 * @param y2
+	 * @param y3
+	 * @param y4
+	 * @param acceleration Designates the acceleration of the robot along the path
+	 * @param maxVelocity Designates the max velocity of the path
+	 * @param startVelocity Designates the velocity at the start of the path
+	 * @param endVelocity Designates the velocity at the end of the path
+	 * @param forwards Designates if the robot drives forwards or backwards along the path
+	 */
 	public void addSpline(double x1, double x2, double x3, double x4, double y1, double y2, double y3, double y4,
 			double acceleration, double maxVelocity, double startVelocity, double endVelocity, boolean forwards) {
 		new SplineFactory(this.controlPath, this.period, x1, x2, x3, x4, y1, y2, y3, y4, acceleration, maxVelocity,
 				startVelocity, endVelocity, forwards);
 	}
 
-	// Move to next motion pose in the sequence
+	/**
+	 * Move to next motion pose in the sequence
+	 */
 	public void next() {
-		this.iterator++;
-	}
-
-	// Calculate distance
-	public double distanceCalc(double x1, double x2, double y1, double y2) {
-		return Math.pow((Math.pow(x2 - x1, 2)) + (Math.pow(y2 - y1, 2)), 0.5);
+		if(iterator < controlPath.size()) { this.iterator++; }
 	}
 }

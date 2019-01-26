@@ -7,6 +7,12 @@ public abstract class PositionController {
 
 	protected double currentPosition, setpoint;
 
+	/**
+	 * Initializes PositionController and sets PID values
+	 * @param posP Proportional
+	 * @param posI Integral
+	 * @param posD Derivative
+	 */
 	public PositionController(double posP, double posI, double posD) {
 
 		this.posP = posP;
@@ -15,21 +21,36 @@ public abstract class PositionController {
 
 	}
 
-	// This will be redefined to update the current value in the controller
+	/**
+	 * This must be defined to update the current values from the subsystem
+	 */
 	public abstract void updateValues();
 
-	// This will be redefined to update the output in the subsystem
+	/**
+	 * This must be defined to update the output to the subsystem
+	 * @param output The PID output to set
+	 */
 	public abstract void setOutput(double output);
 
+	/**
+	 * Removes the I term and resets the controller
+	 * Can be overridden for other control systems
+	 */
 	public void reset() {
 		positionPID.reset();
 	}
 
+	/**
+	 * Configures the target value
+	 * @param setpoint Target value
+	 */
 	public void setSetpoint(double setpoint) {
 		this.setpoint = setpoint;
 	}
 
-	// This will be called inside the run function of the parent subsystem
+	/**
+	 * This will be called inside the run function of the parent subsystem
+	 */
 	public void runController() {
 		updateValues();
 		double output = 0;

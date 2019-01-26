@@ -28,6 +28,7 @@ public abstract class SubsystemModule extends Subsystem {
 
 	/**
 	 * Empty function that has to get called in constructor
+	 * This is where all the subsystem commands get created
 	 */ 
 	public abstract void registerCommands();
 
@@ -40,6 +41,18 @@ public abstract class SubsystemModule extends Subsystem {
 	 * Gets called when the subsystem stops
 	 */
 	public abstract void destruct();
+
+	public void enable() {
+		enabled = true;
+	}
+
+	public void disable() {
+		enabled = false;
+	}
+
+	public boolean getStatus() {
+		return enabled;
+	}
 
 	/**
 	 * Gets called when the run function gets called

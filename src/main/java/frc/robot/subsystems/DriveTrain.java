@@ -55,8 +55,6 @@ public class DriveTrain extends SubsystemModule {
 	private double rKD;
 	private double rKFF;
 
-	private int debugMode;
-
 	// Robot characteristics
 	private double wheelSeparation = 2;
 
@@ -92,23 +90,6 @@ public class DriveTrain extends SubsystemModule {
 		rPidController.setIZone(rKIS);
 		rPidController.setFF(rKFF);
 		rPidController.setOutputRange(kMinOutput, kMaxOutput);
-
-		// SmartDashboard configuration
-		SmartDashboard.putNumber("Left P Gain", lKP);
-		SmartDashboard.putNumber("Left I Gain", lKI);
-		SmartDashboard.putNumber("Left D Gain", lKD);
-		SmartDashboard.putNumber("Left I Zone", lKIS);
-		SmartDashboard.putNumber("Left Feed Forward", lKFF);
-
-		SmartDashboard.putNumber("Right P Gain", rKP);
-		SmartDashboard.putNumber("Right I Gain", rKI);
-		SmartDashboard.putNumber("Right D Gain", rKD);
-		SmartDashboard.putNumber("Right I Zone", rKIS);
-		SmartDashboard.putNumber("Right Feed Forward", rKFF);
-
-		SmartDashboard.putNumber("Max Output", kMaxOutput);
-		SmartDashboard.putNumber("Min Output", kMinOutput);
-		SmartDashboard.putNumber("Debug Mode", debugMode);
 	}
 
 	// Instantiate odometer and link in encoders and navX
@@ -117,8 +98,8 @@ public class DriveTrain extends SubsystemModule {
 		@Override
 		public void updateEncodersAndHeading() {
 			this.headingAngle = 450 - navX.getFusedHeading();
-			if(this.headingAngle>360) {
-				this.headingAngle-=360;
+			if(this.headingAngle > 360) {
+				this.headingAngle -= 360;
 			}	
 
 			this.leftPos=leftEncoder.getDistance();
@@ -127,13 +108,14 @@ public class DriveTrain extends SubsystemModule {
 			this.currentAverageVelocity = (leftEncoder.getRate() + rightEncoder.getRate()) / 2;
 	
 		}
-
 	};
 
 	// Instantiate point controller for autonomous driving
 	public DrivingController drivingcontroller = new DrivingController(0.0005) {
 
-		// Use output from odometer and pass into autonomous driving controller
+		/**
+		 * Use output from odometer and pass into autonomous driving controller
+		 */
 		@Override
 		public void updateVariables(){
 			this.currentX = odometer.getCurrentX();
@@ -142,13 +124,18 @@ public class DriveTrain extends SubsystemModule {
 			this.currentAverageVelocity = odometer.getCurrentAverageVelocity();
 		}
 
-		// Link autonomous driving controller to the drive train motor control
+		/**
+		 * Link autonomous driving controller to the drive train motor control
+		 */
 		@Override
 		public void driveRobot(double power, double pivot) {
 			closedLoopArcade(power, pivot);
 		}
 	};
 
+	/**
+	 * Resets the variables for the drivetrain
+	 */
 	@Override
 	public void init() {
 		leftEncoder.reset();
@@ -163,6 +150,9 @@ public class DriveTrain extends SubsystemModule {
 		rMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
 	}
 
+	/**
+	 * Disables the motors and stops the drivetrain
+	 */
 	@Override
 	public void destruct() {
 		lMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
@@ -172,7 +162,9 @@ public class DriveTrain extends SubsystemModule {
 		rMotor0.set(0);
 	}
 	
-	// Subsystem run function, use controller collection (multi-threaded at fast period)
+	/**
+	 * Subsystem run function, uses ControlsProcessor (multi-threaded at fast period)
+	 */
 	@Override
 	public void run() {
 
@@ -180,44 +172,8 @@ public class DriveTrain extends SubsystemModule {
 		this.odometer.integratePosition();
 
 		// Run only when subsystem is enabled
-		if (this.enabled) {
+		if (getStatus()) {
 			this.drivingcontroller.run();
-		}
-	}
-
-	// Pull values from SmartDashboard
-	public void configureCoefficients() {
-		double lP = SmartDashboard.getNumber("Left P Gain", 0);
-		double lI = SmartDashboard.getNumber("Left I Gain", 0);
-		double lD = SmartDashboard.getNumber("Left D Gain", 0);
-		double lIS = SmartDashboard.getNumber("Left I Saturation", 0);
-		double lFF = SmartDashboard.getNumber("Left Feed Forward", 0);
-
-		double rP = SmartDashboard.getNumber("Right P Gain", 0);
-		double rI = SmartDashboard.getNumber("Right I Gain", 0);
-		double rD = SmartDashboard.getNumber("Right D Gain", 0);
-		double rIS = SmartDashboard.getNumber("Right I Saturation", 0);
-		double rFF = SmartDashboard.getNumber("Right Feed Forward", 0);
-						
-		double max = SmartDashboard.getNumber("Max Output", 0);
-		double min = SmartDashboard.getNumber("Min Output", 0);
-	
-		// If PID coefficients on SmartDashboard have changed, write new values to controller
-		if (lP != lKP) { lPidController.setP(lP); lKP = lP; }						
-		if (lI != lKI) { lPidController.setI(lI); lKI = lI; }
-		if (lD != lKD) { lPidController.setD(lD); lKD = lD; }			
-		if (lIS != lKIS) { lPidController.setIZone(lIS); lKIS = lIS; }
-		if (lFF != lKFF) { lPidController.setFF(lFF); lKFF = lFF; }
-
-		if (rP != rKP) { rPidController.setP(rP); rKP = rP; }
-		if (rI != rKI) { rPidController.setI(rI); rKI = rI; }
-		if (rD != rKD) { rPidController.setD(rD); rKD = rD; }
-		if (rIS != rKIS) { rPidController.setIZone(rIS); rKIS = rIS;}
-		if (rFF != rKFF) { rPidController.setFF(rFF); rKFF = rFF; }
-						
-		if ((max != kMaxOutput) || (min != kMinOutput)) { 
-			lPidController.setOutputRange(min, max); 
-			kMinOutput = min; kMaxOutput = max;
 		}
 	}
 
@@ -228,10 +184,6 @@ public class DriveTrain extends SubsystemModule {
 
 	// Closed loop velocity based tank
 	public void closedLoopTank(double leftVelocity, double rightVelocity) {
-		
-		if(SmartDashboard.getNumber("DebugMode", 0) > 0){
-			configureCoefficients();																			
-		}
 				
 		lPidController.setReference(leftVelocity, ControlType.kVelocity);
 		rPidController.setReference(-rightVelocity, ControlType.kVelocity);
@@ -334,7 +286,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				enabled = true;
+				enable();
 			}
 
 			@Override

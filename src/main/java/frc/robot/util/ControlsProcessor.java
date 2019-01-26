@@ -35,7 +35,7 @@ public abstract class ControlsProcessor extends Thread {
 	protected JoystickButton back = new JoystickButton(xbox1, 7);
 	protected JoystickButton start = new JoystickButton(xbox1, 8);
 
-	//
+	// Array list that holds all of the operator controls
 	private ArrayList<JoystickCommandPair> operatorControls = new ArrayList<JoystickCommandPair>();
 	
 	/**
@@ -83,7 +83,7 @@ public abstract class ControlsProcessor extends Thread {
 				counter++;
 				
 				checkButtons();
-				commandQueue();
+				processCommandQueue();
 
 				// Busy wait until the next iteration
 				while (System.nanoTime() < timestamp + periodNanoseconds) { }
@@ -153,12 +153,19 @@ public abstract class ControlsProcessor extends Thread {
 	}
 
 	/**
+	 * Adds a command to commandQueue
+	 */
+	public void addToQueue(CommandDetails newCommand) {
+		commandQueue.add(newCommand);
+	}
+
+	/**
 	 * Pull new command off of queue, if it is a sequential command, make sure
 	 * nothing else is running. If it is a parallel command, call it and add it to
 	 * the list.
 	 */
-	public void commandQueue() {
-		// TODO: Test
+	public void processCommandQueue() {
+		// TODO: Test time delay
 		if (this.commandQueue.size() > 0 && (this.commandQueue.get(0).type().equals(CommandDetails.CommandType.PARALLEL)
 				|| this.commandQueue.get(0).type().equals(CommandDetails.CommandType.TIMEDELAY))) {
 			System.out.println(this.commandQueue.get(0).name());

@@ -19,6 +19,12 @@ public abstract class Odometer {
 	private double change_x, change_y;
 	private double current_x, current_y;
 
+	/**
+	 * Initializes an Odometer and sets these variables
+	 * @param startX
+	 * @param startY
+	 * @param startOffset
+	 */
 	public Odometer(double startX, double startY, double startOffset) {
 		this.current_x = startX;
 		this.current_y = startY;
@@ -30,14 +36,19 @@ public abstract class Odometer {
 		current_y = 0;
 	}
 
-	// Update with getFusedHeading, leftPos, rightPos, and velocity (0.5  rates)
+	/**
+	 * Must be defined to update the odometer variables from the subsystem
+	 */
 	public abstract void updateEncodersAndHeading();
 
-	// Integrate the position of the robot using the distance from each encoder.
+	/**
+	 * Finds the robot's expected position using its heading and distance
+	 */
 	public void integratePosition() {
 
 		updateEncodersAndHeading();
 
+		// Get the heading
 		headingAngle = headingAngle + startOffset;
 
 		if (headingAngle > 360)
@@ -46,11 +57,13 @@ public abstract class Odometer {
 		if (headingAngle < 0)
 			headingAngle += 360;
 
+		// Get the distances
 		leftDistance = (leftPos - lastLeftPos);
 		rightDistance = (rightPos - lastRightPos);
 
 		hypotenuseDistance = (leftDistance + rightDistance) / 2;
 
+		// Calculates the expected movement
 		change_x = (Math.cos(Math.toRadians(headingAngle)) * hypotenuseDistance);
 		change_y = (Math.sin(Math.toRadians(headingAngle)) * hypotenuseDistance);
 
@@ -59,9 +72,12 @@ public abstract class Odometer {
 
 		lastLeftPos = leftPos;
 		lastRightPos = rightPos;
-
 	}
 
+	/**
+	 * The robot's initial offset angle in respect to 90 degrees
+	 * @param offset Initial offset
+	 */
 	public void setOffset(double offset) {
 		startOffset = offset;
 	}

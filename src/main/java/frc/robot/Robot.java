@@ -5,7 +5,9 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.autontasks.TestAuton;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.util.AutonTask;
 import frc.robot.util.ControlsProcessor;
 
 /*
@@ -47,6 +49,10 @@ public class Robot extends TimedRobot {
 		controlsProcessor.start();
 	}
 
+	/**
+	 * Runs when the robot is disabled and cancels
+	 * everything running in the controls processor
+	 */
 	@Override
 	public void disabledInit() {
 		drivetrain.destruct();
@@ -58,31 +64,38 @@ public class Robot extends TimedRobot {
 		}
 	}
 
+	/**
+	 * Does NOTHING!
+	 */
 	@Override
 	public void disabledPeriodic() {
 		Scheduler.getInstance().run();
 	}
 
+	/**
+	 * Runs at the beginning of auton mode
+	 * TODO: Replace WPI Lib with auton task
+	 */
 	@Override
 	public void autonomousInit() {
-
-		autonomousCommand = autoChooser.getSelected();
-
-		if (autonomousCommand != null) {
-			autonomousCommand.start();
-		}
-
 		generalInit();
 
+		AutonTask choiceOne = new TestAuton(controlsProcessor);
+		AutonTask choiceTwo = new TestAuton(controlsProcessor);
+
+		choiceOne.run();
 	}
 
+	/**
+	 * Runs periodically during auton
+	 */
 	@Override
-	public void autonomousPeriodic() {
+	public void autonomousPeriodic() { Scheduler.getInstance().run(); }
 
-		Scheduler.getInstance().run();
-
-	}
-
+	/**
+	 * Runs at the start of teleop mode
+	 * TODO: Cancel the queue
+	 */
 	@Override
 	public void teleopInit() {
 		if (autonomousCommand != null)
@@ -91,37 +104,36 @@ public class Robot extends TimedRobot {
 		generalInit();
 	}
 
+	/**
+	 * Runs periodically during teleop
+	 */
 	@Override
 	public void teleopPeriodic() {
 
 		Scheduler.getInstance().run();
 
 		if(Math.abs(controlsProcessor.getLeftJoystick()) >= 0.1 || Math.abs(controlsProcessor.getRightJoystick()) >= 0.1){
-			System.out.println("teleop control");
+			System.out.println("Teleop control");
 			drivetrain.arcadeDrive(-controlsProcessor.getLeftJoystick(), controlsProcessor.getRightJoystick());
 		}
 
 	}
 
+	/**
+	 * Unused
+	 */
 	@Override
-	public void testInit() {
+	public void testInit() { }
 
-		autonomousCommand = autoChooser.getSelected();
-
-		if (autonomousCommand != null) {
-			autonomousCommand.start();
-		}
-
-		generalInit();
-
-	}
-
+	/**
+	 * Unused
+	 */
 	@Override
-	public void testPeriodic() {
+	public void testPeriodic() { }
 
-	}
-
-	// General init 
+	/**
+	 * Called at the start of both auton and teleop init
+	 */
 	private void generalInit() {
 		if (controlsProcessor != null) {
 			controlsProcessor.enable();
