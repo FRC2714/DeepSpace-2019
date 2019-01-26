@@ -92,16 +92,15 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopPeriodic() {
-		System.out.println("IT WORKS");
 		Scheduler.getInstance().run();
 
 
-		if(Math.abs(ControlsProcessor.getLeftJoystick()) >= 0.07 || Math.abs(ControlsProcessor.getRightJoystick()) >= 0.07){
-			drivetrain.closedLoopArcade(-ControlsProcessor.getLeftJoystick() * drivetrain.getMaxVelocity(),
-					ControlsProcessor.getRightJoystick());
-		} else {
-			drivetrain.closedLoopArcade(0,0);
-		}
+		// if(Math.abs(ControlsProcessor.getLeftJoystick()) >= 0.07 || Math.abs(ControlsProcessor.getRightJoystick()) >= 0.07){
+		// 	drivetrain.closedLoopArcade(-ControlsProcessor.getLeftJoystick() * drivetrain.getMaxVelocity(),
+		// 			ControlsProcessor.getRightJoystick());
+		// } else {
+		// 	drivetrain.closedLoopArcade(0,0);
+		// }
 
 	}
 
