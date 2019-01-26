@@ -18,14 +18,14 @@ import frc.robot.util.ControlsProcessor;
 public class Robot extends TimedRobot {
 
 	// Initialize subsystems
-	public DriveTrain drivetrain = new DriveTrain();
+	private DriveTrain drivetrain = new DriveTrain();
 
 	// Initialize auton mode selector
 	private Command autonomousCommand;
 	private SendableChooser<Command> autoChooser;
 
 	// Initialize robot control systems
-	public ControlsProcessor ControlsProcessor;
+	private ControlsProcessor controlsProcessor;
 
 	// Init and Periodic functions
 	@Override
@@ -33,15 +33,18 @@ public class Robot extends TimedRobot {
 		autoChooser = new SendableChooser<>();
 		SmartDashboard.putData("Autonomous Mode Selector", autoChooser);
 
-		ControlsProcessor = new ControlsProcessor(500000, 1) {
+		// Controls processor only gets created ONCE when code is run
+		controlsProcessor = new ControlsProcessor(500000, 1) {
 			@Override
 			public void registerOperatorControls() {
 				append("add_forwards_spline -s 0,0,-6,-6,0,3,6,9,8,8,0,0", this.y);
 				append("start_path -s", this.b);
 			}
 		};
-		ControlsProcessor.registerController("DriveTrain", drivetrain);
-		ControlsProcessor.start();
+
+		// Required to register all subsystems in order to be processed. 
+		controlsProcessor.registerController("DriveTrain", drivetrain);
+		controlsProcessor.start();
 	}
 
 	@Override
@@ -49,9 +52,9 @@ public class Robot extends TimedRobot {
 		drivetrain.destruct();
 		Scheduler.getInstance().removeAll();
 
-		if (ControlsProcessor != null) {
-			ControlsProcessor.cancelAll();
-			ControlsProcessor.disable();
+		if (controlsProcessor != null) {
+			controlsProcessor.cancelAll();
+			controlsProcessor.disable();
 		}
 	}
 
@@ -93,9 +96,9 @@ public class Robot extends TimedRobot {
 
 		Scheduler.getInstance().run();
 
-		if(Math.abs(ControlsProcessor.getLeftJoystick()) >= 0.1 || Math.abs(ControlsProcessor.getRightJoystick()) >= 0.1){
+		if(Math.abs(controlsProcessor.getLeftJoystick()) >= 0.1 || Math.abs(controlsProcessor.getRightJoystick()) >= 0.1){
 			System.out.println("teleop control");
-			drivetrain.arcadeDrive(-ControlsProcessor.getLeftJoystick(), ControlsProcessor.getRightJoystick());
+			drivetrain.arcadeDrive(-controlsProcessor.getLeftJoystick(), controlsProcessor.getRightJoystick());
 		}
 
 	}
@@ -120,8 +123,8 @@ public class Robot extends TimedRobot {
 
 	// General init 
 	private void generalInit() {
-		if (ControlsProcessor != null) {
-			ControlsProcessor.enable();
+		if (controlsProcessor != null) {
+			controlsProcessor.enable();
 		}
 
 		drivetrain.init();
