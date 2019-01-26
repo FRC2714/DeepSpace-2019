@@ -52,7 +52,7 @@ public class DriveTrain extends SubsystemModule {
 	private final double lKFF = 1.77e-4;
 	private final double rKFF = 1.78e-4;
 
-	private final double convFactor = 322.2; // Convert ft/s to RPM
+	private final double convFactor = 100; // Convert ft/s to RPM
 	private final double sensitivity = 5;
 	private final double maxVelocity = 13;
 
@@ -69,10 +69,11 @@ public class DriveTrain extends SubsystemModule {
 	// NavX gyro
 	private AHRS navX = new AHRS(SPI.Port.kMXP);
 
-	// Drivetrain initialization
+	// Drivetrain initializations
 	public DriveTrain() {
 		registerCommands();
-
+		
+		drive.setSafetyEnabled(false);
 		// Configure follow mode
 		lMotor1.follow(lMotor0);
 		lMotor2.follow(lMotor0);

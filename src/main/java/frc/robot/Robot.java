@@ -94,10 +94,11 @@ public class Robot extends TimedRobot {
 		Scheduler.getInstance().run();
 
 
-		if(Math.abs(ControlsProcessor.getLeftJoystick()) >= 0.1 || Math.abs(ControlsProcessor.getRightJoystick()) >= 0.07){
-			System.out.println("teleop control");
+		if(Math.abs(ControlsProcessor.getLeftJoystick()) >= 0.07 || Math.abs(ControlsProcessor.getRightJoystick()) >= 0.07){
 			drivetrain.closedLoopArcade(-ControlsProcessor.getLeftJoystick() * drivetrain.getMaxVelocity(),
 					ControlsProcessor.getRightJoystick());
+		} else {
+			drivetrain.closedLoopArcade(0,0);
 		}
 
 	}
