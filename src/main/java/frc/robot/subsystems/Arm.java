@@ -30,25 +30,25 @@ public class Arm extends SubsystemModule {
 	private Encoder wristOutputEncoder = new Encoder(RobotMap.p_wristEncoderA, RobotMap.p_wristEncoderB, true, EncodingType.k4X);
 
 	// PID coefficients
-	private final double sMinOutput = -1.0;
-	private final double sMaxOutput = 1.0;
-	private final double sP = 0.0;
-	private final double sI = 0.0;
-	private final double sD = 0.0;
-	private final double sIS = 0.0;
-	private final double sFF = 0.0;
+	private final double sMinOutput = -1;
+	private final double sMaxOutput = 1;
+	private final double sP = 0;
+	private final double sI = 0;
+	private final double sD = 0;
+	private final double sIS = 0;
+	private final double sFF = 0;
 
-	private final double wMinOutput = -1.0;
-	private final double wMaxOutput = 1.0;
-	private final double wP = 0.0;
-	private final double wI = 0.0;
-	private final double wD = 0.0;
-	private final double wIS = 0.0;
-	private final double wFF = 0.0;
+	private final double wMinOutput = -1;
+	private final double wMaxOutput = 1;
+	private final double wP = 0;
+	private final double wI = 0;
+	private final double wD = 0;
+	private final double wIS = 0;
+	private final double wFF = 0;
 
 	// Arm characteristics
 	private final double shoulderRatio = 512.0/3;
-	private final double wristRatio = 140.0/1;
+	private final double wristRatio = 140;
 
 	// Arm initialization
     public Arm() {
@@ -74,7 +74,7 @@ public class Arm extends SubsystemModule {
 		double initialShoulderTheta = 0.0;
 		double initialWristTheta = 0.0;
 
-		
+
     }
 
     @Override public void registerCommands() {
