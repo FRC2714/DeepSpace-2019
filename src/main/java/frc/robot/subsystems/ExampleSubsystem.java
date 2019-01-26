@@ -6,7 +6,7 @@ import frc.robot.util.SubsystemModule;
 public class ExampleSubsystem extends SubsystemModule {
 
     public ExampleSubsystem() { 
-        registerCommands(); 
+        registerCommands(); // Puts commands onto the hashmap 
     }
 
     @Override public void run() {
