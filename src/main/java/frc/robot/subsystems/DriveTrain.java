@@ -40,20 +40,17 @@ public class DriveTrain extends SubsystemModule {
 	private DifferentialDrive drive = new DifferentialDrive(lMotor0, rMotor0);
 
 	// PID coefficients
-	private double kMinOutput;
-	private double kMaxOutput;
 
-	private double lKP;
-	private double lKI;
-	private double lKIS;
-	private double lKD;
-	private double lKFF;
+	private final double kMinOutput = -1;
+	private final double kMaxOutput = 1;
 
-	private double rKP;
-	private double rKI;
-	private double rKIS;
-	private double rKD;
-	private double rKFF;
+	private final double kP = 4.8e-5;
+	private final double kI = 5.0e-7;
+	private final double kD = 0.0;
+	private final double kIS = 0.0;
+
+	private final double lKFF = 1.77e-4;
+	private final double rKFF = 1.78e-4;
 
 	private int debugMode;
 
@@ -79,36 +76,19 @@ public class DriveTrain extends SubsystemModule {
 		rMotor2.follow(rMotor0);
 
 		// Setup up PID coefficients
-		lPidController.setP(lKP);
-		lPidController.setI(lKI);
-		lPidController.setD(lKD);
-		lPidController.setIZone(lKIS);
+		lPidController.setP(kP);
+		lPidController.setI(kI);
+		lPidController.setD(kD);
+		lPidController.setIZone(kIS);
 		lPidController.setFF(lKFF);
 		lPidController.setOutputRange(kMinOutput, kMaxOutput);
 
-		rPidController.setP(rKP);
-		rPidController.setI(rKI);
-		rPidController.setD(rKD);
-		rPidController.setIZone(rKIS);
+		rPidController.setP(kP);
+		rPidController.setI(kI);
+		rPidController.setD(kD);
+		rPidController.setIZone(kIS);
 		rPidController.setFF(rKFF);
 		rPidController.setOutputRange(kMinOutput, kMaxOutput);
-
-		// SmartDashboard configuration
-		SmartDashboard.putNumber("Left P Gain", lKP);
-		SmartDashboard.putNumber("Left I Gain", lKI);
-		SmartDashboard.putNumber("Left D Gain", lKD);
-		SmartDashboard.putNumber("Left I Zone", lKIS);
-		SmartDashboard.putNumber("Left Feed Forward", lKFF);
-
-		SmartDashboard.putNumber("Right P Gain", rKP);
-		SmartDashboard.putNumber("Right I Gain", rKI);
-		SmartDashboard.putNumber("Right D Gain", rKD);
-		SmartDashboard.putNumber("Right I Zone", rKIS);
-		SmartDashboard.putNumber("Right Feed Forward", rKFF);
-
-		SmartDashboard.putNumber("Max Output", kMaxOutput);
-		SmartDashboard.putNumber("Min Output", kMinOutput);
-		SmartDashboard.putNumber("Debug Mode", debugMode);
 	}
 
 	// Instantiate odometer and link in encoders and navX
@@ -185,41 +165,7 @@ public class DriveTrain extends SubsystemModule {
 		}
 	}
 
-	// Pull values from SmartDashboard
-	public void configureCoefficients() {
-		double lP = SmartDashboard.getNumber("Left P Gain", 0);
-		double lI = SmartDashboard.getNumber("Left I Gain", 0);
-		double lD = SmartDashboard.getNumber("Left D Gain", 0);
-		double lIS = SmartDashboard.getNumber("Left I Saturation", 0);
-		double lFF = SmartDashboard.getNumber("Left Feed Forward", 0);
 
-		double rP = SmartDashboard.getNumber("Right P Gain", 0);
-		double rI = SmartDashboard.getNumber("Right I Gain", 0);
-		double rD = SmartDashboard.getNumber("Right D Gain", 0);
-		double rIS = SmartDashboard.getNumber("Right I Saturation", 0);
-		double rFF = SmartDashboard.getNumber("Right Feed Forward", 0);
-						
-		double max = SmartDashboard.getNumber("Max Output", 0);
-		double min = SmartDashboard.getNumber("Min Output", 0);
-	
-		// If PID coefficients on SmartDashboard have changed, write new values to controller
-		if (lP != lKP) { lPidController.setP(lP); lKP = lP; }						
-		if (lI != lKI) { lPidController.setI(lI); lKI = lI; }
-		if (lD != lKD) { lPidController.setD(lD); lKD = lD; }			
-		if (lIS != lKIS) { lPidController.setIZone(lIS); lKIS = lIS; }
-		if (lFF != lKFF) { lPidController.setFF(lFF); lKFF = lFF; }
-
-		if (rP != rKP) { rPidController.setP(rP); rKP = rP; }
-		if (rI != rKI) { rPidController.setI(rI); rKI = rI; }
-		if (rD != rKD) { rPidController.setD(rD); rKD = rD; }
-		if (rIS != rKIS) { rPidController.setIZone(rIS); rKIS = rIS;}
-		if (rFF != rKFF) { rPidController.setFF(rFF); rKFF = rFF; }
-						
-		if ((max != kMaxOutput) || (min != kMinOutput)) { 
-			lPidController.setOutputRange(min, max); 
-			kMinOutput = min; kMaxOutput = max;
-		}
-	}
 
 	// General arcade drive
 	public void arcadeDrive(double power, double pivot) {
@@ -228,11 +174,6 @@ public class DriveTrain extends SubsystemModule {
 
 	// Closed loop velocity based tank
 	public void closedLoopTank(double leftVelocity, double rightVelocity) {
-		
-		if(SmartDashboard.getNumber("DebugMode", 0) > 0){
-			configureCoefficients();																			
-		}
-				
 		lPidController.setReference(leftVelocity, ControlType.kVelocity);
 		rPidController.setReference(-rightVelocity, ControlType.kVelocity);
 	}
