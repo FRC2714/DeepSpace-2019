@@ -52,6 +52,10 @@ public class DriveTrain extends SubsystemModule {
 	private final double lKFF = 1.77e-4;
 	private final double rKFF = 1.78e-4;
 
+	private final double convFactor = 322.2; // Convert ft/s to RPM
+	private final double sensitivity = 5;
+	private final double maxVelocity = 13;
+
 	private int debugMode;
 
 	// Robot characteristics
@@ -174,19 +178,23 @@ public class DriveTrain extends SubsystemModule {
 
 	// Closed loop velocity based tank
 	public void closedLoopTank(double leftVelocity, double rightVelocity) {
-		lPidController.setReference(leftVelocity, ControlType.kVelocity);
-		rPidController.setReference(-rightVelocity, ControlType.kVelocity);
+		lPidController.setReference(leftVelocity * convFactor, ControlType.kVelocity);
+		rPidController.setReference(-rightVelocity * convFactor, ControlType.kVelocity);
 	}
 
 	// Closed loop arcade based tank
-	public void closedLoopArcade(double velocity, double rps) {
-		double pivot = Math.PI * wheelSeparation * rps;
+	public void closedLoopArcade(double velocity, double pivot) {
+		pivot = pivot * convFactor * sensitivity;
 		closedLoopTank(velocity - pivot, velocity + pivot);
 	}
 
 	// Output encoder values
 	public void getEncoderValues() {
 		System.out.println("LE: " + lEncoder.getPosition() + " RE: " + rEncoder.getPosition());
+	}
+
+	public double getMaxVelocity(){
+		return maxVelocity;
 	}
 
 	@Override
