@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import frc.robot.RobotMap;
 
-public class ControlsProcessor extends Thread {
+public abstract class ControlsProcessor extends Thread {
 
 	private double periodNanoseconds = 0;
 	private boolean stopProcessor = false;
@@ -38,9 +38,7 @@ public class ControlsProcessor extends Thread {
 	private ArrayList<JoystickCommandPair> controls = new ArrayList<JoystickCommandPair>();
 	
 	// Override this from robot class
-	public void registerOperatorControls() {
-
-	}
+	public abstract void registerOperatorControls();
 
 	// Initialize controller collection with a period
 	public ControlsProcessor(double periodNanoseconds, int commandDivider) {

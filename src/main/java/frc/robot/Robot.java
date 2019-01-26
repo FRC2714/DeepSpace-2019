@@ -33,11 +33,13 @@ public class Robot extends TimedRobot {
 		autoChooser = new SendableChooser<>();
 		SmartDashboard.putData("Autonomous Mode Selector", autoChooser);
 
-		ControlsProcessor = new ControlsProcessor(500000, 1) {
+		ControlsProcessor = new ControlsProcessor(2000000, 1) {
 			@Override
 			public void registerOperatorControls() {
-				append("add_forwards_spline -s 0,0,-6,-6,0,3,6,9,8,8,0,0", this.y);
-				append("start_path -s", this.b);
+				append("closed_loop_tank -s 5", this.a);
+				System.out.println("Controls reg");
+				//append("add_forwards_spline -s 0,0,-6,-6,0,3,6,9,8,8,0,0", this.y);
+				//append("start_path -s", this.b);
 			}
 		};
 		ControlsProcessor.registerController("DriveTrain", drivetrain);
@@ -90,7 +92,7 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopPeriodic() {
-
+		System.out.println("IT WORKS");
 		Scheduler.getInstance().run();
 
 

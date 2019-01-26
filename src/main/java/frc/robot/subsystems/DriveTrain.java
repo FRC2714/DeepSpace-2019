@@ -21,12 +21,12 @@ import frc.robot.util.SubsystemModule;
 public class DriveTrain extends SubsystemModule {
 
 	// Drivetrain motors
-	private CANSparkMax lMotor0 = new CANSparkMax(0, MotorType.kBrushless);
-	private CANSparkMax lMotor1 = new CANSparkMax(1, MotorType.kBrushless);
-	private CANSparkMax lMotor2 = new CANSparkMax(2, MotorType.kBrushless);
-	private CANSparkMax rMotor0 = new CANSparkMax(3, MotorType.kBrushless);
-	private CANSparkMax rMotor1 = new CANSparkMax(4, MotorType.kBrushless);
-	private CANSparkMax rMotor2 = new CANSparkMax(5, MotorType.kBrushless);
+	private CANSparkMax lMotor0;
+	private CANSparkMax lMotor1;
+	private CANSparkMax lMotor2;
+	private CANSparkMax rMotor0;
+	private CANSparkMax rMotor1;
+	private CANSparkMax rMotor2;
 
 	// PID controllers
 	private CANPIDController lPidController = lMotor0.getPIDController();
@@ -72,7 +72,20 @@ public class DriveTrain extends SubsystemModule {
 	// Drivetrain initializations
 	public DriveTrain() {
 		registerCommands();
-		
+
+		lMotor0 = new CANSparkMax(0, MotorType.kBrushless);
+		System.out.println("lMotor0 good");
+		lMotor1 = new CANSparkMax(1, MotorType.kBrushless);
+		System.out.println("lMotor1 good");
+		lMotor2 = new CANSparkMax(2, MotorType.kBrushless);
+		System.out.println("lMotor2 good");
+		rMotor0 = new CANSparkMax(3, MotorType.kBrushless);
+		System.out.println("rMotor0 good");
+		rMotor1 = new CANSparkMax(4, MotorType.kBrushless);
+		System.out.println("rMotor1 good");
+		rMotor2 = new CANSparkMax(5, MotorType.kBrushless);
+		System.out.println("rMotor2 good");
+
 		drive.setSafetyEnabled(false);
 		// Configure follow mode
 		lMotor1.follow(lMotor0);
@@ -116,7 +129,7 @@ public class DriveTrain extends SubsystemModule {
 	};
 
 	// Instantiate point controller for autonomous driving
-	public DrivingController drivingcontroller = new DrivingController(0.0005) {
+	public DrivingController drivingcontroller = new DrivingController(0.002) {
 
 		// Use output from odometer and pass into autonomous driving controller
 		@Override
@@ -200,6 +213,30 @@ public class DriveTrain extends SubsystemModule {
 
 	@Override
 	public void registerCommands() {
+		new SubsystemCommand(this.registeredCommands, "closed_loop_tank") {
+
+			@Override
+			public void initialize() {
+				double velocity = Double.parseDouble(this.args[0]);
+				closedLoopTank(velocity, velocity);
+			}
+
+			@Override
+			public void execute() {
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {
+				closedLoopTank(0, 0);
+			}
+		};
+
 		new SubsystemCommand(this.registeredCommands, "set_angular_offset") {
 
 			@Override
