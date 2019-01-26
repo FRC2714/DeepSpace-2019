@@ -46,6 +46,9 @@ public class SplineFactory {
 
     }
 
+    /**
+     * 
+     */
     public void generate() {
 
         // Fill point buffer
@@ -61,6 +64,7 @@ public class SplineFactory {
             // PT and VT, are the position and velocity at time T
             // A is the profile acceleration
 
+            // Ramp up velocity by acceleration
             if (currentFrontVelocity < this.velocity) {
                 currentFrontVelocity += this.acceleration * this.period;
             }
@@ -77,8 +81,9 @@ public class SplineFactory {
 
         }
 
-        System.out.println("done");
+        System.out.println("Done");
 
+        // Calculates the MotionPoses and adds them to the array list
         for (int i = 0; i < xValues.size() - 1; i++) {
 
             double angle;
@@ -126,6 +131,15 @@ public class SplineFactory {
 
     }
 
+    /**
+     * Finds the point at a given distance
+     * @param startT Value of T the search starts at
+     * @param distance Desired distance
+     * @param location Location for point insertion
+     * @param xValues List of x points being created
+     * @param yValues List of y points being created
+     * @return Resultant T value
+     */
     public double binaryFind(double startT, double distance, int location, ArrayList<Double> xValues, ArrayList<Double> yValues) {
         double internalT = startT;
         double tStep_modified = this.tStep;
@@ -180,13 +194,28 @@ public class SplineFactory {
         return internalT;
     }
 
-    // Calculate quartic spline point with 4 controls
+    /**
+     * Quartic spline equation with 4 control points
+     * @param t T step input
+     * @param c1
+     * @param c2
+     * @param c3
+     * @param c4
+     * @return
+     */
     public double quarticCalc(double t, double c1, double c2, double c3, double c4) {
         return (Math.pow(1 - t, 3) * c1) + 3 * (Math.pow(1 - t, 2) * t * c2) + 3 * (Math.pow(t, 2) * (1 - t) * c3)
                 + (Math.pow(t, 3) * c4);
     }
 
-    // Calculate distance
+    /**
+     * Calculate distance between points
+     * @param x1
+     * @param x2
+     * @param y1
+     * @param y2
+     * @return
+     */
     public double distanceCalc(double x1, double x2, double y1, double y2) {
         return Math.pow((Math.pow(x2 - x1, 2)) + (Math.pow(y2 - y1, 2)), 0.5);
     }

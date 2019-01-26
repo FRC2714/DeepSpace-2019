@@ -5,7 +5,9 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.autontasks.TestAuton;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.util.AutonTask;
 import frc.robot.util.ControlsProcessor;
 
 /*
@@ -18,14 +20,14 @@ import frc.robot.util.ControlsProcessor;
 public class Robot extends TimedRobot {
 
 	// Initialize subsystems
-	public DriveTrain drivetrain = new DriveTrain();
+	private DriveTrain drivetrain = new DriveTrain();
 
 	// Initialize auton mode selector
 	private Command autonomousCommand;
 	private SendableChooser<Command> autoChooser;
 
 	// Initialize robot control systems
-	public ControlsProcessor ControlsProcessor;
+	private ControlsProcessor controlsProcessor;
 
 	// Init and Periodic functions
 	@Override
@@ -33,53 +35,67 @@ public class Robot extends TimedRobot {
 		autoChooser = new SendableChooser<>();
 		SmartDashboard.putData("Autonomous Mode Selector", autoChooser);
 
-		ControlsProcessor = new ControlsProcessor(500000, 1) {
+		// Controls processor only gets created ONCE when code is run
+		controlsProcessor = new ControlsProcessor(500000, 1) {
 			@Override
 			public void registerOperatorControls() {
 				append("add_forwards_spline -s 0,0,-6,-6,0,3,6,9,8,8,0,0", this.y);
 				append("start_path -s", this.b);
 			}
 		};
-		ControlsProcessor.registerController("DriveTrain", drivetrain);
-		ControlsProcessor.start();
+
+		// Required to register all subsystems in order to be processed. 
+		controlsProcessor.registerController("DriveTrain", drivetrain);
+		controlsProcessor.start();
 	}
 
+	/**
+	 * Runs when the robot is disabled and cancels
+	 * everything running in the controls processor
+	 */
 	@Override
 	public void disabledInit() {
 		drivetrain.destruct();
 		Scheduler.getInstance().removeAll();
 
-		if (ControlsProcessor != null) {
-			ControlsProcessor.cancelAll();
-			ControlsProcessor.disable();
+		if (controlsProcessor != null) {
+			controlsProcessor.cancelAll();
+			controlsProcessor.disable();
 		}
 	}
 
+	/**
+	 * Does NOTHING!
+	 */
 	@Override
 	public void disabledPeriodic() {
 		Scheduler.getInstance().run();
 	}
 
+	/**
+	 * Runs at the beginning of auton mode
+	 * TODO: Replace WPI Lib with auton task
+	 */
 	@Override
 	public void autonomousInit() {
-
-		autonomousCommand = autoChooser.getSelected();
-
-		if (autonomousCommand != null) {
-			autonomousCommand.start();
-		}
-
 		generalInit();
 
+		AutonTask choiceOne = new TestAuton(controlsProcessor);
+		AutonTask choiceTwo = new TestAuton(controlsProcessor);
+
+		choiceOne.run();
 	}
 
+	/**
+	 * Runs periodically during auton
+	 */
 	@Override
-	public void autonomousPeriodic() {
+	public void autonomousPeriodic() { Scheduler.getInstance().run(); }
 
-		Scheduler.getInstance().run();
-
-	}
-
+	/**
+	 * Runs at the start of teleop mode
+	 * TODO: Cancel the queue
+	 */
 	@Override
 	public void teleopInit() {
 		if (autonomousCommand != null)
@@ -88,40 +104,39 @@ public class Robot extends TimedRobot {
 		generalInit();
 	}
 
+	/**
+	 * Runs periodically during teleop
+	 */
 	@Override
 	public void teleopPeriodic() {
 
 		Scheduler.getInstance().run();
 
-		if(Math.abs(ControlsProcessor.getLeftJoystick()) >= 0.1 || Math.abs(ControlsProcessor.getRightJoystick()) >= 0.1){
-			System.out.println("teleop control");
-			drivetrain.arcadeDrive(-ControlsProcessor.getLeftJoystick(), ControlsProcessor.getRightJoystick());
+		if(Math.abs(controlsProcessor.getLeftJoystick()) >= 0.1 || Math.abs(controlsProcessor.getRightJoystick()) >= 0.1){
+			System.out.println("Teleop control");
+			drivetrain.arcadeDrive(-controlsProcessor.getLeftJoystick(), controlsProcessor.getRightJoystick());
 		}
 
 	}
 
+	/**
+	 * Unused
+	 */
 	@Override
-	public void testInit() {
+	public void testInit() { }
 
-		autonomousCommand = autoChooser.getSelected();
-
-		if (autonomousCommand != null) {
-			autonomousCommand.start();
-		}
-
-		generalInit();
-
-	}
-
+	/**
+	 * Unused
+	 */
 	@Override
-	public void testPeriodic() {
+	public void testPeriodic() { }
 
-	}
-
-	// General init 
+	/**
+	 * Called at the start of both auton and teleop init
+	 */
 	private void generalInit() {
-		if (ControlsProcessor != null) {
-			ControlsProcessor.enable();
+		if (controlsProcessor != null) {
+			controlsProcessor.enable();
 		}
 
 		drivetrain.init();
