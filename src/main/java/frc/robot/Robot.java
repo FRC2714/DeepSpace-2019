@@ -5,7 +5,9 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.autontasks.TestAuton;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.util.AutonTask;
 import frc.robot.util.ControlsProcessor;
 
 /*
@@ -25,7 +27,7 @@ public class Robot extends TimedRobot {
 	private SendableChooser<Command> autoChooser;
 
 	// Initialize robot control systems
-	public ControlsProcessor ControlsProcessor;
+	private ControlsProcessor controlsProcessor;
 
 	// Init and Periodic functions
 	@Override
@@ -33,7 +35,8 @@ public class Robot extends TimedRobot {
 		autoChooser = new SendableChooser<>();
 		SmartDashboard.putData("Autonomous Mode Selector", autoChooser);
 
-		ControlsProcessor = new ControlsProcessor(2000000, 10) {
+		// Controls processor only gets created ONCE when code is run
+		controlsProcessor = new ControlsProcessor(2000000, 10) {
 			@Override
 			public void registerOperatorControls() {
 				append("closed_loop_tank -s 5", this.x);
@@ -44,48 +47,58 @@ public class Robot extends TimedRobot {
 			}
 		};
 
-		drivetrain = new DriveTrain(ControlsProcessor);
-
-		ControlsProcessor.registerController("DriveTrain", drivetrain);
-		ControlsProcessor.start();
+		// Required to register all subsystems in order to be processed. 
+		controlsProcessor.registerController("DriveTrain", drivetrain);
+		controlsProcessor.start();
 	}
 
+	/**
+	 * Runs when the robot is disabled and cancels
+	 * everything running in the controls processor
+	 */
 	@Override
 	public void disabledInit() {
 		drivetrain.destruct();
 		Scheduler.getInstance().removeAll();
 
-		if (ControlsProcessor != null) {
-			ControlsProcessor.cancelAll();
-			ControlsProcessor.disable();
+		if (controlsProcessor != null) {
+			controlsProcessor.cancelAll();
+			controlsProcessor.disable();
 		}
 	}
 
+	/**
+	 * Does NOTHING!
+	 */
 	@Override
 	public void disabledPeriodic() {
 		Scheduler.getInstance().run();
 	}
 
+	/**
+	 * Runs at the beginning of auton mode
+	 * TODO: Replace WPI Lib with auton task
+	 */
 	@Override
 	public void autonomousInit() {
-
-		autonomousCommand = autoChooser.getSelected();
-
-		if (autonomousCommand != null) {
-			autonomousCommand.start();
-		}
-
 		generalInit();
 
+		AutonTask choiceOne = new TestAuton(controlsProcessor);
+		AutonTask choiceTwo = new TestAuton(controlsProcessor);
+
+		choiceOne.run();
 	}
 
+	/**
+	 * Runs periodically during auton
+	 */
 	@Override
-	public void autonomousPeriodic() {
+	public void autonomousPeriodic() { Scheduler.getInstance().run(); }
 
-		Scheduler.getInstance().run();
-
-	}
-
+	/**
+	 * Runs at the start of teleop mode
+	 * TODO: Cancel the queue
+	 */
 	@Override
 	public void teleopInit() {
 		if (autonomousCommand != null)
@@ -94,33 +107,32 @@ public class Robot extends TimedRobot {
 		generalInit();
 	}
 
+	/**
+	 * Runs periodically during teleop
+	 */
 	@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
 	}
 
+	/**
+	 * Unused
+	 */
 	@Override
-	public void testInit() {
+	public void testInit() { }
 
-		autonomousCommand = autoChooser.getSelected();
-
-		if (autonomousCommand != null) {
-			autonomousCommand.start();
-		}
-
-		generalInit();
-
-	}
-
+	/**
+	 * Unused
+	 */
 	@Override
-	public void testPeriodic() {
+	public void testPeriodic() { }
 
-	}
-
-	// General init 
+	/**
+	 * Called at the start of both auton and teleop init
+	 */
 	private void generalInit() {
-		if (ControlsProcessor != null) {
-			ControlsProcessor.enable();
+		if (controlsProcessor != null) {
+			controlsProcessor.enable();
 		}
 
 		drivetrain.init();

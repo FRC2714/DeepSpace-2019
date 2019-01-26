@@ -37,12 +37,19 @@ public abstract class ControlsProcessor extends Thread {
 	protected JoystickButton leftStick = new JoystickButton(xbox1, 9);
 	protected JoystickButton rightStick = new JoystickButton(xbox1, 10);
 
-	private ArrayList<JoystickCommandPair> controls = new ArrayList<JoystickCommandPair>();
+	// Array list that holds all of the operator controls
+	private ArrayList<JoystickCommandPair> operatorControls = new ArrayList<JoystickCommandPair>();
 	
-	// Override this from robot class
+	/**
+	 * Has to be overridden from robot class
+	 */
 	public abstract void registerOperatorControls();
 
-	// Initialize controller collection with a period
+	/**
+	 * Initialize controller collection with specified period
+	 * @param periodNanoseconds Period in nanoseconds
+	 * @param commandDivider How often the commands get processed alongside the actual control loop
+	 */
 	public ControlsProcessor(double periodNanoseconds, int commandDivider) {
 		this.periodNanoseconds = periodNanoseconds;
 		this.commandDivider = commandDivider;
@@ -50,15 +57,23 @@ public abstract class ControlsProcessor extends Thread {
 		registerOperatorControls();
 	}
 
-	// Function to add the subsystem into the collection
+	/**
+	 * Function to add the subsystem into the collection
+	 * All the runs are added and called periodically
+	 * @param name 
+	 * @param subsystem
+	 */
 	public void registerController(String name, SubsystemModule subsystem) {
 		controllers.put(name, subsystem);
 	}
 
-	// Thread "run" function to process all sideband controls
+	/**
+	 * Runs periodically as required by extension of Java Thread
+	 */
 	public void run() {
-		double timestamp_ = System.nanoTime();
+		double timestamp = System.nanoTime();
 
+		// Runs even when robot is disabled
 		while (true) {
 
 			if (!stopProcessor) {
@@ -68,56 +83,69 @@ public abstract class ControlsProcessor extends Thread {
 					controllers.forEach((k, v) -> v.runCommands());
 				}
 				counter++;
-
+				
 				checkButtons();
-				commandQueue();
+				processCommandQueue();
 
-				while (System.nanoTime() < timestamp_ + periodNanoseconds) {
+				// Busy wait until the next iteration
+				while (System.nanoTime() < timestamp + periodNanoseconds) { }
 
-				}
-
-				timestamp_ = System.nanoTime();
+				timestamp = System.nanoTime();
 
 			}
 		}
 	}
 
-	/*
-	  Split the command input to get the command name and pull the arguments off of
-	  the command input, the args will always come last. ex: target_point -s 2,3
-	  ex: target_point 2,3
+	/**
+	 * Split the command input to get the command name and pull the arguments off of 
+	 * the command input, the args will always come last. 
+	 * ex: target_point -s 2,3ex: target_point 2,3
+	 * 
+	 * Called in commandQueue
+	 * @param command Command in reference
 	 */
 	public void callCommand(CommandDetails command) {
 		System.out.println("Received command: " + command.toString());
+		
 		controllers.forEach((k, v) -> {
+
+			// Matches the name of registered commands in the subsystem constructors
 			SubsystemCommand foundCommand = v.registeredCommands.get(command.name());
+
+			// Distinguishes based on whether or not the command contains arguments
 			if (foundCommand != null && command.args().isEmpty()) {
-				System.out.println("found command: " + command.name());
+				System.out.println("Found command: " + command.name());
+
 				if (command.type().equals(CommandDetails.CommandType.TIMEDELAY)) {
 					foundCommand.configureDelay(command.getDelay());
 				}
+
 				foundCommand.call();
+
 			} else if (foundCommand != null && !command.args().isEmpty()) {
-				System.out.println("found command: " + command.name());
+				System.out.println("Found command: " + command.name());
+
 				if (command.type().equals(CommandDetails.CommandType.TIMEDELAY)) {
 					foundCommand.configureDelay(command.getDelay());
 				}
+
 				foundCommand.call(command.args());
 			}
 		});
 	}
 
-	// Cancel a command
+	// Cancel a command based on input
 	public void cancelCommand(CommandDetails command) {
 		controllers.forEach((k, v) -> {
 			SubsystemCommand foundCommand = v.registeredCommands.get(command.name());
+
 			if (foundCommand != null) {
 				foundCommand.cancel();
 			}
 		});
 	}
 
-	// Cancels all commands
+	// Cancels all commands running
 	public void cancelAll() {
 		controllers.forEach((k, v) -> {
 			v.registeredCommands.forEach((k1, v1) -> {
@@ -126,42 +154,45 @@ public abstract class ControlsProcessor extends Thread {
 		});
 	}
 
-	public void commandQueue() {
-		/*
-		  Pull new command off of queue, if it is a sequential command, make sure
-		  nothing else is running. If it is a parallel command, call it and add it to
-		  the list.
-		 */
+	/**
+	 * Adds a command to commandQueue
+	 */
+	public void addToQueue(CommandDetails newCommand) {
+		commandQueue.add(newCommand);
+	}
 
-		if (this.commandQueue.size() > 0
-				&& this.commandQueue.get(0).type().equals(CommandDetails.CommandType.PARALLEL)) {
+	/**
+	 * Pull new command off of queue, if it is a sequential command, make sure
+	 * nothing else is running. If it is a parallel command, call it and add it to
+	 * the list.
+	 */
+	public void processCommandQueue() {
+		// TODO: Test time delay
+		if (this.commandQueue.size() > 0 && (this.commandQueue.get(0).type().equals(CommandDetails.CommandType.PARALLEL)
+				|| this.commandQueue.get(0).type().equals(CommandDetails.CommandType.TIMEDELAY))) {
 			System.out.println(this.commandQueue.get(0).name());
 			callCommand(this.commandQueue.get(0));
 			this.commandQueue.remove(0);
 		}
 
-		// Check for any running commands... and EXIT
+		// Checks to see if there are any commands currently running, and if there, it exits the method
+		// This would prevent any sequential commands from running
 		if (this.runningCommands != null) {
 			this.runningCommands.forEach(i -> {
 				controllers.forEach((k, v) -> {
 					SubsystemCommand foundCommand = v.registeredCommands.get(i);
-					if (foundCommand != null) {
-						if (foundCommand.running) {
-							return;
-						}
-					}
+					if (foundCommand != null && foundCommand.running)
+						return;
 				});
 			});
 		}
 
-		/*
-		  If it is a sequential command, we can clear the list aaaaaaand then we add
-		  the next sequential command.
+		/**
+		 * If it is a sequential command, we can clear the list and then we add
+		 * the next sequential command.
 		 */
-
-		if (this.commandQueue.size() > 0 && (this.commandQueue.get(0).type().equals(CommandDetails.CommandType.SERIES)
-				|| this.commandQueue.get(0).type().equals(CommandDetails.CommandType.TIMEDELAY))) {
-			System.out.println(this.commandQueue.get(0).name());
+		if (this.commandQueue.size() > 0 && (this.commandQueue.get(0).type().equals(CommandDetails.CommandType.SERIES))) {
+			// System.out.println(this.commandQueue.get(0).name());
 			callCommand(this.commandQueue.get(0));
 			this.commandQueue.remove(0);
 		}
@@ -178,17 +209,26 @@ public abstract class ControlsProcessor extends Thread {
 
 	// Append to the registered buttons and commands
     public void append(String command, JoystickButton button) {
-		controls.add(new JoystickCommandPair(this, command, button));
+		operatorControls.add(new JoystickCommandPair(this, command, button));
     }
 
+	/**
+	 * Calls checkButton for every button on controller
+	 */
     public void checkButtons() {
-		controls.forEach((k) -> k.checkButton());
+		operatorControls.forEach((k) -> k.checkButton());
     }
 
+	/**
+	 * @return Returns left Joystick
+	 */
 	public double getLeftJoystick() {
 		return xbox1.getRawAxis(1);
 	}
 
+	/**
+	 * @return Returns right Joystick
+	 */
 	public double getRightJoystick() {
 		return xbox1.getRawAxis(4);
 	}

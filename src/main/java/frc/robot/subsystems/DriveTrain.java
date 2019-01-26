@@ -56,8 +56,6 @@ public class DriveTrain extends SubsystemModule {
 	private final double sensitivity = 5;
 	private final double maxVelocity = 13;
 
-	private int debugMode;
-
 	// Robot characteristics
 	private double wheelSeparation = 2;
 
@@ -108,8 +106,8 @@ public class DriveTrain extends SubsystemModule {
 		@Override
 		public void updateEncodersAndHeading() {
 			this.headingAngle = 450 - navX.getFusedHeading();
-			if(this.headingAngle>360) {
-				this.headingAngle-=360;
+			if(this.headingAngle > 360) {
+				this.headingAngle -= 360;
 			}	
 
 			this.leftPos=leftEncoder.getDistance();
@@ -118,13 +116,14 @@ public class DriveTrain extends SubsystemModule {
 			this.currentAverageVelocity = (leftEncoder.getRate() + rightEncoder.getRate()) / 2;
 	
 		}
-
 	};
 
 	// Instantiate point controller for autonomous driving
 	public DrivingController drivingcontroller = new DrivingController(0.002) {
 
-		// Use output from odometer and pass into autonomous driving controller
+		/**
+		 * Use output from odometer and pass into autonomous driving controller
+		 */
 		@Override
 		public void updateVariables(){
 			this.currentX = odometer.getCurrentX();
@@ -133,13 +132,18 @@ public class DriveTrain extends SubsystemModule {
 			this.currentAverageVelocity = odometer.getCurrentAverageVelocity();
 		}
 
-		// Link autonomous driving controller to the drive train motor control
+		/**
+		 * Link autonomous driving controller to the drive train motor control
+		 */
 		@Override
 		public void driveRobot(double power, double pivot) {
 			closedLoopArcade(power, pivot);
 		}
 	};
 
+	/**
+	 * Resets the variables for the drivetrain
+	 */
 	@Override
 	public void init() {
 		leftEncoder.reset();
@@ -154,6 +158,9 @@ public class DriveTrain extends SubsystemModule {
 		rMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
 	}
 
+	/**
+	 * Disables the motors and stops the drivetrain
+	 */
 	@Override
 	public void destruct() {
 		driverControlled = false;
@@ -165,7 +172,9 @@ public class DriveTrain extends SubsystemModule {
 		rMotor0.set(0);
 	}
 	
-	// Subsystem run function, use controller collection (multi-threaded at fast period)
+	/**
+	 * Subsystem run function, uses ControlsProcessor (multi-threaded at fast period)
+	 */
 	@Override
 	public void run() {
 
@@ -173,12 +182,10 @@ public class DriveTrain extends SubsystemModule {
 		this.odometer.integratePosition();
 
 		// Run only when subsystem is enabled
-		if (this.enabled) {
+		if (getStatus()) {
 			this.drivingcontroller.run();
 		}
 	}
-
-
 
 	// General arcade drive
 	public void arcadeDrive(double power, double pivot) {
@@ -351,7 +358,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				enabled = true;
+				enable();
 			}
 
 			@Override
