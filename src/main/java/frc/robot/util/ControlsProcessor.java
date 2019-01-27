@@ -232,4 +232,11 @@ public abstract class ControlsProcessor extends Thread {
 	public double getRightJoystick() {
 		return xbox1.getRawAxis(4);
 	}
+
+	/**
+	 * @return Returns the actual period with commandDivider in seconds
+	 */
+	public double getActualPeriod() {
+		return (this.periodNanoseconds / 1000000000) * commandDivider;
+	}
 }
