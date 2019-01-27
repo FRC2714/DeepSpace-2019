@@ -53,8 +53,11 @@ public class DriveTrain extends SubsystemModule {
 	private final double rKFF = 1.78e-4;
 
 	private final double convFactor = 322.2; // Convert ft/s to RPM
-	private final double sensitivity = 5;
+	private final double sensitivity = 2.5;
 	private final double maxVelocity = 13;
+	private final double maxAcceleration = 30;
+
+	private double lastVelocity = 0;
 
 	// Robot characteristics
 	private double wheelSeparation = 2;
@@ -192,7 +195,7 @@ public class DriveTrain extends SubsystemModule {
 		drive.arcadeDrive(power, pivot);
 	}
 
-	// Closed loop velocity based tank
+	// Closed loop velocity based tank without an acceleration limit
 	public void closedLoopTank(double leftVelocity, double rightVelocity) {
 		lPidController.setReference(leftVelocity * convFactor, ControlType.kVelocity);
 		rPidController.setReference(-rightVelocity * convFactor, ControlType.kVelocity);
@@ -202,6 +205,24 @@ public class DriveTrain extends SubsystemModule {
 	public void closedLoopArcade(double velocity, double pivot) {
 		pivot = pivot * sensitivity;
 		closedLoopTank(velocity - pivot, velocity + pivot);
+	}
+
+	// Closed loop velocity based tank with an acceleration limit
+	public void closedLoopArcade(double velocity, double pivot, double accelLimit) {
+		accelLimit *= controlsProcessor.getActualPeriod();
+
+		double velocitySetpoint = velocity;
+
+		if (Math.abs(velocity - lastVelocity) > accelLimit) {
+			if (velocity - lastVelocity > 0)
+				velocitySetpoint = lastVelocity + accelLimit;
+			else
+				velocitySetpoint = lastVelocity - accelLimit;
+		}
+
+		closedLoopArcade(velocitySetpoint, pivot);
+
+		lastVelocity = velocitySetpoint;
 	}
 
 	// Output encoder values
@@ -232,7 +253,7 @@ public class DriveTrain extends SubsystemModule {
 				if (Math.abs(controlsProcessor.getRightJoystick()) > .1)
 					pivot = controlsProcessor.getRightJoystick();
 
-				closedLoopArcade(-power * maxVelocity, -pivot);
+				closedLoopArcade(-power * maxVelocity, -pivot, maxAcceleration);
 
 				// System.out.println("Power: " + power + " Pivot: " + pivot);
 			}
