@@ -47,6 +47,8 @@ public class Robot extends TimedRobot {
 			}
 		};
 
+		drivetrain = new DriveTrain(controlsProcessor);
+
 		// Required to register all subsystems in order to be processed. 
 		controlsProcessor.registerController("DriveTrain", drivetrain);
 		controlsProcessor.start();
