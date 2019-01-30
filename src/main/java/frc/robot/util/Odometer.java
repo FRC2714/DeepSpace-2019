@@ -7,11 +7,11 @@ public abstract class Odometer {
 
 	private double leftDistance;
 	protected double leftPos;
-	private double lastLeftPos = 0;
+	protected double lastLeftPos = 0;
 
 	private double rightDistance;
 	protected double rightPos;
-	private double lastRightPos = 0;
+	protected double lastRightPos = 0;
 
 	private double hypotenuseDistance;
 	protected double currentAverageVelocity;
@@ -96,5 +96,10 @@ public abstract class Odometer {
 
 	public double getCurrentAverageVelocity() {
 		return currentAverageVelocity;
+	}
+
+	public void printEncoderPosition() {
+		System.out.println("LE: " + leftPos + " RE: " + rightPos
+		);
 	}
 }

@@ -39,11 +39,11 @@ public class Robot extends TimedRobot {
 		controlsProcessor = new ControlsProcessor(2000000, 10) {
 			@Override
 			public void registerOperatorControls() {
-				append("closed_loop_tank -s 5", this.x);
-				append("closed_loop_tank -s -5", this.a);
+				//append("closed_loop_tank -s 5", this.x);
+				//append("closed_loop_tank -s -5", this.a);
 				append("driver_control -p", this.rightStick);
-				//append("add_forwards_spline -s 0,0,-6,-6,0,3,6,9,8,8,0,0", this.y);
-				//append("start_path -s", this.b);
+				append("add_forwards_spline -s 0,0,0,0,0,0,0,10,8,8,0,0", this.a);
+				append("start_path -s", this.b);
 			}
 		};
 
@@ -115,6 +115,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
+		//drivetrain.odometer.printEncoderPosition();
 	}
 
 	/**

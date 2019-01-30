@@ -8,7 +8,7 @@ public abstract class DrivingController {
 	 * Controls the magnitude of angular correction
 	 * Corrects both the anglular and perpendicular error
 	 */
-	private PID samsonControl = new PID(0.01, 0.0, 0);
+	private PID samsonControl = new PID(0.005, 0.0, 0);
 	private double samsonOutput;
 
 	/**
@@ -22,7 +22,7 @@ public abstract class DrivingController {
 	 * k3: For angular error
 	 */
 	private double k2 = 0.0;
-	private double k3 = 0.9;
+	private double k3 = 1.0;
 
 	/**
 	 * Populates an array list from the SplineFactory
@@ -34,6 +34,8 @@ public abstract class DrivingController {
 	protected double currentY;
 	protected double currentAngle;
 	protected double currentAverageVelocity;
+
+	private boolean pathFinished = false;
 
 	/**
 	 * Time separation between points in the controlPath in seconds
@@ -60,6 +62,7 @@ public abstract class DrivingController {
 
 		// Move to the next point in the spline
 		if(iterator < controlPath.size()) { this.iterator++; }
+		else { pathFinished = true; }
 
 		// Use tangential correction and velocity control cascaded to control velocity and position.
 		double orthogonalError = controlPath.get(iterator).getOrthogonalDisplacement(currentX, currentY);
@@ -73,8 +76,8 @@ public abstract class DrivingController {
 
 		samsonOutput = samsonControl.getOutput(samsonCorrection2 + samsonCorrection3, 0);
 		tangentialOutput = tangentialControl.getOutput(tangentialError, 0);
-		
-		driveRobot(refVelocity + tangentialOutput, -(samsonOutput / period));
+
+		driveRobot(refVelocity + tangentialOutput, -samsonOutput);
 	}
 
 	// Abstract functions to move and get position of the robot
@@ -108,5 +111,13 @@ public abstract class DrivingController {
 	 */
 	public void next() {
 		if(iterator < controlPath.size()) { this.iterator++; }
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isFinished() {
+		return pathFinished;
 	}
 }

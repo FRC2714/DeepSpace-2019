@@ -234,9 +234,17 @@ public abstract class ControlsProcessor extends Thread {
 	}
 
 	/**
-	 * @return Returns the actual period with commandDivider in seconds
+	 * @return Returns the command period with commandDivider in seconds
 	 */
-	public double getActualPeriod() {
+	public double getCommandPeriod() {
 		return (this.periodNanoseconds / 1000000000) * commandDivider;
+	}
+
+	/**
+	 * 
+	 * @return Returns the period in seconds
+	 */
+	public double getControlsPeriod() {
+		return (this.periodNanoseconds / 1000000000);
 	}
 }
