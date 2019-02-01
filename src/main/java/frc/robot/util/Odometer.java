@@ -99,7 +99,10 @@ public abstract class Odometer {
 	}
 
 	public void printEncoderPosition() {
-		System.out.println("LE: " + leftPos + " RE: " + rightPos
-		);
+		System.out.println("LE: " + leftPos + " RE: " + rightPos);
+	}
+
+	public void printOdometerPosition() {
+		System.out.println("X: " + current_x + " Y: " + current_y);
 	}
 }

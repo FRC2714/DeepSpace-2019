@@ -84,7 +84,7 @@ public abstract class SubsystemCommand {
      */
     public void cancel() {
         end();
-
+        
         this.running = false;
     }
 

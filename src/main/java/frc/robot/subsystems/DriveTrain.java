@@ -51,8 +51,11 @@ public class DriveTrain extends SubsystemModule {
 	private final double lKFF = 1.77e-4;
 	private final double rKFF = 1.78e-4;
 
-	private final double rpmToFeet = 0.0031; // Convert RPM to ft/s
-	private final double rotationsToFeet = 0.1862; // Convert rotations to feet
+	private final double rpmToFeet = 0.003135; // Convert RPM to ft/s
+	private final double rotationsToFeet = 0.1881; // Convert rotations to feet
+
+	private double startTime;
+	private int numberOfRuns;
 
 
 	private final double sensitivity = 2.5;
@@ -119,8 +122,8 @@ public class DriveTrain extends SubsystemModule {
 				this.headingAngle -= 360;
 			}	
 
-			this.leftPos = (lEncoder.getPosition() - leftEncoderOffset) * rotationsToFeet;
-			this.rightPos = (-rEncoder.getPosition() - rightEncoderOffset) * rotationsToFeet;
+			this.leftPos = lEncoder.getPosition() * rotationsToFeet;
+			this.rightPos = -rEncoder.getPosition() * rotationsToFeet;
 			
 			double leftVelocity = lEncoder.getVelocity() * rpmToFeet;
 			double rightVelocity = -rEncoder.getVelocity() * rpmToFeet;
@@ -130,7 +133,7 @@ public class DriveTrain extends SubsystemModule {
 	};
 
 	// Instantiate point controller for autonomous driving
-	public DrivingController drivingcontroller = new DrivingController(0.002) {
+	public DrivingController drivingcontroller = new DrivingController(0.004) {
 
 		/**
 		 * Use output from odometer and pass into autonomous driving controller
@@ -181,6 +184,9 @@ public class DriveTrain extends SubsystemModule {
 
 		lMotor0.set(0);
 		rMotor0.set(0);
+
+		disable();
+		drivingcontroller.clearControlPath();
 	}
 	
 	/**
@@ -214,6 +220,7 @@ public class DriveTrain extends SubsystemModule {
 	public void closedLoopArcade(double velocity, double pivot) {
 		pivot = pivot * sensitivity;
 		closedLoopTank(velocity - pivot, velocity + pivot);
+		//System.out.println("pivot " + pivot);
 	}
 
 	// Closed loop velocity based tank with an acceleration limit
@@ -263,8 +270,6 @@ public class DriveTrain extends SubsystemModule {
 					pivot = controlsProcessor.getRightJoystick();
 
 				closedLoopArcade(-power * maxVelocity, -pivot, maxAcceleration);
-
-				// System.out.println("Power: " + power + " Pivot: " + pivot);
 			}
 
 			@Override
@@ -384,16 +389,20 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
+		
+
 		new SubsystemCommand(this.registeredCommands, "start_path") {
 
 			@Override
 			public void initialize() {
 				enable();
+				startTime = System.nanoTime()/1000000;
+				numberOfRuns = 0;
 			}
 
 			@Override
 			public void execute() {
-
+				numberOfRuns++;
 			}
 
 			@Override
@@ -403,6 +412,9 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
+				double currentTime = System.nanoTime()/1000000;
+				System.out.println("Average Time " + (currentTime - startTime)/ (numberOfRuns*10));
+				closedLoopArcade(0, 0);
 				disable();
 			}
 		};

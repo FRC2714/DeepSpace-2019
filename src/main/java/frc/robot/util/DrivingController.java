@@ -8,7 +8,7 @@ public abstract class DrivingController {
 	 * Controls the magnitude of angular correction
 	 * Corrects both the anglular and perpendicular error
 	 */
-	private PID samsonControl = new PID(0.005, 0.0, 0);
+	private PID samsonControl = new PID(0.25, 0.0, 0);
 	private double samsonOutput;
 
 	/**
@@ -56,12 +56,14 @@ public abstract class DrivingController {
 	 * Run function for Driving Controller uses distance and angle controllers
 	 */
 	public void run() {
+		// Test
+		//System.out.println(System.nanoTime());
 
 		// Update using abstracted functions from the calling class
 		updateVariables();
 
 		// Move to the next point in the spline
-		if(iterator < controlPath.size()) { this.iterator++; }
+		if(iterator < controlPath.size() - 1) { this.iterator++; }
 		else { pathFinished = true; }
 
 		// Use tangential correction and velocity control cascaded to control velocity and position.
@@ -71,13 +73,18 @@ public abstract class DrivingController {
 
 		double refVelocity = controlPath.get(iterator).velocity;
 
-		double samsonCorrection2 = (k2 * orthogonalError * refVelocity) / angularError;
+		//double samsonCorrection2 = (k2 * orthogonalError * refVelocity) / angularError;
 		double samsonCorrection3 = k3 * angularError;
 
-		samsonOutput = samsonControl.getOutput(samsonCorrection2 + samsonCorrection3, 0);
+		samsonOutput = samsonControl.getOutput(0 + samsonCorrection3, 0);
 		tangentialOutput = tangentialControl.getOutput(tangentialError, 0);
 
-		driveRobot(refVelocity + tangentialOutput, -samsonOutput);
+		//System.out.println("Ref Velocity: " + refVelocity);
+
+		// Both +
+		driveRobot(refVelocity, samsonOutput);
+		//System.out.println(samsonOutput);
+
 	}
 
 	// Abstract functions to move and get position of the robot
@@ -104,6 +111,9 @@ public abstract class DrivingController {
 			double acceleration, double maxVelocity, double startVelocity, double endVelocity, boolean forwards) {
 		new SplineFactory(this.controlPath, this.period, x1, x2, x3, x4, y1, y2, y3, y4, acceleration, maxVelocity,
 				startVelocity, endVelocity, forwards);
+		// for (MotionPose i : controlPath) {
+		// 	System.out.println("Velocity: " + i.velocity + " Y: " + i.y);
+		// }
 	}
 
 	/**
@@ -111,6 +121,10 @@ public abstract class DrivingController {
 	 */
 	public void next() {
 		if(iterator < controlPath.size()) { this.iterator++; }
+	}
+
+	public void clearControlPath(){
+		controlPath.clear();
 	}
 
 	/**

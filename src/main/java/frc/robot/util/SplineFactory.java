@@ -13,7 +13,7 @@ public class SplineFactory {
 
     private double tolerance = 0.00001;
     private double tStep = 0.001;
-    private double period = 0.0005;
+    private double period = 0.002;
 
     private ArrayList<Double> xValues = new ArrayList<Double>();
     private ArrayList<Double> yValues = new ArrayList<Double>();

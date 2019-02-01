@@ -86,12 +86,12 @@ public abstract class ControlsProcessor extends Thread {
 				
 				checkButtons();
 				processCommandQueue();
-
+				
 				// Busy wait until the next iteration
 				while (System.nanoTime() < timestamp + periodNanoseconds) { }
 
 				timestamp = System.nanoTime();
-
+				
 			}
 		}
 	}
