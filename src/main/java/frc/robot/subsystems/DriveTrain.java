@@ -133,7 +133,7 @@ public class DriveTrain extends SubsystemModule {
 	};
 
 	// Instantiate point controller for autonomous driving
-	public DrivingController drivingcontroller = new DrivingController(0.005) {
+	public DrivingController drivingController = new DrivingController(0.005) {
 
 		/**
 		 * Use output from odometer and pass into autonomous driving controller
@@ -186,7 +186,7 @@ public class DriveTrain extends SubsystemModule {
 		rMotor0.set(0);
 
 		disable();
-		drivingcontroller.clearControlPath();
+		drivingController.clearControlPath();
 	}
 	
 	/**
@@ -200,7 +200,7 @@ public class DriveTrain extends SubsystemModule {
 
 		// Run only when subsystem is enabled
 		if (getStatus()) {
-			this.drivingcontroller.run();
+			this.drivingController.run();
 		}
 	}
 
@@ -337,7 +337,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				drivingcontroller.addSpline(Double.parseDouble(this.args[0]), Double.parseDouble(this.args[1]),
+				drivingController.addSpline(Double.parseDouble(this.args[0]), Double.parseDouble(this.args[1]),
 						Double.parseDouble(this.args[2]), Double.parseDouble(this.args[3]),
 						Double.parseDouble(this.args[4]), Double.parseDouble(this.args[5]),
 						Double.parseDouble(this.args[6]), Double.parseDouble(this.args[7]),
@@ -365,7 +365,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				drivingcontroller.addSpline(Double.parseDouble(this.args[0]), Double.parseDouble(this.args[1]),
+				drivingController.addSpline(Double.parseDouble(this.args[0]), Double.parseDouble(this.args[1]),
 						Double.parseDouble(this.args[2]), Double.parseDouble(this.args[3]),
 						Double.parseDouble(this.args[4]), Double.parseDouble(this.args[5]),
 						Double.parseDouble(this.args[6]), Double.parseDouble(this.args[7]),
@@ -404,7 +404,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return drivingcontroller.isFinished();
+				return drivingController.isFinished();
 			}
 
 			@Override

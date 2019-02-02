@@ -8,17 +8,16 @@ public class RobotMap {
 	public static int p_newButtonBoxA = 1;
 	public static int p_newButtonBoxB = 2;
 
-	// Drivetrain Motors
-	public static int p_leftDrive1 = 0;
-	public static int p_leftDrive2 = 1;
-	public static int p_rightDrive1 = 2;
-	public static int p_rightDrive2 = 3;
-
-	public static int p_driveShifter1 = 0;
-	public static int p_driveShifter2 = 1;
-
+	// Drivetrain Encoders
 	public static int p_leftEncoderA = 0;
 	public static int p_leftEncoderB = 1;
 	public static int p_rightEncoderA = 2;
 	public static int p_rightEncoderB = 3;
+
+	// Arm Encoders
+	public static int p_shoulderEncoderA = 4;
+	public static int p_shoulderEncoderB = 5;
+	public static int p_wristEncoderA = 6;
+	public static int p_wristEncoderB = 7;
+
 }
