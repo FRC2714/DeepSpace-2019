@@ -80,7 +80,6 @@ public class Robot extends TimedRobot {
 
 	/**
 	 * Runs at the beginning of auton mode
-	 * TODO: Replace WPI Lib with auton task
 	 */
 	@Override
 	public void autonomousInit() {
@@ -100,7 +99,6 @@ public class Robot extends TimedRobot {
 
 	/**
 	 * Runs at the start of teleop mode
-	 * TODO: Cancel the queue
 	 */
 	@Override
 	public void teleopInit() {
