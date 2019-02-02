@@ -24,7 +24,7 @@ public abstract class SubsystemCommand {
      */
     public SubsystemCommand(HashMap<String, SubsystemCommand> commands, String commandName) {
         this.commandName = commandName;
-
+        this.delayTimer = new Timer();
         commands.put(this.commandName, this);
     }
 

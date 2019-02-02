@@ -35,13 +35,20 @@ public class CommandDetails {
     public CommandDetails(String commandInput) {
         //Splits commandInput String into an array when spaces are found
         String[] commandParts = commandInput.split(" ");
+//        for (String currentParts : commandParts){
+//            System.out.print("CURRENT PARTS = " + currentParts + " || ");
+//        }
+//        System.out.println();
 
         // Sets commandName as the first string found in the commandInput
         this.commandName = commandParts[0];
 
         if (commandParts.length == 1) {
+//            System.out.println("RETURNING ");
             return;
         }
+
+
 
         switch (commandParts[1]) {
             case "-s":
@@ -57,6 +64,7 @@ public class CommandDetails {
                 }
                 break;
             case "-t":
+
                 this.commandType = CommandType.TIMEDELAY;
                 this.timeDelay = Double.parseDouble(commandParts[2]);
                 if (commandParts.length == 4) {

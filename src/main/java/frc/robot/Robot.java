@@ -5,7 +5,9 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.autontasks.TestAuton;
+import frc.robot.autontasks.DelayAutonTesterTask;
+import frc.robot.autontasks.UnusedRightHatchAltAuton;
+import frc.robot.autontasks.RightRocketHatchAuton;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.util.AutonTask;
 import frc.robot.util.ControlsProcessor;
@@ -44,6 +46,7 @@ public class Robot extends TimedRobot {
 				append("driver_control -p", this.rightStick);
 				append("add_forwards_spline -s 0,0,-3,-3,0,3,6,10,8,8,0,0", this.a);
 				append("start_path -s", this.b);
+				append("delay_tester -s", this.y);
 			}
 		};
 
@@ -85,10 +88,11 @@ public class Robot extends TimedRobot {
 	public void autonomousInit() {
 		generalInit();
 
-		AutonTask choiceOne = new TestAuton(controlsProcessor);
-		AutonTask choiceTwo = new TestAuton(controlsProcessor);
+		AutonTask choiceOne = new RightRocketHatchAuton(controlsProcessor);
+		AutonTask choiceTwo = new UnusedRightHatchAltAuton(controlsProcessor);
+		AutonTask delayTester = new DelayAutonTesterTask(controlsProcessor);
 
-		choiceOne.run();
+		choiceTwo.run();
 	}
 
 	/**

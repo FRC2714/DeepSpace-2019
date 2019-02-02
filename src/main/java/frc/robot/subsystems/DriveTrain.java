@@ -413,6 +413,30 @@ public class DriveTrain extends SubsystemModule {
 				disable();
 			}
 		};
+
+		new SubsystemCommand(this.registeredCommands, "delay_tester"){
+			@Override
+			public void initialize() {
+//				System.out.println("Delay = " + Double.parseDouble(this.args[1]));
+//				enable();
+			}
+
+			@Override
+			public void execute() {
+				System.out.println("DELAY TESTER running!" );
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {
+			}
+		};
+
+
 	}
 
 }
