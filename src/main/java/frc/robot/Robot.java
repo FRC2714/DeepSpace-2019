@@ -5,8 +5,11 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.autontasks.TestAuton;
 import frc.robot.subsystems.Arm;
+import frc.robot.autontasks.DelayAutonTesterTask;
+import frc.robot.autontasks.RightCargoHatchAuton;
+import frc.robot.autontasks.UnusedRightHatchAltAuton;
+import frc.robot.autontasks.RightRocketHatchAuton;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.util.AutonTask;
 import frc.robot.util.ControlsProcessor;
@@ -38,7 +41,7 @@ public class Robot extends TimedRobot {
 		SmartDashboard.putData("Autonomous Mode Selector", autoChooser);
 
 		// Controls processor only gets created ONCE when code is run
-		controlsProcessor = new ControlsProcessor(2000000, 10) {
+		controlsProcessor = new ControlsProcessor(5000000, 10) {
 			@Override
 			public void registerOperatorControls() {
 				// append("jog_up -s", this.y);
@@ -72,6 +75,7 @@ public class Robot extends TimedRobot {
 			controlsProcessor.cancelAll();
 			controlsProcessor.disable();
 		}
+
 	}
 
 	/**
@@ -84,16 +88,15 @@ public class Robot extends TimedRobot {
 
 	/**
 	 * Runs at the beginning of auton mode
-	 * TODO: Replace WPI Lib with auton task
 	 */
 	@Override
 	public void autonomousInit() {
 		generalInit();
 
-		AutonTask choiceOne = new TestAuton(controlsProcessor);
-		AutonTask choiceTwo = new TestAuton(controlsProcessor);
+		AutonTask rightRocket = new RightRocketHatchAuton(controlsProcessor);
+		AutonTask rightCargo = new RightCargoHatchAuton(controlsProcessor);
 
-		choiceOne.run();
+		rightCargo.run();
 	}
 
 	/**
@@ -104,7 +107,6 @@ public class Robot extends TimedRobot {
 
 	/**
 	 * Runs at the start of teleop mode
-	 * TODO: Cancel the queue
 	 */
 	@Override
 	public void teleopInit() {
@@ -120,6 +122,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
+		//drivetrain.odometer.printEncoderPosition();
 	}
 
 	/**

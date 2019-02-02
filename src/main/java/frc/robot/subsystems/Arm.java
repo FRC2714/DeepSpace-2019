@@ -135,7 +135,7 @@ public class Arm extends SubsystemModule {
 		else
 			return new ArrayList<Double>();
 
-		double positionDelta = direction * degreesPerSecond * controlsProcessor.getActualPeriod();
+		double positionDelta = direction * degreesPerSecond * controlsProcessor.getCommandPeriod();
 		
 		ArrayList<Double> points = new ArrayList<Double>(1);
 		points.add(0, endPosition);
@@ -159,7 +159,7 @@ public class Arm extends SubsystemModule {
 	public void jogUp() {
 		currentDegreesPerSecond = maxDegreesPerSecond;
 
-		double currentDegreesPerPeriod = currentDegreesPerSecond * controlsProcessor.getActualPeriod();
+		double currentDegreesPerPeriod = currentDegreesPerSecond * controlsProcessor.getCommandPeriod();
 
 		currentShoulderAngle += currentDegreesPerPeriod;
 		currentWristAngle -= currentDegreesPerPeriod;
@@ -171,7 +171,7 @@ public class Arm extends SubsystemModule {
 	public void jogDown() {
 		currentDegreesPerSecond = maxDegreesPerSecond;
 
-		double currentDegreesPerPeriod = currentDegreesPerSecond * controlsProcessor.getActualPeriod();
+		double currentDegreesPerPeriod = currentDegreesPerSecond * controlsProcessor.getCommandPeriod();
 
 		currentShoulderAngle -= currentDegreesPerPeriod;
 		currentWristAngle += currentDegreesPerPeriod;

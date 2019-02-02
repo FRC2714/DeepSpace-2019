@@ -86,12 +86,12 @@ public abstract class ControlsProcessor extends Thread {
 				
 				checkButtons();
 				processCommandQueue();
-
+				
 				// Busy wait until the next iteration
 				while (System.nanoTime() < timestamp + periodNanoseconds) { }
 
 				timestamp = System.nanoTime();
-
+				
 			}
 		}
 	}
@@ -138,6 +138,8 @@ public abstract class ControlsProcessor extends Thread {
 	public void cancelCommand(CommandDetails command) {
 		controllers.forEach((k, v) -> {
 			SubsystemCommand foundCommand = v.registeredCommands.get(command.name());
+
+			System.out.println("Cancelling Command = " + command.name());
 
 			if (foundCommand != null) {
 				foundCommand.cancel();
@@ -234,9 +236,17 @@ public abstract class ControlsProcessor extends Thread {
 	}
 
 	/**
-	 * @return Returns the actual period with commandDivider in seconds
+	 * @return Returns the command period with commandDivider in seconds
 	 */
-	public double getActualPeriod() {
+	public double getCommandPeriod() {
 		return (this.periodNanoseconds / 1000000000) * commandDivider;
+	}
+
+	/**
+	 * 
+	 * @return Returns the period in seconds
+	 */
+	public double getControlsPeriod() {
+		return (this.periodNanoseconds / 1000000000);
 	}
 }

@@ -24,7 +24,7 @@ public abstract class SubsystemCommand {
      */
     public SubsystemCommand(HashMap<String, SubsystemCommand> commands, String commandName) {
         this.commandName = commandName;
-
+        this.delayTimer = new Timer();
         commands.put(this.commandName, this);
     }
 
@@ -70,6 +70,7 @@ public abstract class SubsystemCommand {
             this.delayTimer.start();
         }
 
+        initialize();
     }
 
     /**
@@ -77,6 +78,8 @@ public abstract class SubsystemCommand {
      */
     public void call() {
         this.firstRun = true;
+
+        initialize();
     }
 
     /**
@@ -84,7 +87,7 @@ public abstract class SubsystemCommand {
      */
     public void cancel() {
         end();
-
+        
         this.running = false;
     }
 
