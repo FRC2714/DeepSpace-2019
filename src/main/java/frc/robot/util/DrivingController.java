@@ -109,16 +109,17 @@ public abstract class DrivingController {
 	 */
 	public void addSpline(double x1, double x2, double x3, double x4, double y1, double y2, double y3, double y4,
 			double acceleration, double maxVelocity, double startVelocity, double endVelocity, boolean forwards) {
-		 
-			SplineFactory nextSpline = new SplineFactory(this.period, x1, x2, x3, x4, y1, y2, y3, y4, acceleration, maxVelocity,
-				startVelocity, endVelocity, forwards);
-				System.out.println("Size of Spline : " + controlPath.size());
-			
-				controlPath.addAll(nextSpline.getSpline());
-				System.out.println("Concatanating Spline size = " + controlPath.size());
+		
+		SplineFactory nextSpline = new SplineFactory(this.period, x1, x2, x3, x4, y1, y2, y3, y4, acceleration, maxVelocity,
+			startVelocity, endVelocity, forwards);
+		System.out.println("Forwards : " + forwards);
+	
+		controlPath.addAll(nextSpline.getSpline());
+
 		// for (MotionPose i : controlPath) {
-		// 	System.out.println("Velocity: " + i.velocity + " Y: " + i.y);
+		// 	System.out.println("Velocity: " + i.velocity);
 		// }
+
 	}
 
 	/**

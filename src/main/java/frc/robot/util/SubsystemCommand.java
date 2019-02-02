@@ -70,6 +70,7 @@ public abstract class SubsystemCommand {
             this.delayTimer.start();
         }
 
+        initialize();
     }
 
     /**
@@ -77,6 +78,8 @@ public abstract class SubsystemCommand {
      */
     public void call() {
         this.firstRun = true;
+
+        initialize();
     }
 
     /**

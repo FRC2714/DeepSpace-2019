@@ -396,13 +396,10 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 				enable();
-				startTime = System.nanoTime()/1000000;
-				numberOfRuns = 0;
 			}
 
 			@Override
 			public void execute() {
-				numberOfRuns++;
 			}
 
 			@Override
@@ -412,8 +409,6 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
-				double currentTime = System.nanoTime()/1000000;
-				System.out.println("Average Time " + (currentTime - startTime)/ (numberOfRuns*10));
 				closedLoopArcade(0, 0);
 				disable();
 			}
