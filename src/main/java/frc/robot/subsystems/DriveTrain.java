@@ -133,7 +133,7 @@ public class DriveTrain extends SubsystemModule {
 	};
 
 	// Instantiate point controller for autonomous driving
-	public DrivingController drivingcontroller = new DrivingController(0.004) {
+	public DrivingController drivingcontroller = new DrivingController(0.005) {
 
 		/**
 		 * Use output from odometer and pass into autonomous driving controller

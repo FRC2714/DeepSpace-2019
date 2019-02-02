@@ -139,6 +139,8 @@ public abstract class ControlsProcessor extends Thread {
 		controllers.forEach((k, v) -> {
 			SubsystemCommand foundCommand = v.registeredCommands.get(command.name());
 
+			System.out.println("Cancelling Command = " + command.name());
+
 			if (foundCommand != null) {
 				foundCommand.cancel();
 			}

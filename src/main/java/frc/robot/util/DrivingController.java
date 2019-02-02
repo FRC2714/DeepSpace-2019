@@ -8,7 +8,7 @@ public abstract class DrivingController {
 	 * Controls the magnitude of angular correction
 	 * Corrects both the anglular and perpendicular error
 	 */
-	private PID samsonControl = new PID(0.25, 0.0, 0);
+	private PID samsonControl = new PID(0.25 * 0.6, 0.0, 0);
 	private double samsonOutput;
 
 	/**
@@ -109,8 +109,13 @@ public abstract class DrivingController {
 	 */
 	public void addSpline(double x1, double x2, double x3, double x4, double y1, double y2, double y3, double y4,
 			double acceleration, double maxVelocity, double startVelocity, double endVelocity, boolean forwards) {
-		new SplineFactory(this.controlPath, this.period, x1, x2, x3, x4, y1, y2, y3, y4, acceleration, maxVelocity,
+		 
+			SplineFactory nextSpline = new SplineFactory(this.period, x1, x2, x3, x4, y1, y2, y3, y4, acceleration, maxVelocity,
 				startVelocity, endVelocity, forwards);
+				System.out.println("Size of Spline : " + controlPath.size());
+			
+				controlPath.addAll(nextSpline.getSpline());
+				System.out.println("Concatanating Spline size = " + controlPath.size());
 		// for (MotionPose i : controlPath) {
 		// 	System.out.println("Velocity: " + i.velocity + " Y: " + i.y);
 		// }

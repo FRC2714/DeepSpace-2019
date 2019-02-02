@@ -36,14 +36,14 @@ public class Robot extends TimedRobot {
 		SmartDashboard.putData("Autonomous Mode Selector", autoChooser);
 
 		// Controls processor only gets created ONCE when code is run
-		controlsProcessor = new ControlsProcessor(4000000, 10) {
+		controlsProcessor = new ControlsProcessor(5000000, 10) {
 			@Override
 			public void registerOperatorControls() {
 				append("closed_loop_tank -s -5", this.x);
 				//append("closed_loop_tank -s 5", this.a);
 				append("driver_control -p", this.rightStick);
 				append("add_forwards_spline -s 0,0,-3,-3,0,3,6,10,8,8,0,0", this.a);
-				append("start_path -p", this.b);
+				append("start_path -s", this.b);
 			}
 		};
 
