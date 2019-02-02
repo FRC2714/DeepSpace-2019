@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.autontasks.TestAuton;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.util.AutonTask;
 import frc.robot.util.ControlsProcessor;
@@ -21,6 +22,7 @@ public class Robot extends TimedRobot {
 
 	// Initialize subsystems
 	private DriveTrain drivetrain;
+	private Arm arm;
 
 	// Initialize auton mode selector
 	private Command autonomousCommand;
@@ -39,18 +41,20 @@ public class Robot extends TimedRobot {
 		controlsProcessor = new ControlsProcessor(2000000, 10) {
 			@Override
 			public void registerOperatorControls() {
-				append("closed_loop_tank -s 5", this.x);
-				append("closed_loop_tank -s -5", this.a);
-				append("driver_control -p", this.rightStick);
-				//append("add_forwards_spline -s 0,0,-6,-6,0,3,6,9,8,8,0,0", this.y);
-				//append("start_path -s", this.b);
+				// append("jog_up -s", this.y);
+				// append("jog_down -s", this.a);
+				append("go_to_position_basic -p 90,180,45,90", this.b);
+				append("go_to_position_basic -p 155,180,90,90", this.a);
+				append("go_to_position_basic -p 10,180,0,90", this.x);
 			}
 		};
 
 		drivetrain = new DriveTrain(controlsProcessor);
+		arm = new Arm(controlsProcessor);
 
 		// Required to register all subsystems in order to be processed. 
 		controlsProcessor.registerController("DriveTrain", drivetrain);
+		controlsProcessor.registerController("Arm", arm);
 		controlsProcessor.start();
 	}
 
@@ -61,6 +65,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void disabledInit() {
 		drivetrain.destruct();
+		arm.destruct();
 		Scheduler.getInstance().removeAll();
 
 		if (controlsProcessor != null) {
@@ -138,5 +143,6 @@ public class Robot extends TimedRobot {
 		}
 
 		drivetrain.init();
+		arm.init();
 	}
 }

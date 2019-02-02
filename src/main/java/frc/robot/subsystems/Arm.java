@@ -39,7 +39,7 @@ public class Arm extends SubsystemModule {
 	// PID coefficients
 	private final double sMinOutput = -1;
 	private final double sMaxOutput = 1;
-	private final double sP = 0;
+	private final double sP = 0.1;
 	private final double sI = 0;
 	private final double sD = 0;
 	private final double sIS = 0;
@@ -47,14 +47,21 @@ public class Arm extends SubsystemModule {
 
 	private final double wMinOutput = -1;
 	private final double wMaxOutput = 1;
-	private final double wP = 0;
+	private final double wP = 0.1;
 	private final double wI = 0;
 	private final double wD = 0;
 	private final double wIS = 0;
 	private final double wFF = 0;
 
-	private double shoulderOffset = 0.0;
-	private double wristOffset = 0.0;
+	// All angles are in degrees
+	private double shoulderOffset = 0;
+	private double wristOffset = 0;
+
+	private double currentShoulderAngle = 0;
+	private double currentWristAngle = 0;
+	private double currentDegreesPerSecond = 0;
+
+	private final double maxDegreesPerSecond = 5;
 
 	// Arm characteristics
 	private final double shoulderRatio = 512.0/3;
@@ -95,9 +102,10 @@ public class Arm extends SubsystemModule {
 	 * @param desiredTheta Desired angle for the shoulder in degrees
 	 */
 	public void setShoulderAngle(double desiredTheta) {
-		desiredTheta = (shoulderOffset + desiredTheta) / shoulderRatio * 360;
+		double desiredMotorRotations = ((shoulderOffset + desiredTheta) / 360) * shoulderRatio;
 
-		shoulderPidController.setReference(desiredTheta, ControlType.kPosition);
+		// System.out.println("Shoulder Desired Theta: " + desiredTheta + " Desired Motor Rotations: " + desiredMotorRotations);
+		shoulderPidController.setReference(desiredMotorRotations, ControlType.kPosition);
 	}
 
 	/**
@@ -106,9 +114,10 @@ public class Arm extends SubsystemModule {
 	 * @param desiredTheta Desired angle for the wrist in degrees
 	 */
 	public void setWristAngle(double desiredTheta) {
-		desiredTheta = (wristOffset + desiredTheta) / wristRatio * 360;
+		double desiredMotorRotations = ((wristOffset + desiredTheta) / 360) * wristRatio;
 		
-		wristPidController.setReference(desiredTheta, ControlType.kPosition);
+		// System.out.println("Wrist Desired Theta: " + desiredTheta + " Desired Motor Rotations: " + desiredMotorRotations);
+		wristPidController.setReference(desiredMotorRotations, ControlType.kPosition);
 	}
 
 	/**
@@ -118,11 +127,14 @@ public class Arm extends SubsystemModule {
 	 * @param revolutionsPerSecond Velocity in RPS
 	 * @return ArrayList of type double with every point in the path
 	 */
-	public ArrayList<Double> generatePath(double startPosition, double endPosition, double revolutionsPerSecond) {
+	public ArrayList<Double> generatePath(double startPosition, double endPosition, double degreesPerSecond) {
 		int direction = (int)(endPosition - startPosition);
-		direction /= Math.abs(direction);
+		
+		if (Math.abs(direction) != 0)
+			direction /= Math.abs(direction);
+		else
+			return new ArrayList<Double>();
 
-		double degreesPerSecond = revolutionsPerSecond * 360;
 		double positionDelta = direction * degreesPerSecond * controlsProcessor.getActualPeriod();
 		
 		ArrayList<Double> points = new ArrayList<Double>(1);
@@ -144,10 +156,35 @@ public class Arm extends SubsystemModule {
 		return points;
 	}
 
+	public void jogUp() {
+		currentDegreesPerSecond = maxDegreesPerSecond;
+
+		double currentDegreesPerPeriod = currentDegreesPerSecond * controlsProcessor.getActualPeriod();
+
+		currentShoulderAngle += currentDegreesPerPeriod;
+		currentWristAngle -= currentDegreesPerPeriod;
+
+		setShoulderAngle(currentShoulderAngle);
+		setWristAngle(currentWristAngle);
+	}
+
+	public void jogDown() {
+		currentDegreesPerSecond = maxDegreesPerSecond;
+
+		double currentDegreesPerPeriod = currentDegreesPerSecond * controlsProcessor.getActualPeriod();
+
+		currentShoulderAngle -= currentDegreesPerPeriod;
+		currentWristAngle += currentDegreesPerPeriod;
+
+		setShoulderAngle(currentShoulderAngle);
+		setWristAngle(currentWristAngle);
+	}
+
 	@Override
 	public void run() {
-		
-    }
+		currentShoulderAngle = ((shoulderMotorEncoder.getPosition() / shoulderRatio) * 360) - shoulderOffset;
+		currentWristAngle = ((wristMotorEncoder.getPosition() / wristRatio) * 360) - wristOffset;
+	}
 
 	@Override
 	public void registerCommands() {
@@ -158,17 +195,22 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				shoulderPath = generatePath(Double.parseDouble(this.args[0]),
-						Double.parseDouble(this.args[1]), Double.parseDouble(this.args[2]));
+				shoulderPathFinished = false;
+				wristPathFinished = false;
 
-				wristPath = generatePath(Double.parseDouble(this.args[3]),
-						Double.parseDouble(this.args[4]), Double.parseDouble(this.args[5]));
+				shoulderPath = generatePath(currentShoulderAngle,
+						Double.parseDouble(this.args[0]), Double.parseDouble(this.args[1]));
+
+				wristPath = generatePath(currentWristAngle,
+						Double.parseDouble(this.args[2]), Double.parseDouble(this.args[3]));
 
 				iterator = 0;
 			}
 
 			@Override
 			public void execute() {
+				iterator++;
+
 				if (iterator < shoulderPath.size())
 					setShoulderAngle(shoulderPath.get(iterator));
 				else
@@ -187,7 +229,109 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void end() {
-				destruct();
+				
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "go_to_position_basic_wrist") {
+
+			int iterator;
+
+			@Override
+			public void initialize() {
+				wristPathFinished = false;
+
+				wristPath = generatePath(Double.parseDouble(this.args[3]),
+						Double.parseDouble(this.args[4]), Double.parseDouble(this.args[5]));
+
+				iterator = 0;
+			}
+
+			@Override
+			public void execute() {
+				if (iterator < wristPath.size())
+					setWristAngle(wristPath.get(iterator));
+				else
+					wristPathFinished = true;
+			}
+
+			@Override
+			public boolean isFinished() {
+				return wristPathFinished;
+			}
+
+			@Override
+			public void end() {
+
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "jog_up") {
+
+			@Override
+			public void initialize() {
+			
+			}
+
+			@Override
+			public void execute() {
+				jogUp();
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {
+
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "jog_down") {
+
+			@Override
+			public void initialize() {
+			
+			}
+
+			@Override
+			public void execute() {
+				jogDown();
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {
+
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "print_current_angles") {
+
+			@Override
+			public void initialize() {
+				System.out.println("Current Shoulder Angle: " + currentShoulderAngle + " Current Wrist Angle: " + currentWristAngle);
+			}
+
+			@Override
+			public void execute() {
+				System.out.println("Current Shoulder Angle: " + currentShoulderAngle + " Current Wrist Angle: " + currentWristAngle);
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {
+				
 			}
 		};
     }
@@ -199,6 +343,12 @@ public class Arm extends SubsystemModule {
 
 		// shoulderOutputEncoder.setDistancePerPulse(shoulderScaler);
 		// wristOutputEncoder.setDistancePerPulse(wristScaler);
+
+		currentShoulderAngle = 0;
+		currentWristAngle = 0;
+
+		shoulderOffset = (shoulderMotorEncoder.getPosition() / shoulderRatio) * 360;
+		wristOffset = (wristMotorEncoder.getPosition() / wristRatio) * 360;
 
 		shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		wristMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
