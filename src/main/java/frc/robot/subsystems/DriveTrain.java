@@ -21,12 +21,12 @@ import frc.robot.util.SubsystemModule;
 public class DriveTrain extends SubsystemModule {
 
 	// Drivetrain motors
-	private CANSparkMax lMotor0 = new CANSparkMax(0, MotorType.kBrushless);
-	private CANSparkMax lMotor1 = new CANSparkMax(1, MotorType.kBrushless);
-	private CANSparkMax lMotor2 = new CANSparkMax(2, MotorType.kBrushless);
-	private CANSparkMax rMotor0 = new CANSparkMax(3, MotorType.kBrushless);
-	private CANSparkMax rMotor1 = new CANSparkMax(4, MotorType.kBrushless);
-	private CANSparkMax rMotor2 = new CANSparkMax(5, MotorType.kBrushless);
+	private CANSparkMax lMotor0 = new CANSparkMax(1, MotorType.kBrushless);
+	private CANSparkMax lMotor1 = new CANSparkMax(2, MotorType.kBrushless);
+	private CANSparkMax lMotor2 = new CANSparkMax(3, MotorType.kBrushless);
+	private CANSparkMax rMotor0 = new CANSparkMax(4, MotorType.kBrushless);
+	private CANSparkMax rMotor1 = new CANSparkMax(5, MotorType.kBrushless);
+	private CANSparkMax rMotor2 = new CANSparkMax(6, MotorType.kBrushless);
 
 	// PID controllers
 	private CANPIDController lPidController = lMotor0.getPIDController();
@@ -122,7 +122,7 @@ public class DriveTrain extends SubsystemModule {
 	};
 
 	// Instantiate point controller for autonomous driving
-	public DrivingController drivingcontroller = new DrivingController(0.002) {
+	public DrivingController drivingController = new DrivingController(0.002) {
 
 		/**
 		 * Use output from odometer and pass into autonomous driving controller
@@ -186,7 +186,7 @@ public class DriveTrain extends SubsystemModule {
 
 		// Run only when subsystem is enabled
 		if (getStatus()) {
-			this.drivingcontroller.run();
+			this.drivingController.run();
 		}
 	}
 
@@ -323,7 +323,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				drivingcontroller.addSpline(Double.parseDouble(this.args[0]), Double.parseDouble(this.args[1]),
+				drivingController.addSpline(Double.parseDouble(this.args[0]), Double.parseDouble(this.args[1]),
 						Double.parseDouble(this.args[2]), Double.parseDouble(this.args[3]),
 						Double.parseDouble(this.args[4]), Double.parseDouble(this.args[5]),
 						Double.parseDouble(this.args[6]), Double.parseDouble(this.args[7]),
@@ -351,7 +351,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				drivingcontroller.addSpline(Double.parseDouble(this.args[0]), Double.parseDouble(this.args[1]),
+				drivingController.addSpline(Double.parseDouble(this.args[0]), Double.parseDouble(this.args[1]),
 						Double.parseDouble(this.args[2]), Double.parseDouble(this.args[3]),
 						Double.parseDouble(this.args[4]), Double.parseDouble(this.args[5]),
 						Double.parseDouble(this.args[6]), Double.parseDouble(this.args[7]),
