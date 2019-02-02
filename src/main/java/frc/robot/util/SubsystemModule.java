@@ -65,7 +65,6 @@ public abstract class SubsystemModule extends Subsystem {
 
 			// Call the initializer if the first run is active
 			if (v.firstRun && v.checkDelayExpired()) {
-				v.initialize();
 				v.firstRun = false;
 				v.running = true;
 			}
@@ -76,6 +75,7 @@ public abstract class SubsystemModule extends Subsystem {
 
 				// If the command is finished, exit
 				if (v.isFinished()) {
+					System.out.println("Command isFinished == true");
 					v.end();
 					v.running = false;
 				}

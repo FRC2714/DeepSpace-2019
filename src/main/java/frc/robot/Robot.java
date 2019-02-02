@@ -5,7 +5,10 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.autontasks.TestAuton;
+import frc.robot.autontasks.DelayAutonTesterTask;
+import frc.robot.autontasks.RightCargoHatchAuton;
+import frc.robot.autontasks.UnusedRightHatchAltAuton;
+import frc.robot.autontasks.RightRocketHatchAuton;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.util.AutonTask;
 import frc.robot.util.ControlsProcessor;
@@ -36,14 +39,15 @@ public class Robot extends TimedRobot {
 		SmartDashboard.putData("Autonomous Mode Selector", autoChooser);
 
 		// Controls processor only gets created ONCE when code is run
-		controlsProcessor = new ControlsProcessor(2000000, 10) {
+		controlsProcessor = new ControlsProcessor(5000000, 10) {
 			@Override
 			public void registerOperatorControls() {
-				append("closed_loop_tank -s 5", this.x);
-				append("closed_loop_tank -s -5", this.a);
+				append("closed_loop_tank -s -5", this.x);
+				//append("closed_loop_tank -s 5", this.a);
 				append("driver_control -p", this.rightStick);
-				//append("add_forwards_spline -s 0,0,-6,-6,0,3,6,9,8,8,0,0", this.y);
-				//append("start_path -s", this.b);
+				append("add_forwards_spline -s 0,0,-3,-3,0,3,6,10,8,8,0,0", this.a);
+				append("start_path -s", this.b);
+				append("delay_tester -s", this.y);
 			}
 		};
 
@@ -67,6 +71,7 @@ public class Robot extends TimedRobot {
 			controlsProcessor.cancelAll();
 			controlsProcessor.disable();
 		}
+
 	}
 
 	/**
@@ -79,16 +84,15 @@ public class Robot extends TimedRobot {
 
 	/**
 	 * Runs at the beginning of auton mode
-	 * TODO: Replace WPI Lib with auton task
 	 */
 	@Override
 	public void autonomousInit() {
 		generalInit();
 
-		AutonTask choiceOne = new TestAuton(controlsProcessor);
-		AutonTask choiceTwo = new TestAuton(controlsProcessor);
+		AutonTask rightRocket = new RightRocketHatchAuton(controlsProcessor);
+		AutonTask rightCargo = new RightCargoHatchAuton(controlsProcessor);
 
-		choiceOne.run();
+		rightCargo.run();
 	}
 
 	/**
@@ -99,7 +103,6 @@ public class Robot extends TimedRobot {
 
 	/**
 	 * Runs at the start of teleop mode
-	 * TODO: Cancel the queue
 	 */
 	@Override
 	public void teleopInit() {
@@ -115,6 +118,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
+		//drivetrain.odometer.printEncoderPosition();
 	}
 
 	/**

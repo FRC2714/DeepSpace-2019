@@ -21,12 +21,12 @@ import frc.robot.util.SubsystemModule;
 public class DriveTrain extends SubsystemModule {
 
 	// Drivetrain motors
-	private CANSparkMax lMotor0 = new CANSparkMax(0, MotorType.kBrushless);
-	private CANSparkMax lMotor1 = new CANSparkMax(1, MotorType.kBrushless);
-	private CANSparkMax lMotor2 = new CANSparkMax(2, MotorType.kBrushless);
-	private CANSparkMax rMotor0 = new CANSparkMax(3, MotorType.kBrushless);
-	private CANSparkMax rMotor1 = new CANSparkMax(4, MotorType.kBrushless);
-	private CANSparkMax rMotor2 = new CANSparkMax(5, MotorType.kBrushless);
+	private CANSparkMax lMotor0 = new CANSparkMax(1, MotorType.kBrushless);
+	private CANSparkMax lMotor1 = new CANSparkMax(2, MotorType.kBrushless);
+	private CANSparkMax lMotor2 = new CANSparkMax(3, MotorType.kBrushless);
+	private CANSparkMax rMotor0 = new CANSparkMax(4, MotorType.kBrushless);
+	private CANSparkMax rMotor1 = new CANSparkMax(5, MotorType.kBrushless);
+	private CANSparkMax rMotor2 = new CANSparkMax(6, MotorType.kBrushless);
 
 	// PID controllers
 	private CANPIDController lPidController = lMotor0.getPIDController();
@@ -40,7 +40,6 @@ public class DriveTrain extends SubsystemModule {
 	private DifferentialDrive drive = new DifferentialDrive(lMotor0, rMotor0);
 
 	// PID coefficients
-
 	private final double kMinOutput = -1;
 	private final double kMaxOutput = 1;
 
@@ -52,11 +51,21 @@ public class DriveTrain extends SubsystemModule {
 	private final double lKFF = 1.77e-4;
 	private final double rKFF = 1.78e-4;
 
-	private final double convFactor = 322.2; // Convert ft/s to RPM
+	private final double rpmToFeet = 0.003135; // Convert RPM to ft/s
+	private final double rotationsToFeet = 0.1881; // Convert rotations to feet
+
+	private double startTime;
+	private int numberOfRuns;
+
+
 	private final double sensitivity = 2.5;
 	private final double maxVelocity = 13;
 	private final double maxAcceleration = 30;
 
+	// 
+	private double leftEncoderOffset = 0;
+	private double rightEncoderOffset = 0;
+	
 	private double lastVelocity = 0;
 
 	// Robot characteristics
@@ -67,9 +76,9 @@ public class DriveTrain extends SubsystemModule {
 	private ControlsProcessor controlsProcessor;
 
 	// Gearbox encoders
-	private Encoder leftEncoder = new Encoder(RobotMap.p_leftEncoderA, RobotMap.p_leftEncoderB, true, EncodingType.k4X);
-	private Encoder rightEncoder = new Encoder(RobotMap.p_rightEncoderA, RobotMap.p_rightEncoderB, true,
-			EncodingType.k4X);
+	//private Encoder leftEncoder = new Encoder(RobotMap.p_leftEncoderA, RobotMap.p_leftEncoderB, true, EncodingType.k4X);
+	//private Encoder rightEncoder = new Encoder(RobotMap.p_rightEncoderA, RobotMap.p_rightEncoderB, true,
+	//		EncodingType.k4X);
 
 	// NavX gyro
 	private AHRS navX = new AHRS(SPI.Port.kMXP);
@@ -113,16 +122,18 @@ public class DriveTrain extends SubsystemModule {
 				this.headingAngle -= 360;
 			}	
 
-			this.leftPos=leftEncoder.getDistance();
-			this.rightPos=rightEncoder.getDistance();
+			this.leftPos = lEncoder.getPosition() * rotationsToFeet;
+			this.rightPos = -rEncoder.getPosition() * rotationsToFeet;
+			
+			double leftVelocity = lEncoder.getVelocity() * rpmToFeet;
+			double rightVelocity = -rEncoder.getVelocity() * rpmToFeet;
 
-			this.currentAverageVelocity = (leftEncoder.getRate() + rightEncoder.getRate()) / 2;
-	
+			this.currentAverageVelocity = (leftVelocity + rightVelocity) / 2;	
 		}
 	};
 
 	// Instantiate point controller for autonomous driving
-	public DrivingController drivingcontroller = new DrivingController(0.002) {
+	public DrivingController drivingcontroller = new DrivingController(0.005) {
 
 		/**
 		 * Use output from odometer and pass into autonomous driving controller
@@ -149,13 +160,13 @@ public class DriveTrain extends SubsystemModule {
 	 */
 	@Override
 	public void init() {
-		leftEncoder.reset();
-		rightEncoder.reset();
+		leftEncoderOffset = lEncoder.getPosition();
+		rightEncoderOffset = -rEncoder.getPosition();
 		navX.reset();
 		navX.zeroYaw();
 
-		leftEncoder.setDistancePerPulse(-0.0495);
-		rightEncoder.setDistancePerPulse(0.00105);
+		// leftEncoder.setDistancePerPulse(-0.0495);
+		// rightEncoder.setDistancePerPulse(0.00105);
 
 		lMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
 		rMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
@@ -173,6 +184,9 @@ public class DriveTrain extends SubsystemModule {
 
 		lMotor0.set(0);
 		rMotor0.set(0);
+
+		disable();
+		drivingcontroller.clearControlPath();
 	}
 	
 	/**
@@ -197,19 +211,21 @@ public class DriveTrain extends SubsystemModule {
 
 	// Closed loop velocity based tank without an acceleration limit
 	public void closedLoopTank(double leftVelocity, double rightVelocity) {
-		lPidController.setReference(leftVelocity * convFactor, ControlType.kVelocity);
-		rPidController.setReference(-rightVelocity * convFactor, ControlType.kVelocity);
+		lPidController.setReference(leftVelocity / rpmToFeet, ControlType.kVelocity);
+		rPidController.setReference(-rightVelocity / rpmToFeet, ControlType.kVelocity);
+		//System.out.println("ls: " + leftVelocity / rpmToFeet + " rs: " + -rightVelocity / rpmToFeet);
 	}
 
 	// Closed loop arcade based tank
 	public void closedLoopArcade(double velocity, double pivot) {
 		pivot = pivot * sensitivity;
 		closedLoopTank(velocity - pivot, velocity + pivot);
+		//System.out.println("pivot " + pivot);
 	}
 
 	// Closed loop velocity based tank with an acceleration limit
 	public void closedLoopArcade(double velocity, double pivot, double accelLimit) {
-		accelLimit *= controlsProcessor.getActualPeriod();
+		accelLimit *= controlsProcessor.getCommandPeriod();
 
 		double velocitySetpoint = velocity;
 
@@ -254,8 +270,6 @@ public class DriveTrain extends SubsystemModule {
 					pivot = controlsProcessor.getRightJoystick();
 
 				closedLoopArcade(-power * maxVelocity, -pivot, maxAcceleration);
-
-				// System.out.println("Power: " + power + " Pivot: " + pivot);
 			}
 
 			@Override
@@ -375,6 +389,8 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
+		
+
 		new SubsystemCommand(this.registeredCommands, "start_path") {
 
 			@Override
@@ -384,19 +400,43 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void execute() {
-
 			}
 
 			@Override
 			public boolean isFinished() {
-				return true;
+				return drivingcontroller.isFinished();
 			}
 
 			@Override
 			public void end() {
-
+				closedLoopArcade(0, 0);
+				disable();
 			}
 		};
+
+		new SubsystemCommand(this.registeredCommands, "delay_tester"){
+			@Override
+			public void initialize() {
+//				System.out.println("Delay = " + Double.parseDouble(this.args[1]));
+//				enable();
+			}
+
+			@Override
+			public void execute() {
+				System.out.println("DELAY TESTER running!" );
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {
+			}
+		};
+
+
 	}
 
 }

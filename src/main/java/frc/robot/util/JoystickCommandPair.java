@@ -37,7 +37,8 @@ public class JoystickCommandPair {
             controlsProcessor.callCommand(this.commandDetails);
         }
 
-        if (!currentState && this.lastState && this.commandDetails.type() == CommandDetails.CommandType.SERIES) {
+        if (!currentState && this.lastState && this.commandDetails.type() == 
+            CommandDetails.CommandType.SERIES) {
             controlsProcessor.cancelCommand(this.commandDetails);
         }
 

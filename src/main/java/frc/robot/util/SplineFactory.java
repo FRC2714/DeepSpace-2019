@@ -13,12 +13,12 @@ public class SplineFactory {
 
     private double tolerance = 0.00001;
     private double tStep = 0.001;
-    private double period = 0.0005;
+    private double period = 0.002;
 
     private ArrayList<Double> xValues = new ArrayList<Double>();
     private ArrayList<Double> yValues = new ArrayList<Double>();
 
-    public SplineFactory(ArrayList<MotionPose> controlPath, double period, double x1, double x2, double x3, double x4,
+    public SplineFactory(double period, double x1, double x2, double x3, double x4,
             double y1, double y2, double y3, double y4, double acceleration, double maxVelocity, double startVelocity,
             double endVelocity, boolean forwards) {
 
@@ -39,7 +39,7 @@ public class SplineFactory {
         this.currentFrontVelocity = startVelocity * this.period;
         this.currentBackVelocity = endVelocity * this.period;
 
-        this.controlPath = controlPath;
+        this.controlPath = new ArrayList<MotionPose>();
         this.forwards = forwards;
 
         generate();
@@ -118,7 +118,7 @@ public class SplineFactory {
                     yValues.get(i)) / period;
 
             if (!forwards) {
-                velocity = -1;
+                velocity *= -1;
                 angle += 180;
                 if (angle > 360) {
                     angle -= 360;
@@ -129,6 +129,14 @@ public class SplineFactory {
 
         }
 
+    }
+
+    /**
+     * 
+     * @return returns the generated list of MotionPose objects.
+     */
+    public ArrayList<MotionPose> getSpline() {
+        return controlPath;
     }
 
     /**
