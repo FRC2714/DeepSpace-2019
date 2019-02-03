@@ -11,6 +11,7 @@ import frc.robot.autontasks.RightCargoHatchAuton;
 import frc.robot.autontasks.UnusedRightHatchAltAuton;
 import frc.robot.autontasks.RightRocketHatchAuton;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Intake;
 import frc.robot.util.AutonTask;
 import frc.robot.util.ControlsProcessor;
 
@@ -26,6 +27,7 @@ public class Robot extends TimedRobot {
 	// Initialize subsystems
 	private DriveTrain drivetrain;
 	private Arm arm;
+	private Intake intake;
 
 	// Initialize auton mode selector
 	private Command autonomousCommand;
@@ -46,18 +48,30 @@ public class Robot extends TimedRobot {
 			public void registerOperatorControls() {
 				// append("jog_up -s", this.y);
 				// append("jog_down -s", this.a);
-				append("go_to_position_basic -p 90,180,45,90", this.b);
-				append("go_to_position_basic -p 155,180,90,90", this.a);
-				append("go_to_position_basic -p 10,180,0,90", this.x);
+
+				append("print_arm -s", this.b);
+				// append("go_to_position -p 90,20,10,120,20,10", this.a);
+				append("go_to_position -p 100,70,210,190,60,180", this.x);
+				append("go_to_position -p 22.5,70,210,182,60,180", this.y);
+
+				append("hatchplate_up -p", this.a);
+				// append("hatchplate_down -p", this.b);
+
+				append("intake -s", this.lb);
+				append("extake -s", this.rb);
+
+				append("driver_control -p", this.rightStick);
 			}
 		};
 
 		drivetrain = new DriveTrain(controlsProcessor);
 		arm = new Arm(controlsProcessor);
+		intake = new Intake(controlsProcessor);
 
 		// Required to register all subsystems in order to be processed. 
 		controlsProcessor.registerController("DriveTrain", drivetrain);
 		controlsProcessor.registerController("Arm", arm);
+		controlsProcessor.registerController("Intake", intake);
 		controlsProcessor.start();
 	}
 
@@ -69,6 +83,7 @@ public class Robot extends TimedRobot {
 	public void disabledInit() {
 		drivetrain.destruct();
 		arm.destruct();
+		intake.destruct();
 		Scheduler.getInstance().removeAll();
 
 		if (controlsProcessor != null) {
@@ -147,5 +162,6 @@ public class Robot extends TimedRobot {
 
 		drivetrain.init();
 		arm.init();
+		intake.init();
 	}
 }

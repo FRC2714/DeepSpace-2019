@@ -56,16 +56,14 @@ public class Arm extends SubsystemModule {
 	// All angles are in degrees
 	private double shoulderOffset = 0;
 	private double wristOffset = 0;
-
 	private double currentShoulderAngle = 0;
 	private double currentWristAngle = 0;
 	private double currentDegreesPerSecond = 0;
-
 	private final double maxDegreesPerSecond = 5;
 
 	// Arm characteristics
 	private final double shoulderRatio = 512.0/3;
-	private final double wristRatio = 140;
+	private final double wristRatio = -140;
 
 	// Array Lists
 	private ArrayList<Double> shoulderPath;
@@ -98,7 +96,6 @@ public class Arm extends SubsystemModule {
 	
 	/**
 	 * Goes to the desired angle from the current angle on the shoulder
-	 * TODO: Offset might be wrong
 	 * @param desiredTheta Desired angle for the shoulder in degrees
 	 */
 	public void setShoulderAngle(double desiredTheta) {
@@ -110,7 +107,6 @@ public class Arm extends SubsystemModule {
 
 	/**
 	 * Goes to the desired angle from the current angle on the wrist
-	 * TODO: Offset might be wrong
 	 * @param desiredTheta Desired angle for the wrist in degrees
 	 */
 	public void setWristAngle(double desiredTheta) {
@@ -124,28 +120,30 @@ public class Arm extends SubsystemModule {
 	 * Generates a path for the arm to follow
 	 * @param startPosition in degrees
 	 * @param endPosition in degrees
-	 * @param revolutionsPerSecond Velocity in RPS
+	 * @param degreesPerSecond Velocity in degrees per second
 	 * @return ArrayList of type double with every point in the path
 	 */
 	public ArrayList<Double> generatePath(double startPosition, double endPosition, double degreesPerSecond) {
 		int direction = (int)(endPosition - startPosition);
 		
+		// Sets the direction of the path to positive or negative (returns 1 or -1 for math)
 		if (Math.abs(direction) != 0)
 			direction /= Math.abs(direction);
-		else
+		else // Prevents nullPointerException
 			return new ArrayList<Double>();
 
+		// Calculates the change in position in degrees for each period
 		double positionDelta = direction * degreesPerSecond * controlsProcessor.getCommandPeriod();
 		
-		ArrayList<Double> points = new ArrayList<Double>(1);
+		ArrayList<Double> points = new ArrayList<Double>();
 		points.add(0, endPosition);
 
+		// Generates the points between the start and end positions (starting from end and going back)
 		if(startPosition < endPosition) {
 			while(points.get(0) >= startPosition) {
 				points.add(0, points.get(0) - positionDelta);
 			}
-		}
-		else {
+		} else {
 			while(points.get(0) <= startPosition) {
 				points.add(0, points.get(0) - positionDelta);
 			}
@@ -156,6 +154,51 @@ public class Arm extends SubsystemModule {
 		return points;
 	}
 
+	/**
+	 * Generates a path for the arm to follow while limiting acceleration
+	 * @param startPosition in degrees
+	 * @param endPosition in degrees
+	 * @param maxDegreesPerSecond Max velocity in degrees per second
+	 * @param acceleration Acceleration in degrees per second per second
+	 * @return ArrayList of type double with every point in the path
+	 */
+	public ArrayList<Double> generatePath(double startPosition, double endPosition, double maxDegreesPerSecond, double acceleration) {
+		int direction = (int)(endPosition - startPosition);
+		
+		// Sets the direction of the path to positive or negative (returns 1 or -1 for math)
+		if (Math.abs(direction) != 0)
+			direction /= Math.abs(direction);
+		else // Prevents nullPointerException
+			return new ArrayList<Double>();
+
+		acceleration *= controlsProcessor.getCommandPeriod();
+
+		double velocity = currentDegreesPerSecond;
+		double positionDelta = direction * velocity * controlsProcessor.getCommandPeriod();
+
+		ArrayList<Double> points = new ArrayList<Double>();
+		points.add(startPosition);
+		points.add(endPosition);
+
+		// Keeps adding points until they meet in the middle
+		for (int i = 0; points.get(i) * direction < points.get(i + 1) * direction; i++) {
+			velocity += acceleration;
+
+			if (velocity >= maxDegreesPerSecond)
+				positionDelta = direction * maxDegreesPerSecond * controlsProcessor.getCommandPeriod();
+			else
+				positionDelta = direction * velocity * controlsProcessor.getCommandPeriod();
+
+			points.add(i + 1, points.get(i + 1) - positionDelta);
+			points.add(i + 1, points.get(i) + positionDelta);
+		}
+
+		return points;
+	}
+
+	/** 
+	 * Locks the arm into a four bar configuration going up
+	 */
 	public void jogUp() {
 		currentDegreesPerSecond = maxDegreesPerSecond;
 
@@ -168,6 +211,9 @@ public class Arm extends SubsystemModule {
 		setWristAngle(currentWristAngle);
 	}
 
+	/** 
+	 * Locks the arm into a four bar configuration going down
+	 */
 	public void jogDown() {
 		currentDegreesPerSecond = maxDegreesPerSecond;
 
@@ -233,15 +279,19 @@ public class Arm extends SubsystemModule {
 			}
 		};
 
-		new SubsystemCommand(this.registeredCommands, "go_to_position_basic_wrist") {
+		new SubsystemCommand(this.registeredCommands, "go_to_position") {
 
 			int iterator;
 
 			@Override
 			public void initialize() {
+				shoulderPathFinished = false;
 				wristPathFinished = false;
 
-				wristPath = generatePath(Double.parseDouble(this.args[3]),
+				shoulderPath = generatePath(currentShoulderAngle, Double.parseDouble(this.args[0]),
+						Double.parseDouble(this.args[1]), Double.parseDouble(this.args[2]));
+
+				wristPath = generatePath(currentWristAngle, Double.parseDouble(this.args[3]),
 						Double.parseDouble(this.args[4]), Double.parseDouble(this.args[5]));
 
 				iterator = 0;
@@ -249,6 +299,13 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void execute() {
+				iterator++;
+
+				if (iterator < shoulderPath.size())
+					setShoulderAngle(shoulderPath.get(iterator));
+				else
+					shoulderPathFinished = true;
+				
 				if (iterator < wristPath.size())
 					setWristAngle(wristPath.get(iterator));
 				else
@@ -257,12 +314,13 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return wristPathFinished;
+				return shoulderPathFinished && wristPathFinished;
 			}
 
 			@Override
 			public void end() {
-
+				shoulderPath = new ArrayList<Double>();
+				wristPath = new ArrayList<Double>();
 			}
 		};
 
@@ -312,16 +370,19 @@ public class Arm extends SubsystemModule {
 			}
 		};
 
-		new SubsystemCommand(this.registeredCommands, "print_current_angles") {
+		new SubsystemCommand(this.registeredCommands, "print_arm") {
 
 			@Override
 			public void initialize() {
+				shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
+				wristMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
+
 				System.out.println("Current Shoulder Angle: " + currentShoulderAngle + " Current Wrist Angle: " + currentWristAngle);
 			}
 
 			@Override
 			public void execute() {
-				System.out.println("Current Shoulder Angle: " + currentShoulderAngle + " Current Wrist Angle: " + currentWristAngle);
+				// System.out.println("Current Shoulder Angle: " + currentShoulderAngle + " Current Wrist Angle: " + currentWristAngle);
 			}
 
 			@Override
@@ -331,7 +392,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void end() {
-				
+				System.out.println("Current Shoulder Angle: " + currentShoulderAngle + " Current Wrist Angle: " + currentWristAngle);
 			}
 		};
     }
@@ -356,8 +417,12 @@ public class Arm extends SubsystemModule {
 
 	@Override
 	public void destruct() {
+		System.out.println("ARM DESTRUCT CALLED");
+
+		
+
 		shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
-		wristMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+		wristMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
 		
 		shoulderMotor.set(0);
 		wristMotor.set(0);
