@@ -51,8 +51,8 @@ public class Robot extends TimedRobot {
 
 				append("print_arm -s", this.b);
 				// append("go_to_position -p 90,20,10,120,20,10", this.a);
-				append("go_to_position -p 100,70,210,190,60,180", this.x);
-				append("go_to_position -p 22.5,70,210,182,60,180", this.y);
+				append("go_to_position -p 100,70,210,630,190,60,180,540", this.x);
+				append("go_to_position -p 22.5,70,210,630,182,60,180,540", this.y);
 
 				append("hatchplate_up -p", this.a);
 				// append("hatchplate_down -p", this.b);

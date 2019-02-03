@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import java.util.ArrayList;
 
+import javax.lang.model.util.ElementScanner6;
+
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
@@ -196,6 +198,46 @@ public class Arm extends SubsystemModule {
 		return points;
 	}
 
+	public ArrayList<Double> generatePath(double startPosition, double endPosition, double maxDegreesPerSecond, double maxAcceleration, double jerk) {
+		int direction = (int)(endPosition - startPosition);
+		
+		// Sets the direction of the path to positive or negative (returns 1 or -1 for math)
+		if (Math.abs(direction) != 0)
+			direction /= Math.abs(direction);
+		else // Prevents nullPointerException
+			return new ArrayList<Double>();
+
+		maxAcceleration *= controlsProcessor.getCommandPeriod();
+
+		double velocity = currentDegreesPerSecond;
+		double acceleration = 0;
+		double positionDelta = direction * velocity * controlsProcessor.getCommandPeriod();
+
+		ArrayList<Double> points = new ArrayList<Double>();
+		points.add(startPosition);
+		points.add(endPosition);
+
+		// Keeps adding points until they meet in the middle
+		for (int i = 0; points.get(i) * direction < points.get(i + 1) * direction; i++) {
+			acceleration += jerk;
+
+			if (acceleration > maxAcceleration)
+				acceleration = maxAcceleration;
+
+			velocity += acceleration;
+
+			if (velocity >= maxDegreesPerSecond)
+				positionDelta = direction * maxDegreesPerSecond * controlsProcessor.getCommandPeriod();
+			else
+				positionDelta = direction * velocity * controlsProcessor.getCommandPeriod();
+
+			points.add(i + 1, points.get(i + 1) - positionDelta);
+			points.add(i + 1, points.get(i) + positionDelta);
+		}
+
+		return points;
+	}
+
 	/** 
 	 * Locks the arm into a four bar configuration going up
 	 */
@@ -289,10 +331,10 @@ public class Arm extends SubsystemModule {
 				wristPathFinished = false;
 
 				shoulderPath = generatePath(currentShoulderAngle, Double.parseDouble(this.args[0]),
-						Double.parseDouble(this.args[1]), Double.parseDouble(this.args[2]));
+						Double.parseDouble(this.args[1]), Double.parseDouble(this.args[2]), Double.parseDouble(this.args[3]));
 
-				wristPath = generatePath(currentWristAngle, Double.parseDouble(this.args[3]),
-						Double.parseDouble(this.args[4]), Double.parseDouble(this.args[5]));
+				wristPath = generatePath(currentWristAngle, Double.parseDouble(this.args[4]),
+						Double.parseDouble(this.args[5]), Double.parseDouble(this.args[6]), Double.parseDouble(this.args[7]));
 
 				iterator = 0;
 			}
@@ -418,8 +460,6 @@ public class Arm extends SubsystemModule {
 	@Override
 	public void destruct() {
 		System.out.println("ARM DESTRUCT CALLED");
-
-		
 
 		shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		wristMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
