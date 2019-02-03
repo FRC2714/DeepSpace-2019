@@ -198,6 +198,15 @@ public class Arm extends SubsystemModule {
 		return points;
 	}
 
+	/**
+	 * Generates a path for the arm to follow while limiting jerk
+	 * @param startPosition in degrees
+	 * @param endPosition in degrees
+	 * @param maxDegreesPerSecond Max velocity in degrees per second
+	 * @param maxAcceleration Max acceleration in degrees per second per second
+	 * @param jerk Jerk in degrees per second per second per second
+	 * @return
+	 */
 	public ArrayList<Double> generatePath(double startPosition, double endPosition, double maxDegreesPerSecond, double maxAcceleration, double jerk) {
 		int direction = (int)(endPosition - startPosition);
 		
@@ -208,6 +217,7 @@ public class Arm extends SubsystemModule {
 			return new ArrayList<Double>();
 
 		maxAcceleration *= controlsProcessor.getCommandPeriod();
+		jerk *= controlsProcessor.getCommandPeriod();
 
 		double velocity = currentDegreesPerSecond;
 		double acceleration = 0;
