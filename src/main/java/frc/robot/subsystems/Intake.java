@@ -66,7 +66,7 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				cargoMotor.set(-1.0);
+				cargoMotor.set(-0.5);
 			}
 
 			@Override
