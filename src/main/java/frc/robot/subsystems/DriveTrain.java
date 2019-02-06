@@ -270,6 +270,8 @@ public class DriveTrain extends SubsystemModule {
 					pivot = controlsProcessor.getRightJoystick();
 
 				closedLoopArcade(-power * maxVelocity, -pivot, maxAcceleration);
+
+				System.out.println("Odometer heading angle " + odometer.getHeadingAngle());
 			}
 
 			@Override
@@ -337,10 +339,26 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				drivingController.addSpline(Double.parseDouble(this.args[0]), Double.parseDouble(this.args[1]),
-						Double.parseDouble(this.args[2]), Double.parseDouble(this.args[3]),
-						Double.parseDouble(this.args[4]), Double.parseDouble(this.args[5]),
-						Double.parseDouble(this.args[6]), Double.parseDouble(this.args[7]),
+
+				double xInitial = Double.parseDouble(this.args[0]);
+				double xFinal = Double.parseDouble(this.args[4]);
+				double yInitial = Double.parseDouble(this.args[1]);
+				double yFinal = Double.parseDouble(this.args[5]);
+				double thetaInitial = Double.parseDouble(this.args[2]);
+				double thetaFinal = Double.parseDouble(this.args[6]);
+				double lInitial = Double.parseDouble(this.args[3]);
+				double lFinal = Double.parseDouble(this.args[7]);
+
+				thetaInitial = Math.toRadians(thetaInitial);
+				thetaFinal = Math.toRadians(thetaFinal);
+
+				double x2 = lInitial * Math.cos(thetaInitial) + xInitial;
+				double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal; 
+				double y2 = lInitial * Math.sin(thetaInitial) + yInitial; 
+				double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal; 
+
+				
+				drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
 						Double.parseDouble(this.args[8]), Double.parseDouble(this.args[9]),
 						Double.parseDouble(this.args[10]), Double.parseDouble(this.args[11]), true);
 			}
@@ -365,10 +383,26 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				drivingController.addSpline(Double.parseDouble(this.args[0]), Double.parseDouble(this.args[1]),
-						Double.parseDouble(this.args[2]), Double.parseDouble(this.args[3]),
-						Double.parseDouble(this.args[4]), Double.parseDouble(this.args[5]),
-						Double.parseDouble(this.args[6]), Double.parseDouble(this.args[7]),
+
+				double xInitial = Double.parseDouble(this.args[0]);
+				double yInitial = Double.parseDouble(this.args[1]);
+				double thetaInitial = Double.parseDouble(this.args[2]);
+				double lInitial = Double.parseDouble(this.args[3]);
+				double xFinal = Double.parseDouble(this.args[4]);
+				double yFinal = Double.parseDouble(this.args[5]);
+				double thetaFinal = Double.parseDouble(this.args[6]);
+				double lFinal = Double.parseDouble(this.args[7]);
+
+				thetaInitial = Math.toRadians(thetaInitial);
+				thetaFinal = Math.toRadians(thetaFinal);
+
+				double x2 = lInitial * Math.cos(thetaInitial + Math.PI) + xInitial;
+				double x3 = lFinal * Math.cos(thetaFinal) + xFinal; 
+				double y2 = lInitial * Math.sin(thetaInitial + Math.PI) + yInitial; 
+				double y3 = lFinal * Math.sin(thetaFinal) + yFinal; 
+
+				
+				drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
 						Double.parseDouble(this.args[8]), Double.parseDouble(this.args[9]),
 						Double.parseDouble(this.args[10]), Double.parseDouble(this.args[11]), false);
 			}

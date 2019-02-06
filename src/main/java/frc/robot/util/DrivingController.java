@@ -9,13 +9,13 @@ public abstract class DrivingController {
 	 * Corrects both the anglular and perpendicular error
 	 */
 	//Samson control was originally at 0.25 * 0.6
-	private PID samsonControl = new PID(0.125, 0.0, 0);
+	private PID samsonControl = new PID(0.1, 0.001, 0);
 	private double samsonOutput;
 
 	/**
 	 * Controls the magnitude of tangential correction
 	 */
-	private PID tangentialControl = new PID(0.05, 0.0, 0.0);
+	private PID tangentialControl = new PID(0.1, 0.0, 0.0);
 	private double tangentialOutput;
 
 	/**
@@ -50,6 +50,8 @@ public abstract class DrivingController {
 	public DrivingController(double period) {
 
 		this.period = period;
+
+		this.samsonControl.setMaxIOutput(0.25);
 
 	}
 

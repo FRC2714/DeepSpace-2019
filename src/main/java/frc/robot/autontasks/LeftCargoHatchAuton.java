@@ -3,13 +3,13 @@ package frc.robot.autontasks;
 import frc.robot.util.AutonTask;
 import frc.robot.util.ControlsProcessor;
 
-public class RightCargoHatchAuton extends AutonTask {
+public class LeftCargoHatchAuton extends AutonTask {
 	/**
 	 * Accepts the object of the running controlsProcessor to modify
 	 *
 	 * @param controlsProcessor
 	 */
-	public RightCargoHatchAuton(ControlsProcessor controlsProcessor) {
+	public LeftCargoHatchAuton(ControlsProcessor controlsProcessor) {
 		super(controlsProcessor);
 
 		// queueTask("add_forwards_spline -s 0,0,0,0,0,0,0,3,13,4,0,4");
