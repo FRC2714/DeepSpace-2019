@@ -426,14 +426,19 @@ public class DriveTrain extends SubsystemModule {
 		
 
 		new SubsystemCommand(this.registeredCommands, "start_path") {
+			double startTime;
+			int counter = 0;
 
 			@Override
 			public void initialize() {
 				enable();
+				startTime = System.nanoTime();
 			}
 
 			@Override
 			public void execute() {
+				System.out.println("going: " + counter);
+				counter++;
 			}
 
 			@Override
@@ -443,8 +448,11 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
-				closedLoopArcade(0, 0);
+				// closedLoopArcade(0, 0);
 				disable();
+				double averageTime = (System.nanoTime() - startTime)/counter;
+				System.out.println("average time " + averageTime);
+				System.out.println(odometer.getCurrentX() + " : " + odometer.getCurrentY());
 			}
 		};
 

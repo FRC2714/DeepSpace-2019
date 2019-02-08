@@ -9,20 +9,20 @@ public abstract class DrivingController {
 	 * Corrects both the anglular and perpendicular error
 	 */
 	//Samson control was originally at 0.25 * 0.6
-	private PID samsonControl = new PID(0.1, 0.001, 0);
+	private PID samsonControl = new PID(0.20*0.6, 0.0, 0.0);
 	private double samsonOutput;
 
 	/**
 	 * Controls the magnitude of tangential correction
 	 */
-	private PID tangentialControl = new PID(0.1, 0.0, 0.0);
+	private PID tangentialControl = new PID(0.4, 0.0, 0.0);
 	private double tangentialOutput;
 
 	/**
 	 * k2: For perpendicular error
 	 * k3: For angular error
 	 */
-	private double k2 = 0.2;
+	private double k2 = 1.0;
 	private double k3 = 1.0;
 
 	/**
@@ -79,22 +79,23 @@ public abstract class DrivingController {
 
 		double samsonCorrection2;
 
-		if (angularError > 0.001)
-		 	samsonCorrection2= (k2 * orthogonalError * refVelocity) / angularError;
-		 else
-			samsonCorrection2 = 0;
-
+		if (angularError > 1) {
+			samsonCorrection2 = (k2 * orthogonalError * refVelocity) / angularError;
+		} else {
+			samsonCorrection2 = (k2 * orthogonalError * refVelocity) / 1;
+		}
+		
 		double samsonCorrection3 = k3 * angularError;
 
-//		System.out.println("Angular Error -- " + angularError);
+		double samsonSum = samsonCorrection2 + samsonCorrection3;
 
-		samsonOutput = samsonControl.getOutput(samsonCorrection2 + samsonCorrection3, 0);
+		samsonOutput = samsonControl.getOutput(samsonSum, 0);
 		tangentialOutput = tangentialControl.getOutput(tangentialError, 0);
 
 		//System.out.println("Ref Velocity: " + refVelocity);
 
 		// Both +
-		driveRobot(refVelocity, samsonOutput);
+		driveRobot(refVelocity + tangentialOutput, samsonOutput);
 		//System.out.println(samsonOutput);
 
 	}
