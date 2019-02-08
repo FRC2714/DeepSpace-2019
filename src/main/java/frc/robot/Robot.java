@@ -46,32 +46,24 @@ public class Robot extends TimedRobot {
 		controlsProcessor = new ControlsProcessor(5000000, 10) {
 			@Override
 			public void registerOperatorControls() {
-				// append("jog_up -s", this.y);
-				// append("jog_down -s", this.a);
-
-				// append("go_to_position -p 22.75,70,182,70", this.y);
-				// append("go_to_position -p 100,70,190,70", this.x);
-				// append("go_to_position -p 150,70,190,70", this.a);
+				append("jog_up -s", this.rb);
+				append("jog_down -s", this.lb);
 				
-				append("go_to_position -p 53,70,195,70", this.a); // Lower cargo rocket
-				append("go_to_position -p 85,70,200,70", this.b); // Middle cargo rocket
+				// append("go_to_position -p 53,70,195,70", this.a); // Lower cargo rocket
+				append("go_to_position -p 85,70,200,200", this.b); // Middle cargo rocket
 				// append("go_to_position -p 110,70,230.8,70", this.y); // Top cargo rocket (No good)
 				
-				append("go_to_position -p 15,70,80,70", this.x); // Lower hatch rocket
-				append("go_to_position -p 62,70,122,70", this.y); // Middle hatch rocket
+				// append("go_to_position -p 15,70,80,70", this.x); // Lower hatch rocket
+				// append("go_to_position -p 62,70,122,70", this.y); // Middle hatch rocket
 				// append("go_to_position -p 110,70,230.8,70", this.y); // Top hatch rocket (No good)
 
 				// append("go_to_position -p 22.75,70,182,70", this.x); // Intake floor
 
-				// append("arm_mode -s 0", this.y); // Position shoulder
-				// append("arm_mode -s 1", this.x); // Position wrist
-				// append("arm_mode -s 2", this.b); // Print
-
 				//append("hatchplate_up -p", this.a);
 				// append("hatchplate_down -p", this.b);
 
-				append("intake -s", this.rb);
-				append("extake -s", this.lb);
+				// append("intake -s", this.rb);
+				// append("extake -s", this.lb);
 
 				//append("driver_control -p", this.rightStick);
 			}
