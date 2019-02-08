@@ -133,7 +133,7 @@ public class DriveTrain extends SubsystemModule {
 	};
 
 	// Instantiate point controller for autonomous driving
-	public DrivingController drivingController = new DrivingController(0.005) {
+	public DrivingController drivingController = new DrivingController(0.01) {
 
 		/**
 		 * Use output from odometer and pass into autonomous driving controller
@@ -179,8 +179,8 @@ public class DriveTrain extends SubsystemModule {
 	public void destruct() {
 		driverControlled = false;
 
-		lMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
-		rMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
+		lMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
+		rMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
 
 		lMotor0.set(0);
 		rMotor0.set(0);
@@ -432,12 +432,16 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 				enable();
-				startTime = System.nanoTime();
+				
 			}
 
 			@Override
 			public void execute() {
-				System.out.println("going: " + counter);
+				if(counter < 5){
+					startTime = System.nanoTime();
+				}
+				double averageTime = (System.nanoTime() - startTime)/counter;
+				System.out.println("average time " + averageTime);
 				counter++;
 			}
 
@@ -448,10 +452,8 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
-				// closedLoopArcade(0, 0);
+				closedLoopArcade(0, 0);
 				disable();
-				double averageTime = (System.nanoTime() - startTime)/counter;
-				System.out.println("average time " + averageTime);
 				System.out.println(odometer.getCurrentX() + " : " + odometer.getCurrentY());
 			}
 		};

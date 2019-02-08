@@ -45,7 +45,7 @@ public class Robot extends TimedRobot {
 		SmartDashboard.putData("Autonomous Mode Selector", autoChooser);
 
 		// Controls processor only gets created ONCE when code is run
-		controlsProcessor = new ControlsProcessor(5000000, 10) {
+		controlsProcessor = new ControlsProcessor(10000000, 2) {
 			@Override
 			public void registerOperatorControls() {
 				// append("jog_up -s", this.y);
