@@ -21,28 +21,50 @@ public class Intake extends SubsystemModule {
 	private Servo hatchplateServo0 = new Servo(0);
 	private Servo hatchplateServo1 = new Servo(1);
 
-	private final double hatchplateUp = 80;
-	private final double hatchplateDown = 100;
+	// Intake Sensors
+	//TODO: These are placeholders
+	private boolean cargoSensor = false;
+	private boolean hatchSensor = false;
 
     public Intake(ControlsProcessor controlsProcessor) { 
 		registerCommands(); // Puts commands onto the hashmap
 		
 		this.controlsProcessor = controlsProcessor;
 	}
-	
 
+	/**
+	 * Raises the hatchplate into tucked position
+	 */
+	public void hatchplateUp() {
+		hatchplateServo0.set(1);
+		hatchplateServo1.set(1);
+	}
 
-    @Override public void run() {
+	/**
+	 * Lowers the hatchplate into active position
+	 */
+	public void hatchplateDown() {
+		hatchplateServo0.set(0.47);
+		hatchplateServo1.set(0.47);
+	}
 
+	@Override
+	public void run() {
+		//TODO: Update intake sensors here
     }
 
-    @Override public void registerCommands() {
+	@Override
+	public void registerCommands() {
 
-        new SubsystemCommand(this.registeredCommands, "intake") {
+        new SubsystemCommand(this.registeredCommands, "cargo_intake") {
 
 			@Override
 			public void initialize() {
-				cargoMotor.set(0.75);
+				if (!cargoSensor && !hatchSensor) {
+					cargoMotor.set(0.75);
+				} else {
+					end();
+				}
 			}
 
 			@Override
@@ -52,13 +74,75 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return false;
+				return cargoSensor;
 			}
 
 			@Override
 			public void end() {
 				cargoMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
-				cargoMotor.set(0.05);
+
+				if (cargoSensor && !hatchSensor) {
+					cargoMotor.set(0.05);
+				}
+			}
+		};
+
+        new SubsystemCommand(this.registeredCommands, "hatch_floor_intake") {
+
+			@Override
+			public void initialize() {
+				if (!cargoSensor && !hatchSensor) {
+					cargoMotor.set(-0.75);
+				} else {
+					end();
+				}
+			}
+
+			@Override
+			public void execute() {
+			}
+
+			@Override
+			public boolean isFinished() {
+				return hatchSensor;
+			}
+
+			@Override
+			public void end() {
+				cargoMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+
+				if (!cargoSensor && hatchSensor) {
+					hatchplateDown();
+					hatchplatePump.set(1);
+				}
+
+				cargoMotor.set(0);
+			}
+		};
+
+        new SubsystemCommand(this.registeredCommands, "hatch_station_intake") {
+
+			@Override
+			public void initialize() {
+				if (!cargoSensor && !hatchSensor) {
+					hatchplateDown();
+					hatchplatePump.set(1);
+				}
+			}
+
+			@Override
+			public void execute() {
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				return hatchSensor;
+			}
+
+			@Override
+			public void end() {
+				cargoMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 			}
 		};
 
@@ -66,7 +150,13 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				cargoMotor.set(-0.5);
+				if (cargoSensor && !hatchSensor) {
+					cargoMotor.set(-0.5);
+				} else if (!cargoSensor && hatchSensor) {
+					hatchplatePump.set(0);
+				} else {
+					end();
+				}
 			}
 
 			@Override
@@ -82,77 +172,11 @@ public class Intake extends SubsystemModule {
 			@Override
 			public void end() {
 				cargoMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
-				cargoMotor.set(0);
-			}
-		};
 
-        new SubsystemCommand(this.registeredCommands, "hatchplate_up") {
-
-			@Override
-			public void initialize() {
-				hatchplateServo0.set(1);
-				hatchplateServo1.set(1);
-			}
-
-			@Override
-			public void execute() {
-
-			}
-
-			@Override
-			public boolean isFinished() {
-				return true;
-			}
-
-			@Override
-			public void end() {
-
-			}
-		};
-
-        new SubsystemCommand(this.registeredCommands, "hatchplate_down") {
-
-			@Override
-			public void initialize() {
-				hatchplateServo0.set(0.47);
-				hatchplateServo1.set(0.47);
-			}
-
-			@Override
-			public void execute() {
-			}
-
-			@Override
-			public boolean isFinished() {
-				return true;
-			}
-
-			@Override
-			public void end() {
-
-			}
-		};
-
-        new SubsystemCommand(this.registeredCommands, "hatchplate_pump") {
-
-			@Override
-			public void initialize() {
-				hatchplatePump.set(Double.parseDouble(args[0]));
-			}
-
-			@Override
-			public void execute() {
-
-			}
-
-			@Override
-			public boolean isFinished() {
-				return false;
-			}
-
-			@Override
-			public void end() {
-				hatchplatePump.set(0);
+				if (!cargoSensor && !hatchSensor) {
+					hatchplateUp();
+					cargoMotor.set(0);
+				}
 			}
 		};
     }

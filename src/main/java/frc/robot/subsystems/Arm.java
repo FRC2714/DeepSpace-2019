@@ -242,6 +242,41 @@ public class Arm extends SubsystemModule {
 		// System.out.println("Down S: " + currentShoulderAngle + "\tW: " + currentWristAngle);
 	}
 
+	/**
+	 * @return if the arm is in start position
+	 */
+	public boolean checkStartPosition() {
+		return startPosition;
+	}
+
+	/**
+	 * @return if the arm is in floor intake position
+	 */
+	public boolean checkFloorIntake() {
+		return floorIntake;
+	}
+
+	/**
+	 * @return if the arm is in station intake position
+	 */
+	public boolean checkStationIntake() {
+		return stationIntake;
+	}
+
+	/**
+	 * @return if the arm is in a cargo scoring position
+	 */
+	public boolean checkCargoPosition() {
+		return cargoPosition;
+	}
+
+	/**
+	 * @return if the arm is in a hatch scoring position
+	 */
+	public boolean checkHatchPosition() {
+		return hatchPosition;
+	}
+
 	@Override
 	public void run() {
 		currentShoulderAngle = ((shoulderMotorEncoder.getPosition() / shoulderRatio) * 360) - shoulderOffset;
@@ -453,6 +488,26 @@ public class Arm extends SubsystemModule {
 							wristMaxVelocity, wristMaxVelocity * 4, wristMaxVelocity * 16);
 
 					iterator = 0;
+				} else if ((floorIntake || cargoPosition) && hatchSensor && !cargoSensor) {
+					startPosition = false;
+					floorIntake = false;
+					stationIntake = false;
+					cargoPosition = false;
+					hatchPosition = true;
+
+					shoulderPathFinished = false;
+					wristPathFinished = false;
+
+					double shoulderMaxVelocity = 70;
+					double wristMaxVelocity = 70;
+					
+					shoulderPath = generatePath(currentShoulderAngle, 15,
+							shoulderMaxVelocity, shoulderMaxVelocity * 4, shoulderMaxVelocity * 16);
+
+					wristPath = generatePath(currentWristAngle, 80,
+							wristMaxVelocity, wristMaxVelocity * 4, wristMaxVelocity * 16);
+
+					iterator = 0;
 				} else {
 					end(); //TODO: test that this prevents execute
 				}
@@ -485,7 +540,7 @@ public class Arm extends SubsystemModule {
 			}
 		};
 
-		new SubsystemCommand(this.registeredCommands, "cargo_middle_position") {
+		new SubsystemCommand(this.registeredCommands, "middle_score") {
 
 			int iterator;
 
@@ -511,6 +566,26 @@ public class Arm extends SubsystemModule {
 							wristMaxVelocity, wristMaxVelocity * 4, wristMaxVelocity * 16);
 
 					iterator = 0;
+				} else if ((floorIntake || cargoPosition) && hatchSensor && !cargoSensor) {
+					startPosition = false;
+					floorIntake = false;
+					stationIntake = false;
+					cargoPosition = false;
+					hatchPosition = true;
+
+					shoulderPathFinished = false;
+					wristPathFinished = false;
+
+					double shoulderMaxVelocity = 70;
+					double wristMaxVelocity = 70;
+					
+					shoulderPath = generatePath(currentShoulderAngle, 62,
+							shoulderMaxVelocity, shoulderMaxVelocity * 4, shoulderMaxVelocity * 16);
+
+					wristPath = generatePath(currentWristAngle, 122,
+							wristMaxVelocity, wristMaxVelocity * 4, wristMaxVelocity * 16);
+
+					iterator = 0;
 				} else {
 					end(); //TODO: test that this prevents execute
 				}
@@ -543,7 +618,8 @@ public class Arm extends SubsystemModule {
 			}
 		};
 
-		new SubsystemCommand(this.registeredCommands, "cargo_upper_position") {
+		//TODO: Positions are wrong for this
+		new SubsystemCommand(this.registeredCommands, "upper_score") {
 
 			int iterator;
 
@@ -555,6 +631,26 @@ public class Arm extends SubsystemModule {
 					stationIntake = false;
 					cargoPosition = true;
 					hatchPosition = false;
+
+					shoulderPathFinished = false;
+					wristPathFinished = false;
+
+					double shoulderMaxVelocity = 70;
+					double wristMaxVelocity = 70;
+					
+					shoulderPath = generatePath(currentShoulderAngle, 110,
+							shoulderMaxVelocity, shoulderMaxVelocity * 4, shoulderMaxVelocity * 16);
+
+					wristPath = generatePath(currentWristAngle, 230.8,
+							wristMaxVelocity, wristMaxVelocity * 4, wristMaxVelocity * 16);
+
+					iterator = 0;
+				} else if ((floorIntake || cargoPosition) && hatchSensor && !cargoSensor) {
+					startPosition = false;
+					floorIntake = false;
+					stationIntake = false;
+					cargoPosition = false;
+					hatchPosition = true;
 
 					shoulderPathFinished = false;
 					wristPathFinished = false;
@@ -601,7 +697,8 @@ public class Arm extends SubsystemModule {
 			}
 		};
 
-		new SubsystemCommand(this.registeredCommands, "hatch_lower_position") {
+		//TODO: Positions are wrong for this		
+		new SubsystemCommand(this.registeredCommands, "back_score") {
 
 			int iterator;
 
@@ -620,10 +717,30 @@ public class Arm extends SubsystemModule {
 					double shoulderMaxVelocity = 70;
 					double wristMaxVelocity = 70;
 					
-					shoulderPath = generatePath(currentShoulderAngle, 110,
+					shoulderPath = generatePath(currentShoulderAngle, 140,
 							shoulderMaxVelocity, shoulderMaxVelocity * 4, shoulderMaxVelocity * 16);
 
-					wristPath = generatePath(currentWristAngle, 230.8,
+					wristPath = generatePath(currentWristAngle, 90,
+							wristMaxVelocity, wristMaxVelocity * 4, wristMaxVelocity * 16);
+
+					iterator = 0;
+				} else if ((floorIntake || cargoPosition) && hatchSensor && !cargoSensor) {
+					startPosition = false;
+					floorIntake = false;
+					stationIntake = false;
+					cargoPosition = false;
+					hatchPosition = true;
+
+					shoulderPathFinished = false;
+					wristPathFinished = false;
+
+					double shoulderMaxVelocity = 70;
+					double wristMaxVelocity = 70;
+					
+					shoulderPath = generatePath(currentShoulderAngle, 155,
+							shoulderMaxVelocity, shoulderMaxVelocity * 4, shoulderMaxVelocity * 16);
+
+					wristPath = generatePath(currentWristAngle, 90,
 							wristMaxVelocity, wristMaxVelocity * 4, wristMaxVelocity * 16);
 
 					iterator = 0;
