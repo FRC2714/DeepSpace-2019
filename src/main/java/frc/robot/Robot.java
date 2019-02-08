@@ -48,6 +48,8 @@ public class Robot extends TimedRobot {
 			public void registerOperatorControls() {
 				append("jog_up -s", this.rb);
 				append("jog_down -s", this.lb);
+
+				
 				
 				// append("go_to_position -p 53,70,195,70", this.a); // Lower cargo rocket
 				append("go_to_position -p 85,70,200,200", this.b); // Middle cargo rocket
