@@ -14,8 +14,6 @@
 - start_path
 - delay_tester
 
-##### Tuning
-
 #### Arm
 ##### Commands
 - go_to_position
@@ -28,8 +26,6 @@
 - middle_score
 - upper_score
 - back_score
-
-##### Tuning
 
 #### Intake
 ##### Commands
