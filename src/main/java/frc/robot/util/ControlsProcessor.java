@@ -77,6 +77,8 @@ public abstract class ControlsProcessor extends Thread {
 		while (true) {
 
 			if (!stopProcessor) {
+				timestamp = System.nanoTime();
+
 				controllers.forEach((k, v) -> v.run());
 
 				if (counter % this.commandDivider == 0) {
@@ -89,8 +91,6 @@ public abstract class ControlsProcessor extends Thread {
 				
 				// Busy wait until the next iteration
 				while (System.nanoTime() < timestamp + periodNanoseconds) { }
-
-				timestamp = System.nanoTime();
 				
 			}
 		}
