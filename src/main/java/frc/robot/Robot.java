@@ -46,17 +46,32 @@ public class Robot extends TimedRobot {
 		controlsProcessor = new ControlsProcessor(5000000, 10) {
 			@Override
 			public void registerOperatorControls() {
-				append("jog_up -s", this.rb);
-				append("jog_down -s", this.lb);
 
-				
-				
-				// append("go_to_position -p 53,70,195,70", this.a); // Lower cargo rocket
-				append("go_to_position -p 85,70,200,200", this.b); // Middle cargo rocket
+				// Go to start postion
+				append("start_position -p", this.start);
+
+				// Intake cargo from ground
+				append("floor_intake -p", this.a);
+				append("cargo_intake -p", this.a);
+
+				// Intake hatch from ground
+				append("floor_intake -p", this.b);
+				append("hatch_floor_intake -p", this.b);
+
+				// Intake hatch from station
+				append("station_intake -p", this.y);
+				append("hatch_station_intake -p", this.y);
+
+				// Score positions
+				// append("lower_position -p", button);
+				// append("middle_position -p", button);
+				// append("upper_position -p", button);
+				// append("back_position -p", button);
+
+				// Extake
+				append("extake -p", this.x);
+
 				// append("go_to_position -p 110,70,230.8,70", this.y); // Top cargo rocket (No good)
-				
-				// append("go_to_position -p 15,70,80,70", this.x); // Lower hatch rocket
-				// append("go_to_position -p 62,70,122,70", this.y); // Middle hatch rocket
 				// append("go_to_position -p 110,70,230.8,70", this.y); // Top hatch rocket (No good)
 
 				// append("go_to_position -p 22.75,70,182,70", this.x); // Intake floor

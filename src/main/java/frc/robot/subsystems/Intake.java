@@ -110,13 +110,12 @@ public class Intake extends SubsystemModule {
 			@Override
 			public void end() {
 				cargoMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+				cargoMotor.set(0);
 
 				if (!cargoSensor && hatchSensor) {
-					hatchplateDown();
 					hatchplatePump.set(1);
+					hatchplateDown();
 				}
-
-				cargoMotor.set(0);
 			}
 		};
 
@@ -125,8 +124,8 @@ public class Intake extends SubsystemModule {
 			@Override
 			public void initialize() {
 				if (!cargoSensor && !hatchSensor) {
-					hatchplateDown();
 					hatchplatePump.set(1);
+					hatchplateDown();
 				}
 			}
 
@@ -137,7 +136,7 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return hatchSensor;
+				return true;
 			}
 
 			@Override
@@ -166,7 +165,7 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return false;
+				return !hatchSensor && !cargoSensor;
 			}
 
 			@Override

@@ -468,7 +468,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				if ((floorIntake || cargoPosition) && !hatchSensor && cargoSensor) {
+				if (!hatchSensor && cargoSensor) {
 					startPosition = false;
 					floorIntake = false;
 					stationIntake = false;
@@ -488,7 +488,7 @@ public class Arm extends SubsystemModule {
 							wristMaxVelocity, wristMaxVelocity * 4, wristMaxVelocity * 16);
 
 					iterator = 0;
-				} else if ((floorIntake || cargoPosition) && hatchSensor && !cargoSensor) {
+				} else if (hatchSensor && !cargoSensor) {
 					startPosition = false;
 					floorIntake = false;
 					stationIntake = false;
@@ -546,7 +546,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				if ((floorIntake || cargoPosition) && !hatchSensor && cargoSensor) {
+				if (!hatchSensor && cargoSensor) {
 					startPosition = false;
 					floorIntake = false;
 					stationIntake = false;
@@ -566,7 +566,7 @@ public class Arm extends SubsystemModule {
 							wristMaxVelocity, wristMaxVelocity * 4, wristMaxVelocity * 16);
 
 					iterator = 0;
-				} else if ((floorIntake || cargoPosition) && hatchSensor && !cargoSensor) {
+				} else if (hatchSensor && !cargoSensor) {
 					startPosition = false;
 					floorIntake = false;
 					stationIntake = false;
@@ -625,7 +625,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				if ((floorIntake || cargoPosition) && !hatchSensor && cargoSensor) {
+				if (!hatchSensor && cargoSensor) {
 					startPosition = false;
 					floorIntake = false;
 					stationIntake = false;
@@ -645,7 +645,7 @@ public class Arm extends SubsystemModule {
 							wristMaxVelocity, wristMaxVelocity * 4, wristMaxVelocity * 16);
 
 					iterator = 0;
-				} else if ((floorIntake || cargoPosition) && hatchSensor && !cargoSensor) {
+				} else if (hatchSensor && !cargoSensor) {
 					startPosition = false;
 					floorIntake = false;
 					stationIntake = false;
@@ -704,7 +704,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				if ((floorIntake || cargoPosition) && !hatchSensor && cargoSensor) {
+				if (!hatchSensor && cargoSensor) {
 					startPosition = false;
 					floorIntake = false;
 					stationIntake = false;
@@ -724,7 +724,7 @@ public class Arm extends SubsystemModule {
 							wristMaxVelocity, wristMaxVelocity * 4, wristMaxVelocity * 16);
 
 					iterator = 0;
-				} else if ((floorIntake || cargoPosition) && hatchSensor && !cargoSensor) {
+				} else if (hatchSensor && !cargoSensor) {
 					startPosition = false;
 					floorIntake = false;
 					stationIntake = false;
