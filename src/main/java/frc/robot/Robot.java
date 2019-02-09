@@ -27,7 +27,6 @@ public class Robot extends TimedRobot {
 	// Initialize subsystems
 	private DriveTrain drivetrain;
 	private Arm arm;
-	private Intake intake;
 
 	// Initialize auton mode selector
 	private Command autonomousCommand;
@@ -51,15 +50,15 @@ public class Robot extends TimedRobot {
 				append("start_position -p", this.start);
 
 				// Intake cargo from ground
-				append("floor_intake -p", this.a);
+				append("floor_position -p", this.a);
 				append("cargo_intake -s", this.a);
 
 				// Intake hatch from ground
-				append("floor_intake -p", this.b);
+				append("floor_position -p", this.b);
 				append("hatch_floor_intake -s", this.b);
 
 				// Intake hatch from station
-				append("station_intake -p", this.y);
+				append("station_position -p", this.y);
 				append("hatch_station_intake -s", this.y);
 
 				// Score positions
@@ -69,7 +68,7 @@ public class Robot extends TimedRobot {
 				// append("back_position -p", button);
 
 				// Extake
-				append("extake -p", this.x);
+				append("extake -s", this.x);
 
 				// append("go_to_position -p 110,70,230.8,70", this.y); // Top cargo rocket (No good)
 				// append("go_to_position -p 110,70,230.8,70", this.y); // Top hatch rocket (No good)
@@ -88,12 +87,10 @@ public class Robot extends TimedRobot {
 
 		drivetrain = new DriveTrain(controlsProcessor);
 		arm = new Arm(controlsProcessor);
-		intake = new Intake(controlsProcessor);
 
 		// Required to register all subsystems in order to be processed. 
 		controlsProcessor.registerController("DriveTrain", drivetrain);
 		controlsProcessor.registerController("Arm", arm);
-		controlsProcessor.registerController("Intake", intake);
 		controlsProcessor.start();
 	}
 
@@ -105,7 +102,6 @@ public class Robot extends TimedRobot {
 	public void disabledInit() {
 		drivetrain.destruct();
 		arm.destruct();
-		intake.destruct();
 		Scheduler.getInstance().removeAll();
 
 		if (controlsProcessor != null) {
@@ -184,6 +180,5 @@ public class Robot extends TimedRobot {
 
 		drivetrain.init();
 		arm.init();
-		intake.init();
 	}
 }

@@ -7,14 +7,13 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.CounterBase.EncodingType;
-import frc.robot.RobotMap;
 import frc.robot.util.ControlsProcessor;
 import frc.robot.util.SubsystemCommand;
 import frc.robot.util.SubsystemModule;
 
 public class Arm extends SubsystemModule {
+
+	private Intake intake;
 
 	// Controls Processor
 	private ControlsProcessor controlsProcessor;
@@ -31,9 +30,9 @@ public class Arm extends SubsystemModule {
 	private CANEncoder shoulderMotorEncoder = shoulderMotor.getEncoder();
 	private CANEncoder wristMotorEncoder = wristMotor.getEncoder();
 
-	// Output encoders
-	private Encoder shoulderOutputEncoder = new Encoder(RobotMap.p_shoulderEncoderA, RobotMap.p_shoulderEncoderB, true, EncodingType.k4X);
-	private Encoder wristOutputEncoder = new Encoder(RobotMap.p_wristEncoderA, RobotMap.p_wristEncoderB, true, EncodingType.k4X);
+	// Output encoders - Probably won't use these
+	// private Encoder shoulderOutputEncoder = new Encoder(RobotMap.p_shoulderEncoderA, RobotMap.p_shoulderEncoderB, true, EncodingType.k4X);
+	// private Encoder wristOutputEncoder = new Encoder(RobotMap.p_wristEncoderA, RobotMap.p_wristEncoderB, true, EncodingType.k4X);
 
 	// PID coefficients
 	private final double sMinOutput = -1;
@@ -63,6 +62,14 @@ public class Arm extends SubsystemModule {
 	private final double shoulderRatio = 512.0/3;
 	private final double wristRatio = -140;
 
+	// Arm movement constants
+	private final double shoulderMaxVelocity = 70;
+	private final double wristMaxVelocity = 100;
+	private final double shoulderAcceleration = shoulderMaxVelocity * 4;
+	private final double shoulderJerk = shoulderAcceleration * 4;
+	private final double wristAcceleration = wristMaxVelocity * 4;
+	private final double wristJerk = wristAcceleration * 4;
+
 	// Array Lists
 	private ArrayList<Double> shoulderPath;
 	private ArrayList<Double> wristPath;
@@ -70,19 +77,11 @@ public class Arm extends SubsystemModule {
 	private boolean shoulderPathFinished = false;
 	private boolean wristPathFinished = false;
 
-	// Arm states
-	private boolean startPosition = false;
-	private boolean floorIntake = false;
-	private boolean stationIntake = false;
-	private boolean cargoPosition = false;
-	private boolean hatchPosition = false;
-	
-	//TODO: Make real sensors instead of these
-	private boolean cargoSensor = false;
-	private boolean hatchSensor = false;
-
 	// Arm initialization
     public Arm(ControlsProcessor controlsProcessor) {
+		intake = new Intake();
+		controlsProcessor.registerController("Intake", intake);
+		
 		registerCommands();
 		
 		this.controlsProcessor = controlsProcessor;
@@ -242,40 +241,8 @@ public class Arm extends SubsystemModule {
 		// System.out.println("Down S: " + currentShoulderAngle + "\tW: " + currentWristAngle);
 	}
 
-	/**
-	 * @return if the arm is in start position
-	 */
-	public boolean checkStartPosition() {
-		return startPosition;
-	}
+	
 
-	/**
-	 * @return if the arm is in floor intake position
-	 */
-	public boolean checkFloorIntake() {
-		return floorIntake;
-	}
-
-	/**
-	 * @return if the arm is in station intake position
-	 */
-	public boolean checkStationIntake() {
-		return stationIntake;
-	}
-
-	/**
-	 * @return if the arm is in a cargo scoring position
-	 */
-	public boolean checkCargoPosition() {
-		return cargoPosition;
-	}
-
-	/**
-	 * @return if the arm is in a hatch scoring position
-	 */
-	public boolean checkHatchPosition() {
-		return hatchPosition;
-	}
 
 	@Override
 	public void run() {
@@ -294,28 +261,17 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				if (!hatchSensor) {
-					startPosition = true;
-					floorIntake = false;
-					stationIntake = false;
-					cargoPosition = false;
-					hatchPosition = false;
-
+				if (!intake.getHatchState()) {
 					shoulderPathFinished = false;
 					wristPathFinished = false;
-
-					double shoulderMaxVelocity = 70;
-					double wristMaxVelocity = 70;
 
 					shoulderPath = generatePath(currentShoulderAngle, 0,
-							shoulderMaxVelocity, shoulderMaxVelocity * 4, shoulderMaxVelocity * 16);
+							shoulderMaxVelocity, shoulderAcceleration, shoulderJerk);
 
 					wristPath = generatePath(currentWristAngle, 0,
-							wristMaxVelocity, wristMaxVelocity * 4, wristMaxVelocity * 16);
+							wristMaxVelocity, wristAcceleration, wristJerk);
 
 					iterator = 0;
-				} else {
-					end(); //TODO: test that this prevents execute
 				}
 			}
 
@@ -346,34 +302,23 @@ public class Arm extends SubsystemModule {
 			}
 		};
 
-		new SubsystemCommand(this.registeredCommands, "floor_intake") {
+		new SubsystemCommand(this.registeredCommands, "floor_position") {
 
 			int iterator;
 
 			@Override
 			public void initialize() {
-				if (!hatchSensor && !cargoSensor) {
-					startPosition = false;
-					floorIntake = true;
-					stationIntake = false;
-					cargoPosition = false;
-					hatchPosition = false;
-
+				if (!intake.getHatchState() && !intake.getCargoState()) {
 					shoulderPathFinished = false;
 					wristPathFinished = false;
-
-					double shoulderMaxVelocity = 70;
-					double wristMaxVelocity = 70;
 
 					shoulderPath = generatePath(currentShoulderAngle, 22.75,
-							shoulderMaxVelocity, shoulderMaxVelocity * 4, shoulderMaxVelocity * 16);
+							shoulderMaxVelocity, shoulderAcceleration, shoulderJerk);
 
 					wristPath = generatePath(currentWristAngle, 182,
-							wristMaxVelocity, wristMaxVelocity * 4, wristMaxVelocity * 16);
+							wristMaxVelocity, wristAcceleration, wristJerk);
 
 					iterator = 0;
-				} else {
-					end(); //TODO: test that this prevents execute
 				}
 			}
 
@@ -404,34 +349,23 @@ public class Arm extends SubsystemModule {
 			}
 		};
 
-		new SubsystemCommand(this.registeredCommands, "station_intake") {
+		new SubsystemCommand(this.registeredCommands, "station_position") {
 
 			int iterator;
 
 			@Override
 			public void initialize() {
-				if (!hatchSensor && !cargoSensor) {
-					startPosition = false;
-					floorIntake = false;
-					stationIntake = true;
-					cargoPosition = false;
-					hatchPosition = false;
-
+				if (!intake.getHatchState() && !intake.getCargoState()) {
 					shoulderPathFinished = false;
 					wristPathFinished = false;
 
-					double shoulderMaxVelocity = 70;
-					double wristMaxVelocity = 70;
-					
-					shoulderPath = generatePath(currentShoulderAngle, 15,
-							shoulderMaxVelocity, shoulderMaxVelocity * 4, shoulderMaxVelocity * 16);
+					shoulderPath = generatePath(currentShoulderAngle, 35.25,
+							shoulderMaxVelocity, shoulderAcceleration, shoulderJerk);
 
-					wristPath = generatePath(currentWristAngle, 80,
-							wristMaxVelocity, wristMaxVelocity * 4, wristMaxVelocity * 16);
+					wristPath = generatePath(currentWristAngle, 100,
+							wristMaxVelocity, wristAcceleration, wristJerk);
 
 					iterator = 0;
-				} else {
-					end(); //TODO: test that this prevents execute
 				}
 			}
 
@@ -468,48 +402,39 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				if (!hatchSensor && cargoSensor) {
-					startPosition = false;
-					floorIntake = false;
-					stationIntake = false;
-					cargoPosition = true;
-					hatchPosition = false;
-
+				if (!intake.getHatchState() && intake.getCargoState()) {
 					shoulderPathFinished = false;
 					wristPathFinished = false;
-
-					double shoulderMaxVelocity = 70;
-					double wristMaxVelocity = 70;
 					
 					shoulderPath = generatePath(currentShoulderAngle, 53,
-							shoulderMaxVelocity, shoulderMaxVelocity * 4, shoulderMaxVelocity * 16);
+							shoulderMaxVelocity, shoulderAcceleration, shoulderJerk);
 
 					wristPath = generatePath(currentWristAngle, 195,
-							wristMaxVelocity, wristMaxVelocity * 4, wristMaxVelocity * 16);
+							wristMaxVelocity, wristAcceleration, wristJerk);
 
 					iterator = 0;
-				} else if (hatchSensor && !cargoSensor) {
-					startPosition = false;
-					floorIntake = false;
-					stationIntake = false;
-					cargoPosition = false;
-					hatchPosition = true;
-
+				} else if (intake.getHatchState() && !intake.getCargoState() && intake.getHatchFloor()) {
 					shoulderPathFinished = false;
 					wristPathFinished = false;
 
-					double shoulderMaxVelocity = 70;
-					double wristMaxVelocity = 70;
-					
 					shoulderPath = generatePath(currentShoulderAngle, 15,
-							shoulderMaxVelocity, shoulderMaxVelocity * 4, shoulderMaxVelocity * 16);
+							shoulderMaxVelocity, shoulderAcceleration, shoulderJerk);
 
 					wristPath = generatePath(currentWristAngle, 80,
-							wristMaxVelocity, wristMaxVelocity * 4, wristMaxVelocity * 16);
+							wristMaxVelocity, wristAcceleration, wristJerk);
 
 					iterator = 0;
-				} else {
-					end(); //TODO: test that this prevents execute
+				} else if (intake.getHatchState() && !intake.getCargoState() && intake.getHatchStation()) {
+					shoulderPathFinished = false;
+					wristPathFinished = false;
+
+					shoulderPath = generatePath(currentShoulderAngle, 35.25,
+							shoulderMaxVelocity, shoulderAcceleration, shoulderJerk);
+
+					wristPath = generatePath(currentWristAngle, 100,
+							wristMaxVelocity, wristAcceleration, wristJerk);
+
+					iterator = 0;
 				}
 			}
 
@@ -546,48 +471,39 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				if (!hatchSensor && cargoSensor) {
-					startPosition = false;
-					floorIntake = false;
-					stationIntake = false;
-					cargoPosition = true;
-					hatchPosition = false;
-
+				if (!intake.getHatchState() && intake.getCargoState()) {
 					shoulderPathFinished = false;
 					wristPathFinished = false;
-
-					double shoulderMaxVelocity = 70;
-					double wristMaxVelocity = 70;
 					
 					shoulderPath = generatePath(currentShoulderAngle, 85,
-							shoulderMaxVelocity, shoulderMaxVelocity * 4, shoulderMaxVelocity * 16);
+							shoulderMaxVelocity, shoulderAcceleration, shoulderJerk);
 
 					wristPath = generatePath(currentWristAngle, 200,
-							wristMaxVelocity, wristMaxVelocity * 4, wristMaxVelocity * 16);
+							wristMaxVelocity, wristAcceleration, wristJerk);
 
 					iterator = 0;
-				} else if (hatchSensor && !cargoSensor) {
-					startPosition = false;
-					floorIntake = false;
-					stationIntake = false;
-					cargoPosition = false;
-					hatchPosition = true;
-
+				} else if (intake.getHatchState() && !intake.getCargoState() && intake.getHatchFloor()) {
 					shoulderPathFinished = false;
 					wristPathFinished = false;
-
-					double shoulderMaxVelocity = 70;
-					double wristMaxVelocity = 70;
 					
 					shoulderPath = generatePath(currentShoulderAngle, 62,
-							shoulderMaxVelocity, shoulderMaxVelocity * 4, shoulderMaxVelocity * 16);
+							shoulderMaxVelocity, shoulderAcceleration, shoulderJerk);
 
 					wristPath = generatePath(currentWristAngle, 122,
-							wristMaxVelocity, wristMaxVelocity * 4, wristMaxVelocity * 16);
+							wristMaxVelocity, wristAcceleration, wristJerk);
 
 					iterator = 0;
-				} else {
-					end(); //TODO: test that this prevents execute
+				} else if (intake.getHatchState() && !intake.getCargoState() && intake.getHatchStation()) {
+					shoulderPathFinished = false;
+					wristPathFinished = false;
+					
+					shoulderPath = generatePath(currentShoulderAngle, 77.25,
+							shoulderMaxVelocity, shoulderAcceleration, shoulderJerk);
+
+					wristPath = generatePath(currentWristAngle, 142,
+							wristMaxVelocity, wristAcceleration, wristJerk);
+
+					iterator = 0;
 				}
 			}
 
@@ -625,48 +541,39 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				if (!hatchSensor && cargoSensor) {
-					startPosition = false;
-					floorIntake = false;
-					stationIntake = false;
-					cargoPosition = true;
-					hatchPosition = false;
-
+				if (!intake.getHatchState() && intake.getCargoState()) {
 					shoulderPathFinished = false;
 					wristPathFinished = false;
-
-					double shoulderMaxVelocity = 70;
-					double wristMaxVelocity = 70;
 					
 					shoulderPath = generatePath(currentShoulderAngle, 110,
-							shoulderMaxVelocity, shoulderMaxVelocity * 4, shoulderMaxVelocity * 16);
+							shoulderMaxVelocity, shoulderAcceleration, shoulderJerk);
 
 					wristPath = generatePath(currentWristAngle, 230.8,
-							wristMaxVelocity, wristMaxVelocity * 4, wristMaxVelocity * 16);
+							wristMaxVelocity, wristAcceleration, wristJerk);
 
 					iterator = 0;
-				} else if (hatchSensor && !cargoSensor) {
-					startPosition = false;
-					floorIntake = false;
-					stationIntake = false;
-					cargoPosition = false;
-					hatchPosition = true;
-
+				} else if (intake.getHatchState() && !intake.getCargoState() && intake.getHatchFloor()) {
 					shoulderPathFinished = false;
 					wristPathFinished = false;
-
-					double shoulderMaxVelocity = 70;
-					double wristMaxVelocity = 70;
 					
 					shoulderPath = generatePath(currentShoulderAngle, 110,
-							shoulderMaxVelocity, shoulderMaxVelocity * 4, shoulderMaxVelocity * 16);
+							shoulderMaxVelocity, shoulderAcceleration, shoulderJerk);
 
 					wristPath = generatePath(currentWristAngle, 230.8,
-							wristMaxVelocity, wristMaxVelocity * 4, wristMaxVelocity * 16);
+							wristMaxVelocity, wristAcceleration, wristJerk);
 
 					iterator = 0;
-				} else {
-					end(); //TODO: test that this prevents execute
+				} else if (intake.getHatchState() && !intake.getCargoState() && intake.getHatchStation()) {
+					shoulderPathFinished = false;
+					wristPathFinished = false;
+					
+					shoulderPath = generatePath(currentShoulderAngle, 125.25,
+							shoulderMaxVelocity, shoulderAcceleration, shoulderJerk);
+
+					wristPath = generatePath(currentWristAngle, 250.8,
+							wristMaxVelocity, wristAcceleration, wristJerk);
+
+					iterator = 0;
 				}
 			}
 
@@ -704,48 +611,39 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				if (!hatchSensor && cargoSensor) {
-					startPosition = false;
-					floorIntake = false;
-					stationIntake = false;
-					cargoPosition = true;
-					hatchPosition = false;
-
+				if (!intake.getHatchState() && intake.getCargoState()) {
 					shoulderPathFinished = false;
 					wristPathFinished = false;
-
-					double shoulderMaxVelocity = 70;
-					double wristMaxVelocity = 70;
 					
 					shoulderPath = generatePath(currentShoulderAngle, 140,
-							shoulderMaxVelocity, shoulderMaxVelocity * 4, shoulderMaxVelocity * 16);
+							shoulderMaxVelocity, shoulderAcceleration, shoulderJerk);
 
 					wristPath = generatePath(currentWristAngle, 90,
-							wristMaxVelocity, wristMaxVelocity * 4, wristMaxVelocity * 16);
+							wristMaxVelocity, wristAcceleration, wristJerk);
 
 					iterator = 0;
-				} else if (hatchSensor && !cargoSensor) {
-					startPosition = false;
-					floorIntake = false;
-					stationIntake = false;
-					cargoPosition = false;
-					hatchPosition = true;
-
+				} else if (intake.getHatchState() && !intake.getCargoState() && intake.getHatchFloor()) {
 					shoulderPathFinished = false;
 					wristPathFinished = false;
-
-					double shoulderMaxVelocity = 70;
-					double wristMaxVelocity = 70;
 					
 					shoulderPath = generatePath(currentShoulderAngle, 155,
-							shoulderMaxVelocity, shoulderMaxVelocity * 4, shoulderMaxVelocity * 16);
+							shoulderMaxVelocity, shoulderAcceleration, shoulderJerk);
 
 					wristPath = generatePath(currentWristAngle, 90,
-							wristMaxVelocity, wristMaxVelocity * 4, wristMaxVelocity * 16);
+							wristMaxVelocity, wristAcceleration, wristJerk);
 
 					iterator = 0;
-				} else {
-					end(); //TODO: test that this prevents execute
+				} else if (intake.getHatchState() && !intake.getCargoState() && intake.getHatchStation()) {
+					shoulderPathFinished = false;
+					wristPathFinished = false;
+					
+					shoulderPath = generatePath(currentShoulderAngle, 170.25,
+							shoulderMaxVelocity, shoulderAcceleration, shoulderJerk);
+
+					wristPath = generatePath(currentWristAngle, 110,
+							wristMaxVelocity, wristAcceleration, wristJerk);
+
+					iterator = 0;
 				}
 			}
 
@@ -789,10 +687,10 @@ public class Arm extends SubsystemModule {
 				double wristMaxVelocity = Double.parseDouble(this.args[3]);
 
 				shoulderPath = generatePath(currentShoulderAngle, Double.parseDouble(this.args[0]),
-						shoulderMaxVelocity, shoulderMaxVelocity * 4, shoulderMaxVelocity * 16);
+						shoulderMaxVelocity, shoulderAcceleration, shoulderJerk);
 
 				wristPath = generatePath(currentWristAngle, Double.parseDouble(this.args[2]),
-						wristMaxVelocity, wristMaxVelocity * 4, wristMaxVelocity * 16);
+						wristMaxVelocity, wristAcceleration, wristJerk);
 
 				iterator = 0;
 			}
@@ -873,6 +771,8 @@ public class Arm extends SubsystemModule {
 
 	@Override
 	public void init() {
+		intake.init();
+
 		// shoulderOutputEncoder.reset();
 		// wristOutputEncoder.reset();
 
@@ -891,6 +791,8 @@ public class Arm extends SubsystemModule {
 
 	@Override
 	public void destruct() {
+		intake.destruct();
+
 		shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		wristMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
 		

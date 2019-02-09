@@ -10,9 +10,6 @@ import frc.robot.util.SubsystemModule;
 
 public class Intake extends SubsystemModule {
 
-	// Controls Processor
-	private ControlsProcessor controlsProcessor;
-
 	// Intake Motors
 	private CANSparkMax cargoMotor = new CANSparkMax(9, MotorType.kBrushless);
 	private CANSparkMax hatchplatePump = new CANSparkMax(10, MotorType.kBrushless);
@@ -21,15 +18,21 @@ public class Intake extends SubsystemModule {
 	private Servo hatchplateServo0 = new Servo(0);
 	private Servo hatchplateServo1 = new Servo(1);
 
-	// Intake Sensors
-	//TODO: These are placeholders
-	private boolean cargoSensor = false;
-	private boolean hatchSensor = false;
+	// Maximum currents for cargo and hatch intakes
+	private double maxCargoCurrent = 100;
+	private double maxHatchCurrent = 100;
+	private double maxPumpCurrent = 100;
 
-    public Intake(ControlsProcessor controlsProcessor) { 
+	// Intake States - Public so Arm can access the states for state-based logic
+	private boolean cargoState = false;
+	private boolean hatchState = false;
+
+	// Hatch intake types
+	private boolean hatchFloor = false;
+	private boolean hatchStation = false;
+
+    public Intake() { 
 		registerCommands(); // Puts commands onto the hashmap
-		
-		this.controlsProcessor = controlsProcessor;
 	}
 
 	/**
@@ -48,9 +51,24 @@ public class Intake extends SubsystemModule {
 		hatchplateServo1.set(0.47);
 	}
 
+	public boolean getCargoState() {
+		return cargoState;
+	}
+
+	public boolean getHatchState() {
+		return hatchState;
+	}
+
+	public boolean getHatchFloor() {
+		return hatchFloor;
+	}
+
+	public boolean getHatchStation() {
+		return hatchStation;
+	}
+
 	@Override
 	public void run() {
-		//TODO: Update intake sensors here
     }
 
 	@Override
@@ -58,53 +76,60 @@ public class Intake extends SubsystemModule {
 
         new SubsystemCommand(this.registeredCommands, "cargo_intake") {
 
+			boolean stopIntake = false;
+
 			@Override
 			public void initialize() {
-				if (!cargoSensor && !hatchSensor) {
+				if (!cargoState && !hatchState) {
 					cargoMotor.set(0.75);
 				} else {
-					end();
+					stopIntake = true;
 				}
 			}
 
 			@Override
 			public void execute() {
-
+				if (cargoMotor.getOutputCurrent() > maxCargoCurrent) { cargoState = true; }
 			}
 
 			@Override
 			public boolean isFinished() {
-				return cargoSensor;
+				return cargoState || stopIntake;
 			}
 
 			@Override
 			public void end() {
 				cargoMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
-				if (cargoSensor && !hatchSensor) {
+				if (cargoState && !hatchState) {
 					cargoMotor.set(0.05);
+				} else {
+					cargoMotor.set(0);
 				}
 			}
 		};
 
         new SubsystemCommand(this.registeredCommands, "hatch_floor_intake") {
 
+			boolean stopIntake = false;
+
 			@Override
 			public void initialize() {
-				if (!cargoSensor && !hatchSensor) {
+				if (!cargoState && !hatchState) {
 					cargoMotor.set(-0.75);
 				} else {
-					end();
+					stopIntake = true;
 				}
 			}
 
 			@Override
 			public void execute() {
+				if (cargoMotor.getOutputCurrent() > maxHatchCurrent) { hatchState = true; }
 			}
 
 			@Override
 			public boolean isFinished() {
-				return hatchSensor;
+				return hatchState || stopIntake;
 			}
 
 			@Override
@@ -112,9 +137,12 @@ public class Intake extends SubsystemModule {
 				cargoMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 				cargoMotor.set(0);
 
-				if (!cargoSensor && hatchSensor) {
+				if (!cargoState && hatchState) {
 					hatchplatePump.set(1);
 					hatchplateDown();
+
+					hatchFloor = true;
+					hatchStation = false;
 				}
 			}
 		};
@@ -123,7 +151,7 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				if (!cargoSensor && !hatchSensor) {
+				if (!cargoState && !hatchState) {
 					hatchplatePump.set(1);
 					hatchplateDown();
 				}
@@ -131,17 +159,22 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public void execute() {
-
+				if (hatchplatePump.getOutputCurrent() > maxPumpCurrent) { hatchState = true; }
 			}
 
 			@Override
 			public boolean isFinished() {
-				return true;
+				return hatchState;
 			}
 
 			@Override
 			public void end() {
 				cargoMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+
+				if (!cargoState && hatchState) {
+					hatchFloor = false;
+					hatchStation = true;
+				}
 			}
 		};
 
@@ -149,12 +182,11 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				if (cargoSensor && !hatchSensor) {
+				if (cargoState && !hatchState) {
 					cargoMotor.set(-0.5);
-				} else if (!cargoSensor && hatchSensor) {
+				} else if (!cargoState && hatchState) {
+					//TODO: Open the blowout valve
 					hatchplatePump.set(0);
-				} else {
-					end();
 				}
 			}
 
@@ -165,17 +197,22 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return !hatchSensor && !cargoSensor;
+				return false;
 			}
 
 			@Override
 			public void end() {
 				cargoMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
 
-				if (!cargoSensor && !hatchSensor) {
-					hatchplateUp();
-					cargoMotor.set(0);
-				}
+				hatchplateUp();
+				cargoMotor.set(0);
+				//TODO: Close the blowout valve
+
+				cargoState = false;
+				hatchState = false;
+
+				hatchFloor = false;
+				hatchStation = false;
 			}
 		};
     }
