@@ -79,6 +79,7 @@ public abstract class DrivingController {
 
 		double samsonCorrection2;
 
+
 		if (angularError > 1) {
 			samsonCorrection2 = (k2 * orthogonalError * refVelocity) / angularError;
 		} else {
@@ -135,11 +136,20 @@ public abstract class DrivingController {
 
 	}
 
+	public double getAngleValues(){
+		return currentAngle;
+		
+	}
+
 	/**
 	 * Move to next motion pose in the sequence
 	 */
 	public void next() {
 		if(iterator < controlPath.size()) { this.iterator++; }
+	}
+
+	public int getIterator() {
+		return iterator;
 	}
 
 	public void clearControlPath(){

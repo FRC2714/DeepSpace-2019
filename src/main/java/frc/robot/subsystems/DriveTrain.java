@@ -160,6 +160,8 @@ public class DriveTrain extends SubsystemModule {
 	 */
 	@Override
 	public void init() {
+		System.out.println("resetting");
+
 		leftEncoderOffset = lEncoder.getPosition();
 		rightEncoderOffset = -rEncoder.getPosition();
 		navX.reset();
@@ -179,8 +181,8 @@ public class DriveTrain extends SubsystemModule {
 	public void destruct() {
 		driverControlled = false;
 
-		lMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
-		rMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
+		lMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
+		rMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
 		lMotor0.set(0);
 		rMotor0.set(0);
@@ -441,7 +443,9 @@ public class DriveTrain extends SubsystemModule {
 					startTime = System.nanoTime();
 				}
 				double averageTime = (System.nanoTime() - startTime)/counter;
-				System.out.println("average time " + averageTime);
+				//System.out.println("average time " + averageTime);
+
+				System.out.println(drivingController.getAngleValues());
 				counter++;
 			}
 

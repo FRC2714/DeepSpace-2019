@@ -18,6 +18,13 @@ public class MotionPose {
         this.y = y;
     }
 
+    /*
+    public void getMPValues(){
+        retur
+
+    }
+    */
+
     /**
      * Calculates the robot's current perpendicular error
      * @param currentX
