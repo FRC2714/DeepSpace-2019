@@ -434,7 +434,6 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 				enable();
-				
 			}
 
 			@Override
