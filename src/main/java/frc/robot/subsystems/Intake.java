@@ -1,10 +1,11 @@
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.Servo;
-import frc.robot.util.ControlsProcessor;
 import frc.robot.util.SubsystemCommand;
 import frc.robot.util.SubsystemModule;
 
@@ -19,9 +20,9 @@ public class Intake extends SubsystemModule {
 	private Servo hatchplateServo1 = new Servo(1);
 
 	// Maximum currents for cargo and hatch intakes
-	private double maxCargoCurrent = 100;
-	private double maxHatchCurrent = 100;
-	private double maxPumpCurrent = 100;
+	private double cargoCurrentThreshold = 20;
+	private double hatchCurrentThreshold = -20;
+	private double pumpCurrentThreshold = 5.5;
 
 	// Intake States - Public so Arm can access the states for state-based logic
 	private boolean cargoState = false;
@@ -89,7 +90,7 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public void execute() {
-				if (cargoMotor.getOutputCurrent() > maxCargoCurrent) { cargoState = true; }
+				if (cargoMotor.getOutputCurrent() > cargoCurrentThreshold) { cargoState = true; }
 			}
 
 			@Override
@@ -124,7 +125,7 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public void execute() {
-				if (cargoMotor.getOutputCurrent() > maxHatchCurrent) { hatchState = true; }
+				if (cargoMotor.getOutputCurrent() < hatchCurrentThreshold) { hatchState = true; }
 			}
 
 			@Override
@@ -148,6 +149,10 @@ public class Intake extends SubsystemModule {
 		};
 
         new SubsystemCommand(this.registeredCommands, "hatch_station_intake") {
+			
+			ArrayList<Double> currents = new ArrayList<Double>();
+			double avgCurrent = 0;
+			double maxSize = 50;
 
 			@Override
 			public void initialize() {
@@ -159,7 +164,17 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public void execute() {
-				if (hatchplatePump.getOutputCurrent() > maxPumpCurrent) { hatchState = true; }
+				currents.add(hatchplatePump.getOutputCurrent());
+				
+				if(currents.size() <= maxSize) {
+					avgCurrent += currents.get(0) / maxSize;
+				}
+				else {
+					avgCurrent += (currents.get(0) - currents.get(currents.size() - 1)) / maxSize;
+					currents.remove(currents.size() - 1);
+
+					if(Math.abs(avgCurrent) < pumpCurrentThreshold) { hatchState = true; }
+				}
 			}
 
 			@Override
