@@ -45,8 +45,8 @@ public class Robot extends TimedRobot {
 		controlsProcessor = new ControlsProcessor(10000000, 2) {
 			@Override
 			public void registerOperatorControls() {
-				append("jog_up -s", this.rb);
-				append("jog_down -s", this.lb);
+				append("closed_loop_tank -s 2", this.launchpad.getButtonInstance(0, 0));
+				append("closed_loop_tank -s -2", this.launchpad.getButtonInstance(1, 0));
 				
 				// append("go_to_position -p 53,70,195,70", this.a); // Lower cargo rocket
 				append("go_to_position -p 85,70,200,200", this.b); // Middle cargo rocket
@@ -77,6 +77,7 @@ public class Robot extends TimedRobot {
 		controlsProcessor.registerController("Arm", arm);
 		controlsProcessor.registerController("Intake", intake);
 		controlsProcessor.start();
+		
 	}
 
 	/**
