@@ -52,15 +52,15 @@ public class Robot extends TimedRobot {
 
 				// Intake cargo from ground
 				append("floor_intake -p", this.a);
-				append("cargo_intake -p", this.a);
+				append("cargo_intake -s", this.a);
 
 				// Intake hatch from ground
 				append("floor_intake -p", this.b);
-				append("hatch_floor_intake -p", this.b);
+				append("hatch_floor_intake -s", this.b);
 
 				// Intake hatch from station
 				append("station_intake -p", this.y);
-				append("hatch_station_intake -p", this.y);
+				append("hatch_station_intake -s", this.y);
 
 				// Score positions
 				// append("lower_position -p", button);
