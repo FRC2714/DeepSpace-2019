@@ -110,9 +110,6 @@ public class Robot extends TimedRobot {
 	public void autonomousInit() {
 		generalInit();
 
-		AutonTask rightRocket = new RightRocketHatchAuton(controlsProcessor);
-		AutonTask rightCargo = new RightCargoHatchAuton(controlsProcessor);
-		AutonTask leftCargo = new LeftCargoHatchAuton(controlsProcessor);
 		AutonTask leftRocket= new LeftRocketHatchAuton(controlsProcessor);
 
 		leftRocket.run();
