@@ -45,32 +45,82 @@ public class Robot extends TimedRobot {
 		controlsProcessor = new ControlsProcessor(5000000, 10) {
 			@Override
 			public void registerOperatorControls() {
-				// // Go to start postion
-				// append("start_position -p", this.start);
+				// Go to start postion
+				append("start_position -p", this.launchpad.getButtonInstance(3, 1));
+				append("start_position -p", this.launchpad.getButtonInstance(3, 2));
+				append("start_position -p", this.launchpad.getButtonInstance(4, 1));
+				append("start_position -p", this.launchpad.getButtonInstance(4, 2));
 
-				// // Intake cargo from ground
-				// append("floor_position -p", this.a);
-				// append("cargo_intake -s", this.a);
+				// Intake cargo from ground
+				append("floor_position -p", this.launchpad.getButtonInstance(0, 7));
+				append("cargo_intake -s", this.launchpad.getButtonInstance(0, 7));
+				append("floor_position -p", this.launchpad.getButtonInstance(0, 8));
+				append("cargo_intake -s", this.launchpad.getButtonInstance(0, 8));
+				append("floor_position -p", this.launchpad.getButtonInstance(1, 7));
+				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 7));
+				append("floor_position -p", this.launchpad.getButtonInstance(1, 8));
+				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 8));
 
-				// // Intake hatch from ground
-				// append("floor_position -p", this.b);
-				// append("hatch_floor_intake -s", this.b);
+				// Intake hatch from ground
+				append("floor_position -p", this.launchpad.getButtonInstance(3, 7));
+				append("hatch_floor_intake -s", this.launchpad.getButtonInstance(3, 7));
+				append("floor_position -p", this.launchpad.getButtonInstance(3, 8));
+				append("hatch_floor_intake -s", this.launchpad.getButtonInstance(3, 8));
+				append("floor_position -p", this.launchpad.getButtonInstance(4, 7));
+				append("hatch_floor_intake -s", this.launchpad.getButtonInstance(4, 7));
+				append("floor_position -p", this.launchpad.getButtonInstance(4, 8));
+				append("hatch_floor_intake -s", this.launchpad.getButtonInstance(4, 8));
 
-				// // Intake hatch from station
-				// append("station_position -p", this.y);
-				// append("hatch_station_intake -s", this.y);
+				// Intake cargo from station
+				append("cargo_station_position -p", this.launchpad.getButtonInstance(0, 4));
+				append("cargo_intake -s", this.launchpad.getButtonInstance(0, 4));
+				append("cargo_station_position -p", this.launchpad.getButtonInstance(0, 5));
+				append("cargo_intake -s", this.launchpad.getButtonInstance(0, 5));
+				append("cargo_station_position -p", this.launchpad.getButtonInstance(1, 4));
+				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 4));
+				append("cargo_station_position -p", this.launchpad.getButtonInstance(1, 5));
+				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 5));
 
-				// // Score positions
-				// append("lower_position -p", button);
-				// append("middle_position -p", button);
-				// append("upper_position -p", button);
-				// append("back_position -p", button);
+				// Intake hatch from station
+				append("hatch_station_position -p", this.launchpad.getButtonInstance(3, 4));
+				append("hatch_station_intake -s", this.launchpad.getButtonInstance(3, 4));
+				append("hatch_station_position -p", this.launchpad.getButtonInstance(3, 5));
+				append("hatch_station_intake -s", this.launchpad.getButtonInstance(3, 5));
+				append("hatch_station_position -p", this.launchpad.getButtonInstance(4, 4));
+				append("hatch_station_intake -s", this.launchpad.getButtonInstance(4, 4));
+				append("hatch_station_position -p", this.launchpad.getButtonInstance(4, 5));
+				append("hatch_station_intake -s", this.launchpad.getButtonInstance(4, 5));
 
-				// // Extake
-				// append("extake -s", this.x);
+				// Score positions
+				append("lower_position -p", this.launchpad.getButtonInstance(6, 8));
+				append("lower_position -p", this.launchpad.getButtonInstance(7, 8));
+				append("middle_position -p", this.launchpad.getButtonInstance(6, 6));
+				append("middle_position -p", this.launchpad.getButtonInstance(7, 6));
+				append("upper_position -p", this.launchpad.getButtonInstance(6, 4));
+				append("upper_position -p", this.launchpad.getButtonInstance(7, 4));
+				append("back_position -p", this.launchpad.getButtonInstance(6, 2));
+				append("back_position -p", this.launchpad.getButtonInstance(7, 2));
 
-				// // Toggle driver control
-				// append("driver_control -p", this.rightStick);
+				// Extake
+				append("extake -s", this.launchpad.getButtonInstance(0, 0));
+				append("extake -s", this.launchpad.getButtonInstance(0, 1));
+				append("extake -s", this.launchpad.getButtonInstance(1, 0));
+				append("extake -s", this.launchpad.getButtonInstance(1, 1));
+
+				// Jog
+				append("jog_up -s" this.launchpad.getButtonInstance(0, 0));
+				append("jog_up -s" this.launchpad.getButtonInstance(8, 7));
+				append("jog_down -s" this.launchpad.getButtonInstance(1, 0));
+				append("jog_down -s" this.launchpad.getButtonInstance(8, 8));
+
+				// Toggle driver control
+				append("driver_control -p", this.rightStick);
+
+				// // Toggle end game
+				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 1))
+				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 2))
+				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 3))
+				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 4))
 			}
 		};
 

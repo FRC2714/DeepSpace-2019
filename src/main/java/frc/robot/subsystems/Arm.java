@@ -349,7 +349,55 @@ public class Arm extends SubsystemModule {
 			}
 		};
 
-		new SubsystemCommand(this.registeredCommands, "station_position") {
+		//TODO: Positions are wrong for this
+		new SubsystemCommand(this.registeredCommands, "cargo_station_position") {
+
+			int iterator;
+
+			@Override
+			public void initialize() {
+				if (!intake.getHatchState() && !intake.getCargoState()) {
+					shoulderPathFinished = false;
+					wristPathFinished = false;
+
+					shoulderPath = generatePath(currentShoulderAngle, 35.25,
+							shoulderMaxVelocity, shoulderAcceleration, shoulderJerk);
+
+					wristPath = generatePath(currentWristAngle, 100,
+							wristMaxVelocity, wristAcceleration, wristJerk);
+
+					iterator = 0;
+				}
+			}
+
+			@Override
+			public void execute() {
+				iterator++;
+
+				if (iterator < shoulderPath.size())
+					setShoulderAngle(shoulderPath.get(iterator));
+				else
+					shoulderPathFinished = true;
+				
+				if (iterator < wristPath.size())
+					setWristAngle(wristPath.get(iterator));
+				else
+					wristPathFinished = true;
+			}
+
+			@Override
+			public boolean isFinished() {
+				return shoulderPathFinished && wristPathFinished;
+			}
+
+			@Override
+			public void end() {
+				shoulderPath = new ArrayList<Double>();
+				wristPath = new ArrayList<Double>();
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "hatch_station_position") {
 
 			int iterator;
 

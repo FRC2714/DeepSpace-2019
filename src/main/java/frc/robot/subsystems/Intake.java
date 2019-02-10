@@ -230,6 +230,54 @@ public class Intake extends SubsystemModule {
 				hatchStation = false;
 			}
 		};
+
+		new SubsystemCommand(this.registeredCommands, "set_cargo_mode") {
+
+			@Override
+			public void initialize() {
+				cargoState = true;
+				hatchState = false;
+			}
+
+			@Override
+			public void execute() {
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				return true;
+			}
+
+			@Override
+			public void end() {
+				
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "set_hatch_mode") {
+
+			@Override
+			public void initialize() {
+				cargoState = false;
+				hatchState = true;
+			}
+
+			@Override
+			public void execute() {
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				return true;
+			}
+
+			@Override
+			public void end() {
+				
+			}
+		};
     }
 
 	@Override
