@@ -107,10 +107,10 @@ public class Robot extends TimedRobot {
 				append("extake -s", this.launchpad.getButtonInstance(1, 1));
 
 				// Jog
-				append("jog_up -s" this.launchpad.getButtonInstance(0, 0));
-				append("jog_up -s" this.launchpad.getButtonInstance(8, 7));
-				append("jog_down -s" this.launchpad.getButtonInstance(1, 0));
-				append("jog_down -s" this.launchpad.getButtonInstance(8, 8));
+				append("jog_up -s", this.launchpad.getButtonInstance(0, 0));
+				append("jog_up -s", this.launchpad.getButtonInstance(8, 7));
+				append("jog_down -s", this.launchpad.getButtonInstance(1, 0));
+				append("jog_down -s", this.launchpad.getButtonInstance(8, 8));
 
 				// Toggle driver control
 				append("driver_control -p", this.rightStick);
