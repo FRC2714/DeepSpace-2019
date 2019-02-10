@@ -7,9 +7,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Arm;
 import frc.robot.autontasks.DelayAutonTesterTask;
-import frc.robot.autontasks.RightCargoHatchAuton;
-import frc.robot.autontasks.UnusedRightHatchAltAuton;
-import frc.robot.autontasks.RightRocketHatchAuton;
+import frc.robot.autontasks.LeftCargoHatchAuton;
+import frc.robot.autontasks.LeftRocketHatchAuton;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.util.AutonTask;
@@ -42,7 +41,7 @@ public class Robot extends TimedRobot {
 		SmartDashboard.putData("Autonomous Mode Selector", autoChooser);
 
 		// Controls processor only gets created ONCE when code is run
-		controlsProcessor = new ControlsProcessor(5000000, 10) {
+		controlsProcessor = new ControlsProcessor(10000000, 2) {
 			@Override
 			public void registerOperatorControls() {
 				// Go to start postion
@@ -131,6 +130,7 @@ public class Robot extends TimedRobot {
 		controlsProcessor.registerController("DriveTrain", drivetrain);
 		controlsProcessor.registerController("Arm", arm);
 		controlsProcessor.start();
+		
 	}
 
 	/**
@@ -164,11 +164,9 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousInit() {
 		generalInit();
+		AutonTask leftCargo = new LeftCargoHatchAuton(controlsProcessor);
 
-		AutonTask rightRocket = new RightRocketHatchAuton(controlsProcessor);
-		AutonTask rightCargo = new RightCargoHatchAuton(controlsProcessor);
-
-		rightCargo.run();
+		leftCargo.run();
 	}
 
 	/**

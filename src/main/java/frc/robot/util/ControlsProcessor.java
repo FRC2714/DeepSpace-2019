@@ -7,6 +7,15 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import frc.robot.RobotMap;
 
+import frc.robot.util.WebsocketButtonPad;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Map;
+
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
+
 public abstract class ControlsProcessor extends Thread {
 
 	private double periodNanoseconds = 0;
@@ -37,6 +46,8 @@ public abstract class ControlsProcessor extends Thread {
 	protected JoystickButton leftStick = new JoystickButton(xbox1, 9);
 	protected JoystickButton rightStick = new JoystickButton(xbox1, 10);
 
+	protected WebsocketButtonPad launchpad;
+
 	// Array list that holds all of the operator controls
 	private ArrayList<JoystickCommandPair> operatorControls = new ArrayList<JoystickCommandPair>();
 	
@@ -53,6 +64,13 @@ public abstract class ControlsProcessor extends Thread {
 	public ControlsProcessor(double periodNanoseconds, int commandDivider) {
 		this.periodNanoseconds = periodNanoseconds;
 		this.commandDivider = commandDivider;
+
+		try {
+			launchpad = new WebsocketButtonPad( new URI( "ws://10.27.14.75:9001" ));
+			launchpad.connect();			
+		} catch (Exception e) {
+			System.out.println("Websocket failure");
+		}
 
 		registerOperatorControls();
 	}
@@ -77,6 +95,8 @@ public abstract class ControlsProcessor extends Thread {
 		while (true) {
 
 			if (!stopProcessor) {
+				timestamp = System.nanoTime();
+
 				controllers.forEach((k, v) -> v.run());
 
 				if (counter % this.commandDivider == 0) {
@@ -89,8 +109,6 @@ public abstract class ControlsProcessor extends Thread {
 				
 				// Busy wait until the next iteration
 				while (System.nanoTime() < timestamp + periodNanoseconds) { }
-
-				timestamp = System.nanoTime();
 				
 			}
 		}
