@@ -77,9 +77,15 @@ public class SplineFactory {
             frontT = binaryFind(frontT, currentFrontVelocity, placement, xValues, yValues);
             backT = binaryFind(backT, -currentBackVelocity, placement + 1, xValues, yValues);
             placement++;
-
-
         }
+
+        xValues.remove(placement);
+        yValues.remove(placement);
+        xValues.remove(placement - 1);
+        yValues.remove(placement - 1);
+
+        xValues.add(placement - 1, (xValues.get(placement - 1) + xValues.get(placement - 2)) / 2);
+        yValues.add(placement - 1, (yValues.get(placement - 1) + yValues.get(placement - 2)) / 2);
 
         System.out.println("Done");
 
