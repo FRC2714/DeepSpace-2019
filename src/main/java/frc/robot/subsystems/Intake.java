@@ -164,7 +164,7 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public void execute() {
-				currents.add(hatchplatePump.getOutputCurrent());
+				currents.add(0, hatchplatePump.getOutputCurrent());
 				
 				if(currents.size() <= maxSize) {
 					avgCurrent += currents.get(0) / maxSize;
