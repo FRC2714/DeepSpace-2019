@@ -66,7 +66,7 @@ public abstract class ControlsProcessor extends Thread {
 		this.commandDivider = commandDivider;
 
 		try {
-			launchpad = new WebsocketButtonPad( new URI( "ws://10.27.14.75:9001" ));
+			launchpad = new WebsocketButtonPad( new URI( "ws://10.27.14.192:9001" ));
 			launchpad.connect();			
 		} catch (Exception e) {
 			System.out.println("Websocket failure");

@@ -17,7 +17,6 @@ public class Intake extends SubsystemModule {
 
 	// Hatchplate Servo
 	private Servo hatchplateServo0 = new Servo(0);
-	private Servo hatchplateServo1 = new Servo(1);
 
 	// Maximum currents for cargo and hatch intakes
 	private double cargoCurrentThreshold = 20;
@@ -32,6 +31,9 @@ public class Intake extends SubsystemModule {
 	private boolean hatchFloor = false;
 	private boolean hatchStation = false;
 
+	// Intake position
+	private boolean atPosition = false;
+
     public Intake() { 
 		registerCommands(); // Puts commands onto the hashmap
 	}
@@ -41,7 +43,6 @@ public class Intake extends SubsystemModule {
 	 */
 	public void hatchplateUp() {
 		hatchplateServo0.set(1);
-		hatchplateServo1.set(1);
 	}
 
 	/**
@@ -49,7 +50,6 @@ public class Intake extends SubsystemModule {
 	 */
 	public void hatchplateDown() {
 		hatchplateServo0.set(0.47);
-		hatchplateServo1.set(0.47);
 	}
 
 	public boolean getCargoState() {
@@ -68,6 +68,11 @@ public class Intake extends SubsystemModule {
 		return hatchStation;
 	}
 
+	public void setAtPosition(boolean atPosition) {
+		this.atPosition = atPosition;
+		System.out.println("setAt: " + atPosition);
+	}
+
 	@Override
 	public void run() {
     }
@@ -77,24 +82,43 @@ public class Intake extends SubsystemModule {
 
         new SubsystemCommand(this.registeredCommands, "cargo_intake") {
 
-			boolean stopIntake = false;
+			ArrayList<Double> currents = new ArrayList<Double>();
+			double avgCurrent = 0;
+			double maxSize = 20;
+
+			boolean stopIntake;
+			boolean intaking;
 
 			@Override
 			public void initialize() {
-				if (!cargoState && !hatchState) {
-					cargoMotor.set(0.75);
-				} else {
-					stopIntake = true;
-				}
+				System.out.println("Cargo: " + cargoState + "\tHatch: " + hatchState);
+				
+				intaking = false;
+				stopIntake = cargoState || hatchState;
 			}
 
 			@Override
 			public void execute() {
-				if (cargoMotor.getOutputCurrent() > cargoCurrentThreshold) { cargoState = true; }
+				currents.add(0, cargoMotor.getOutputCurrent());
+
+				if (!intaking && atPosition) {
+					cargoMotor.set(0.75);
+					intaking = true;
+				}
+				else if(currents.size() <= maxSize) {
+					avgCurrent += currents.get(0) / maxSize;
+				}
+				else {
+					avgCurrent += (currents.get(0) - currents.get(currents.size() - 1)) / maxSize;
+					currents.remove(currents.size() - 1);
+
+					if (Math.abs(avgCurrent) > cargoCurrentThreshold) { cargoState = true; }
+				}
 			}
 
 			@Override
 			public boolean isFinished() {
+				System.out.println("Finished Cargo: " + cargoState + "\tFinished Hatch: " + hatchState);
 				return cargoState || stopIntake;
 			}
 
@@ -107,6 +131,8 @@ public class Intake extends SubsystemModule {
 				} else {
 					cargoMotor.set(0);
 				}
+
+				currents = new ArrayList<Double>();
 			}
 		};
 
@@ -190,6 +216,9 @@ public class Intake extends SubsystemModule {
 					hatchFloor = false;
 					hatchStation = true;
 				}
+				else { hatchplatePump.set(0); }
+
+				currents = new ArrayList<Double>();
 			}
 		};
 
@@ -197,6 +226,8 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public void initialize() {
+				System.out.println("Cargo: " + cargoState + "\tHatch: " + hatchState);
+
 				if (cargoState && !hatchState) {
 					cargoMotor.set(-0.5);
 				} else if (!cargoState && hatchState) {

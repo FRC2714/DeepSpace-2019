@@ -6,6 +6,7 @@ import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 
 import frc.robot.util.ControlsProcessor;
 import frc.robot.util.SubsystemCommand;
@@ -21,7 +22,7 @@ public class Arm extends SubsystemModule {
 	// Arm motors
 	private CANSparkMax shoulderMotor = new CANSparkMax(7, MotorType.kBrushless);
 	private CANSparkMax wristMotor = new CANSparkMax(8, MotorType.kBrushless);
-	
+
 	// PID controllers
 	private CANPIDController shoulderPidController = shoulderMotor.getPIDController();
 	private CANPIDController wristPidController = wristMotor.getPIDController();
@@ -45,7 +46,7 @@ public class Arm extends SubsystemModule {
 
 	private final double wMinOutput = -1;
 	private final double wMaxOutput = 1;
-	private final double wP = 0.18;
+	private final double wP = 0.4;
 	private final double wI = 0;
 	private final double wD = 0;
 	private final double wIS = 0;
@@ -63,7 +64,7 @@ public class Arm extends SubsystemModule {
 	private final double wristRatio = -140;
 
 	// Arm movement constants
-	private final double shoulderMaxVelocity = 70;
+	private final double shoulderMaxVelocity = 50;
 	private final double wristMaxVelocity = 100;
 	private final double shoulderAcceleration = shoulderMaxVelocity * 4;
 	private final double shoulderJerk = shoulderAcceleration * 4;
@@ -85,6 +86,9 @@ public class Arm extends SubsystemModule {
 		registerCommands();
 		
 		this.controlsProcessor = controlsProcessor;
+
+		shoulderMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 5);
+		wristMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 5);
 
 		// Setup up PID coefficients
 		shoulderPidController.setP(sP);
@@ -308,6 +312,8 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void initialize() {
+				intake.setAtPosition(false);
+
 				if (!intake.getHatchState() && !intake.getCargoState()) {
 					shoulderPathFinished = false;
 					wristPathFinished = false;
@@ -346,6 +352,8 @@ public class Arm extends SubsystemModule {
 			public void end() {
 				shoulderPath = new ArrayList<Double>();
 				wristPath = new ArrayList<Double>();
+				
+				intake.setAtPosition(true);
 			}
 		};
 
@@ -593,10 +601,10 @@ public class Arm extends SubsystemModule {
 					shoulderPathFinished = false;
 					wristPathFinished = false;
 					
-					shoulderPath = generatePath(currentShoulderAngle, 110,
+					shoulderPath = generatePath(currentShoulderAngle, 115,
 							shoulderMaxVelocity, shoulderAcceleration, shoulderJerk);
 
-					wristPath = generatePath(currentWristAngle, 230.8,
+					wristPath = generatePath(currentWristAngle, 225,
 							wristMaxVelocity, wristAcceleration, wristJerk);
 
 					iterator = 0;

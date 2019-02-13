@@ -60,7 +60,7 @@ public class DriveTrain extends SubsystemModule {
 
 	private final double sensitivity = 2.5;
 	private final double maxVelocity = 13;
-	private final double maxAcceleration = 30;
+	private final double maxAcceleration = 10;
 
 	// 
 	private double leftEncoderOffset = 0;
@@ -273,7 +273,7 @@ public class DriveTrain extends SubsystemModule {
 
 				closedLoopArcade(-power * maxVelocity, -pivot, maxAcceleration);
 
-				System.out.println("Odometer heading angle " + odometer.getHeadingAngle());
+				//System.out.println("Odometer heading angle " + odometer.getHeadingAngle());
 			}
 
 			@Override

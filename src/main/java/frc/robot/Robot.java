@@ -91,20 +91,20 @@ public class Robot extends TimedRobot {
 				append("hatch_station_intake -s", this.launchpad.getButtonInstance(4, 5));
 
 				// Score positions
-				append("lower_position -p", this.launchpad.getButtonInstance(6, 8));
-				append("lower_position -p", this.launchpad.getButtonInstance(7, 8));
-				append("middle_position -p", this.launchpad.getButtonInstance(6, 6));
-				append("middle_position -p", this.launchpad.getButtonInstance(7, 6));
-				append("upper_position -p", this.launchpad.getButtonInstance(6, 4));
-				append("upper_position -p", this.launchpad.getButtonInstance(7, 4));
-				append("back_position -p", this.launchpad.getButtonInstance(6, 2));
-				append("back_position -p", this.launchpad.getButtonInstance(7, 2));
+				append("lower_score -p", this.launchpad.getButtonInstance(6, 8));
+				append("lower_score -p", this.launchpad.getButtonInstance(7, 8));
+				append("middle_score -p", this.launchpad.getButtonInstance(6, 6));
+				append("middle_score -p", this.launchpad.getButtonInstance(7, 6));
+				append("upper_score -p", this.launchpad.getButtonInstance(6, 4));
+				append("upper_score -p", this.launchpad.getButtonInstance(7, 4));
+				append("back_score -p", this.launchpad.getButtonInstance(6, 2));
+				append("back_score -p", this.launchpad.getButtonInstance(7, 2));
 
 				// Extake
-				append("extake -s", this.launchpad.getButtonInstance(0, 0));
 				append("extake -s", this.launchpad.getButtonInstance(0, 1));
-				append("extake -s", this.launchpad.getButtonInstance(1, 0));
+				append("extake -s", this.launchpad.getButtonInstance(0, 2));
 				append("extake -s", this.launchpad.getButtonInstance(1, 1));
+				append("extake -s", this.launchpad.getButtonInstance(1, 2));
 
 				// Jog
 				append("jog_up -s", this.launchpad.getButtonInstance(0, 0));
