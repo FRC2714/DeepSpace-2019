@@ -8,9 +8,12 @@ public class LeftCargoHatchAuton extends AutonTask {
     public LeftCargoHatchAuton(ControlsProcessor controlsProcessor) {
         super(controlsProcessor);
         queueTask("set_angular_offset -s -180");
-        queueTask("add_backwards_spline -s 0,0,270,3,-5,20.5,300,5,12,10,0,0");
-        queueTask("add_forwards_spline -s -5,20.5,300,2,0.5,18,0,5,12,4,0,0");
-        //queueTask("add_forwards_spline -s -5,20.5,300,2,0.5,18,0,5,12,3,0,0");
+        queueTask("add_backwards_spline -s 0,0,270,3,-5,20.5,320,5,12,12,0,0");
+        queueTask("add_forwards_spline -s -5,20.5,320,2,0.5,18,0,2.5,12,4.5,0,0");
+        queueTask("add_backwards_spline -s 0.5,18,0,2.5,-5,20.5,320,2,12,4.5,0,0");
+        queueTask("add_forwards_spline -s -5,20.5,320,5,-6.5,-2.5,270,5,12,12,0,0");
+        queueTask("add_backwards_spline -s -6.5,-2.5,270,5,-5,20.5,340,3,12,12,0,0");
+        queueTask("add_forwards_spline -s -5,20.5,340,0.5,0.5,18.85,0,1.5,12,4.5,0,0");
 
 
             //queueTask("add_forwards_spline -s 0,0,90,2,-4,9.5,60,2,8,10,0,3");
