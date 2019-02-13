@@ -60,6 +60,7 @@ public class Robot extends TimedRobot {
 				append("extake -s", this.rb);
 
 				append("driver_control -p", this.rightStick);
+				append("debug_print -s", this.a);
 			}
 		};
 
