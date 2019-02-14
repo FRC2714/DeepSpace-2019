@@ -71,14 +71,14 @@ public abstract class SubsystemModule extends Subsystem {
 
 			// Call the execute function if the command is still active
 			if (v.running) {
-				v.execute();
-
 				// If the command is finished, exit
 				if (v.isFinished()) {
 					System.out.println("Command isFinished == true");
 					v.end();
 					v.running = false;
 				}
+				
+				v.execute();
 			}
 		});
 

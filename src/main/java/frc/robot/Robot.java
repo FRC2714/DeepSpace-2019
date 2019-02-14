@@ -115,6 +115,9 @@ public class Robot extends TimedRobot {
 				// Toggle driver control
 				append("driver_control -p", this.rightStick);
 
+				append("servo_down -s", this.a);
+				append("servo_up -s", this.b);
+
 				// // Toggle end game
 				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 1))
 				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 2))

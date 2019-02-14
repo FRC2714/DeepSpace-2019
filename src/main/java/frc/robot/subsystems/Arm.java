@@ -57,6 +57,9 @@ public class Arm extends SubsystemModule {
 	private double wristOffset = 0;
 	private double currentShoulderAngle = 0;
 	private double currentWristAngle = 0;
+	private double currentShoulderSetpoint;
+	private double currentWristSetpoint;
+	
 	private final double maxDegreesPerSecond = 30;
 
 	// Arm characteristics
@@ -217,13 +220,12 @@ public class Arm extends SubsystemModule {
 	 * Locks the arm into a four bar configuration going up
 	 */
 	public void jogUp() {
-
 		double currentDegreesPerPeriod = maxDegreesPerSecond * controlsProcessor.getCommandPeriod();
-		double shoulderDelta = currentShoulderAngle + (currentDegreesPerPeriod);
-		double wristDelta = currentWristAngle + (currentDegreesPerPeriod);
+		currentShoulderSetpoint += currentDegreesPerPeriod;
+		currentWristSetpoint += currentDegreesPerPeriod;
 
-		setShoulderAngle(shoulderDelta);
-		setWristAngle(wristDelta);
+		setShoulderAngle(currentShoulderSetpoint);
+		setWristAngle(currentWristSetpoint);
 
 		// System.out.println("Delta S: " + shoulderDelta + "\tW: " + wristDelta);
 		// System.out.println("Up S:" + currentShoulderAngle + "\tW: " + currentWristAngle);
@@ -233,13 +235,12 @@ public class Arm extends SubsystemModule {
 	 * Locks the arm into a four bar configuration going down
 	 */
 	public void jogDown() {
-
 		double currentDegreesPerPeriod = maxDegreesPerSecond * controlsProcessor.getCommandPeriod();
-		double shoulderDelta = currentShoulderAngle - currentDegreesPerPeriod;
-		double wristDelta = currentWristAngle - currentDegreesPerPeriod;
+		currentShoulderSetpoint -= currentDegreesPerPeriod;
+		currentWristSetpoint -= currentDegreesPerPeriod;
 
-		setShoulderAngle(shoulderDelta);
-		setWristAngle(wristDelta);
+		setShoulderAngle(currentShoulderSetpoint);
+		setWristAngle(currentWristSetpoint);
 
 		// System.out.println("Delta S: " + shoulderDelta + "\tW: " + wristDelta);
 		// System.out.println("Down S: " + currentShoulderAngle + "\tW: " + currentWristAngle);
@@ -307,7 +308,6 @@ public class Arm extends SubsystemModule {
 		};
 
 		new SubsystemCommand(this.registeredCommands, "floor_position") {
-
 			int iterator;
 
 			@Override
@@ -359,11 +359,12 @@ public class Arm extends SubsystemModule {
 
 		//TODO: Positions are wrong for this
 		new SubsystemCommand(this.registeredCommands, "cargo_station_position") {
-
 			int iterator;
 
 			@Override
 			public void initialize() {
+				intake.setAtPosition(false);
+
 				if (!intake.getHatchState() && !intake.getCargoState()) {
 					shoulderPathFinished = false;
 					wristPathFinished = false;
@@ -402,11 +403,12 @@ public class Arm extends SubsystemModule {
 			public void end() {
 				shoulderPath = new ArrayList<Double>();
 				wristPath = new ArrayList<Double>();
+
+				intake.setAtPosition(true);
 			}
 		};
 
 		new SubsystemCommand(this.registeredCommands, "hatch_station_position") {
-
 			int iterator;
 
 			@Override
@@ -782,7 +784,8 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-
+				currentShoulderSetpoint = currentShoulderAngle;
+				currentWristSetpoint = currentWristAngle;
 			}
 
 			@Override
@@ -805,7 +808,8 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-			
+				currentShoulderSetpoint = currentShoulderAngle;
+				currentWristSetpoint = currentWristAngle;
 			}
 
 			@Override

@@ -16,7 +16,8 @@ public class Intake extends SubsystemModule {
 	private CANSparkMax hatchplatePump = new CANSparkMax(10, MotorType.kBrushless);
 
 	// Hatchplate Servo
-	private Servo hatchplateServo0 = new Servo(0);
+	private Servo hatchplateServo = new Servo(0);
+	private Servo pumpServo = new Servo(1);
 
 	// Maximum currents for cargo and hatch intakes
 	private double cargoCurrentThreshold = 20;
@@ -42,14 +43,35 @@ public class Intake extends SubsystemModule {
 	 * Raises the hatchplate into tucked position
 	 */
 	public void hatchplateUp() {
-		hatchplateServo0.set(1);
+		hatchplateServo.set(1);
 	}
 
 	/**
 	 * Lowers the hatchplate into active position
 	 */
 	public void hatchplateDown() {
-		hatchplateServo0.set(0.47);
+		hatchplateServo.set(0.47);
+	}
+
+	/**
+	 * Puts pump servo into hatch intake mode
+	 */
+	public void pumpHatch() {
+		pumpServo.set(0.05);
+	}
+
+	/**
+	 * Puts pump servo into release mode
+	 */
+	public void pumpRelease() {
+		pumpServo.set(0.5);
+	}
+
+	/**
+	 * Puts pump servo into climb mode
+	 */
+	public void pumpClimb() {
+		pumpServo.set(0.95);
 	}
 
 	public boolean getCargoState() {
@@ -80,21 +102,62 @@ public class Intake extends SubsystemModule {
 	@Override
 	public void registerCommands() {
 
-        new SubsystemCommand(this.registeredCommands, "cargo_intake") {
+		new SubsystemCommand(this.registeredCommands, "servo_down") {
 
+			@Override
+			public void initialize() {
+				hatchplateDown();
+			}
+
+			@Override
+			public void execute() {
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {
+
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "servo_up") {
+
+			@Override
+			public void initialize() {
+				hatchplateUp();
+			}
+
+			@Override
+			public void execute() {
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {
+
+			}
+		};
+
+        new SubsystemCommand(this.registeredCommands, "cargo_intake") {
 			ArrayList<Double> currents = new ArrayList<Double>();
 			double avgCurrent = 0;
-			double maxSize = 20;
+			double maxSize = 25;
 
-			boolean stopIntake;
 			boolean intaking;
 
 			@Override
 			public void initialize() {
-				System.out.println("Cargo: " + cargoState + "\tHatch: " + hatchState);
-				
 				intaking = false;
-				stopIntake = cargoState || hatchState;
 			}
 
 			@Override
@@ -109,54 +172,69 @@ public class Intake extends SubsystemModule {
 					avgCurrent += currents.get(0) / maxSize;
 				}
 				else {
+					if (Math.abs(avgCurrent) > cargoCurrentThreshold) { cargoState = true; }
+
 					avgCurrent += (currents.get(0) - currents.get(currents.size() - 1)) / maxSize;
 					currents.remove(currents.size() - 1);
-
-					if (Math.abs(avgCurrent) > cargoCurrentThreshold) { cargoState = true; }
 				}
 			}
 
 			@Override
 			public boolean isFinished() {
-				System.out.println("Finished Cargo: " + cargoState + "\tFinished Hatch: " + hatchState);
-				return cargoState || stopIntake;
+				return cargoState || hatchState;
 			}
 
 			@Override
 			public void end() {
 				cargoMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+				currents = new ArrayList<Double>();
 
 				if (cargoState && !hatchState) {
 					cargoMotor.set(0.05);
 				} else {
 					cargoMotor.set(0);
 				}
-
-				currents = new ArrayList<Double>();
 			}
 		};
 
         new SubsystemCommand(this.registeredCommands, "hatch_floor_intake") {
+			ArrayList<Double> currents = new ArrayList<Double>(0);
+			double avgCurrent = 0;
+			double maxSize = 25;
 
-			boolean stopIntake = false;
+			boolean intaking;
 
 			@Override
 			public void initialize() {
-				if (!cargoState && !hatchState) {
-					cargoMotor.set(-0.75);
-				} else {
-					stopIntake = true;
-				}
+				intaking = false;
 			}
 
 			@Override
 			public void execute() {
-				if (cargoMotor.getOutputCurrent() < hatchCurrentThreshold) { hatchState = true; }
+				currents.add(0, cargoMotor.getOutputCurrent());
+
+				if (!intaking && atPosition) {
+					cargoMotor.set(-0.75);
+					hatchplatePump.set(1);
+					pumpHatch();
+					intaking = true;
+				}
+				else if(currents.size() <= maxSize) {
+					avgCurrent += currents.get(0) / maxSize;
+				}
+				else {
+					if (Math.abs(avgCurrent) > hatchCurrentThreshold) {
+						hatchState = true;
+					}
+
+					avgCurrent += (currents.get(0) - currents.get(currents.size() - 1)) / maxSize;
+					currents.remove(currents.size() - 1);
+				}
 			}
 
 			@Override
 			public boolean isFinished() {
-				return hatchState || stopIntake;
+				return cargoState || hatchState;
 			}
 
 			@Override
@@ -165,33 +243,39 @@ public class Intake extends SubsystemModule {
 				cargoMotor.set(0);
 
 				if (!cargoState && hatchState) {
-					hatchplatePump.set(1);
 					hatchplateDown();
 
 					hatchFloor = true;
 					hatchStation = false;
 				}
+				else {
+					hatchplatePump.set(0);
+				}
 			}
 		};
 
         new SubsystemCommand(this.registeredCommands, "hatch_station_intake") {
-			
 			ArrayList<Double> currents = new ArrayList<Double>();
 			double avgCurrent = 0;
-			double maxSize = 50;
+			double maxSize = 25;
+
+			boolean intaking;
 
 			@Override
 			public void initialize() {
-				if (!cargoState && !hatchState) {
-					hatchplatePump.set(1);
-					hatchplateDown();
-				}
+				intaking = false;
 			}
 
 			@Override
 			public void execute() {
 				currents.add(0, hatchplatePump.getOutputCurrent());
 				
+				if(!intaking && atPosition) {
+					hatchplatePump.set(1);
+					hatchplateDown();
+					pumpHatch();
+					intaking = true;
+				}
 				if(currents.size() <= maxSize) {
 					avgCurrent += currents.get(0) / maxSize;
 				}
@@ -205,7 +289,7 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return hatchState;
+				return cargoState || hatchState;
 			}
 
 			@Override
@@ -223,15 +307,16 @@ public class Intake extends SubsystemModule {
 		};
 
         new SubsystemCommand(this.registeredCommands, "extake") {
+			int counter;
 
 			@Override
 			public void initialize() {
-				System.out.println("Cargo: " + cargoState + "\tHatch: " + hatchState);
+				counter = 0;
 
 				if (cargoState && !hatchState) {
 					cargoMotor.set(-0.5);
 				} else if (!cargoState && hatchState) {
-					//TODO: Open the blowout valve
+					pumpRelease();
 					hatchplatePump.set(0);
 				}
 			}
@@ -243,7 +328,8 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return false;
+				counter++;
+				return counter < 25;
 			}
 
 			@Override
@@ -252,7 +338,6 @@ public class Intake extends SubsystemModule {
 
 				hatchplateUp();
 				cargoMotor.set(0);
-				//TODO: Close the blowout valve
 
 				cargoState = false;
 				hatchState = false;
