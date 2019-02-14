@@ -101,10 +101,10 @@ public class Robot extends TimedRobot {
 				append("back_score -p", this.launchpad.getButtonInstance(7, 2));
 
 				// Extake
-				append("extake -s", this.launchpad.getButtonInstance(0, 1));
-				append("extake -s", this.launchpad.getButtonInstance(0, 2));
-				append("extake -s", this.launchpad.getButtonInstance(1, 1));
-				append("extake -s", this.launchpad.getButtonInstance(1, 2));
+				append("extake -p", this.launchpad.getButtonInstance(0, 1));
+				append("extake -p", this.launchpad.getButtonInstance(0, 2));
+				append("extake -p", this.launchpad.getButtonInstance(1, 1));
+				append("extake -p", this.launchpad.getButtonInstance(1, 2));
 
 				// Jog
 				append("jog_up -s", this.launchpad.getButtonInstance(0, 0));

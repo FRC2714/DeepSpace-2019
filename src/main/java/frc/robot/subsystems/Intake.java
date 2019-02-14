@@ -6,6 +6,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.Servo;
+import frc.robot.util.CommandDetails;
 import frc.robot.util.SubsystemCommand;
 import frc.robot.util.SubsystemModule;
 
@@ -21,7 +22,7 @@ public class Intake extends SubsystemModule {
 
 	// Maximum currents for cargo and hatch intakes
 	private double cargoCurrentThreshold = 20;
-	private double hatchCurrentThreshold = -20;
+	private double hatchCurrentThreshold = 20;
 	private double pumpCurrentThreshold = 5.5;
 
 	// Intake States - Public so Arm can access the states for state-based logic
@@ -43,14 +44,14 @@ public class Intake extends SubsystemModule {
 	 * Raises the hatchplate into tucked position
 	 */
 	public void hatchplateUp() {
-		hatchplateServo.set(1);
+		hatchplateServo.set(0.88);
 	}
 
 	/**
 	 * Lowers the hatchplate into active position
 	 */
 	public void hatchplateDown() {
-		hatchplateServo.set(0.47);
+		hatchplateServo.set(0.3);
 	}
 
 	/**
@@ -149,7 +150,7 @@ public class Intake extends SubsystemModule {
 		};
 
         new SubsystemCommand(this.registeredCommands, "cargo_intake") {
-			ArrayList<Double> currents = new ArrayList<Double>();
+			ArrayList<Double> currents = new ArrayList<Double>(0);
 			double avgCurrent = 0;
 			double maxSize = 25;
 
@@ -172,6 +173,8 @@ public class Intake extends SubsystemModule {
 					avgCurrent += currents.get(0) / maxSize;
 				}
 				else {
+					System.out.println("Cargo Current AVG: " + avgCurrent + "\tMax Cargo Current: " + cargoCurrentThreshold);
+					
 					if (Math.abs(avgCurrent) > cargoCurrentThreshold) { cargoState = true; }
 
 					avgCurrent += (currents.get(0) - currents.get(currents.size() - 1)) / maxSize;
@@ -187,7 +190,7 @@ public class Intake extends SubsystemModule {
 			@Override
 			public void end() {
 				cargoMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
-				currents = new ArrayList<Double>();
+				currents = new ArrayList<Double>(0);
 
 				if (cargoState && !hatchState) {
 					cargoMotor.set(0.05);
@@ -198,20 +201,27 @@ public class Intake extends SubsystemModule {
 		};
 
         new SubsystemCommand(this.registeredCommands, "hatch_floor_intake") {
+
 			ArrayList<Double> currents = new ArrayList<Double>(0);
 			double avgCurrent = 0;
 			double maxSize = 25;
 
 			boolean intaking;
+			boolean hatchRoller;
+			int count;
 
 			@Override
 			public void initialize() {
 				intaking = false;
+				hatchRoller = false;
+				count = 0;
 			}
 
 			@Override
 			public void execute() {
 				currents.add(0, cargoMotor.getOutputCurrent());
+
+				System.out.println("Hatch Floor Current AVG: " + avgCurrent + "\tMax Hatch Floor Current: " + hatchCurrentThreshold);
 
 				if (!intaking && atPosition) {
 					cargoMotor.set(-0.75);
@@ -223,8 +233,15 @@ public class Intake extends SubsystemModule {
 					avgCurrent += currents.get(0) / maxSize;
 				}
 				else {
-					if (Math.abs(avgCurrent) > hatchCurrentThreshold) {
+					if (!hatchRoller && Math.abs(avgCurrent) > hatchCurrentThreshold) {
+						hatchRoller = true;
+						hatchplateDown();
+					}
+					else if (hatchRoller && count >= 25) {
 						hatchState = true;
+					}
+					else {
+						count++;
 					}
 
 					avgCurrent += (currents.get(0) - currents.get(currents.size() - 1)) / maxSize;
@@ -241,21 +258,18 @@ public class Intake extends SubsystemModule {
 			public void end() {
 				cargoMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 				cargoMotor.set(0);
-
+				hatchplatePump.set(0);
+				currents = new ArrayList<Double>(0);
+				
 				if (!cargoState && hatchState) {
-					hatchplateDown();
-
 					hatchFloor = true;
 					hatchStation = false;
-				}
-				else {
-					hatchplatePump.set(0);
 				}
 			}
 		};
 
         new SubsystemCommand(this.registeredCommands, "hatch_station_intake") {
-			ArrayList<Double> currents = new ArrayList<Double>();
+			ArrayList<Double> currents = new ArrayList<Double>(0);
 			double avgCurrent = 0;
 			double maxSize = 25;
 
@@ -270,6 +284,8 @@ public class Intake extends SubsystemModule {
 			public void execute() {
 				currents.add(0, hatchplatePump.getOutputCurrent());
 				
+				System.out.println("Pump Current AVG: " + avgCurrent + "\tMax Pump Current: " + pumpCurrentThreshold);
+
 				if(!intaking && atPosition) {
 					hatchplatePump.set(1);
 					hatchplateDown();
@@ -302,7 +318,7 @@ public class Intake extends SubsystemModule {
 				}
 				else { hatchplatePump.set(0); }
 
-				currents = new ArrayList<Double>();
+				currents = new ArrayList<Double>(0);
 			}
 		};
 
@@ -329,7 +345,7 @@ public class Intake extends SubsystemModule {
 			@Override
 			public boolean isFinished() {
 				counter++;
-				return counter < 25;
+				return counter < 50;
 			}
 
 			@Override
