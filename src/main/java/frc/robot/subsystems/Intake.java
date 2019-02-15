@@ -1,12 +1,9 @@
 package frc.robot.subsystems;
 
 import java.util.ArrayList;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
 import edu.wpi.first.wpilibj.Servo;
-import frc.robot.util.CommandDetails;
 import frc.robot.util.SubsystemCommand;
 import frc.robot.util.SubsystemModule;
 
@@ -18,12 +15,13 @@ public class Intake extends SubsystemModule {
 
 	// Hatchplate Servo
 	private Servo hatchplateServo = new Servo(0);
-	private Servo valveServo = new Servo(1);
+	private Servo valveServo1 = new Servo(1);
+	private Servo valveServo2 = new Servo(2);
 
 	// Maximum currents for cargo and hatch intakes
-	private double cargoCurrentThreshold = 20;
-	private double hatchCurrentThreshold = 20;
-	private double pumpCurrentThreshold = 5.5;
+	private double cargoCurrentThreshold = 30;
+	private double hatchCurrentThreshold = 100;
+	private double pumpCurrentThreshold = 0;
 
 	// ArrayList holding the read currents
 	private ArrayList<Double> cargoCurrents;
@@ -36,9 +34,9 @@ public class Intake extends SubsystemModule {
 	private double pumpAverageCurrent = 0;
 
 	// Number of current values stored
-	private int numberOfCargoCurrents = 25;
-	private int numberOfHatchCurrents = 25;
-	private int numberOfPumpCurrents = 25;
+	private int numberOfCargoCurrents = 50;
+	private int numberOfHatchCurrents = 50;
+	private int numberOfPumpCurrents = 100;
 
 	// Intake States - Public so Arm can access the states for state-based logic
 	private boolean cargoState = false;
@@ -58,7 +56,8 @@ public class Intake extends SubsystemModule {
 		hatchCurrents = new ArrayList<Double>(0);
 		pumpCurrents = new ArrayList<Double>(0);
 
-		valveServo.setBounds(2200, 1600, 1500, 1400, 800);
+		// valveServo1.setBounds(2200, 1600, 1500, 1400, 800);
+		// valveServo2.setBounds(1850, 1800, 1750, 1700, 1650);
 	}
 
 	/**
@@ -79,26 +78,29 @@ public class Intake extends SubsystemModule {
 	 * Puts pump servo into hatch intake mode
 	 */
 	public void pumpHatch() {
-		valveServo.set(0.05);
+		valveServo1.setRaw(197);
+		valveServo2.setRaw(209);
 	}
 
 	/**
 	 * Puts pump servo into release mode
 	 */
 	public void pumpRelease() {
-		valveServo.set(0.5);
+		valveServo1.setRaw(127);
+		valveServo2.setRaw(203);
 	}
 
 	/**
 	 * Puts pump servo into climb mode
 	 */
 	public void pumpClimb() {
-		valveServo.set(0.95);
+		valveServo1.setRaw(800);
+		valveServo2.setRaw(1650);
 	}
 
 	public boolean checkCargoState() {
 		if(cargoMotor.get() > 0.1) {
-			cargoCurrents.add(0, cargoMotor.getOutputCurrent());
+			cargoCurrents.add(0, Math.abs(cargoMotor.getOutputCurrent()));
 			if(cargoCurrents.size() != numberOfCargoCurrents) {
 				cargoAverageCurrent += cargoCurrents.get(0) / numberOfCargoCurrents;
 				return cargoState;
@@ -106,7 +108,7 @@ public class Intake extends SubsystemModule {
 			else {
 				cargoAverageCurrent += (cargoCurrents.get(0) - cargoCurrents.get(cargoCurrents.size() - 1)) / numberOfCargoCurrents;
 				cargoCurrents.remove(cargoCurrents.size() - 1);
-				return Math.abs(cargoAverageCurrent) > cargoCurrentThreshold;
+				return cargoAverageCurrent > cargoCurrentThreshold;
 			}
 		}
 		cargoCurrents.clear();
@@ -116,7 +118,7 @@ public class Intake extends SubsystemModule {
 
 	public boolean checkHatchState() {
 		if(cargoMotor.get() < -0.1) {
-			hatchCurrents.add(0, cargoMotor.getOutputCurrent());
+			hatchCurrents.add(0, Math.abs(cargoMotor.getOutputCurrent()));
 			if(hatchCurrents.size() != numberOfHatchCurrents) {
 				hatchAverageCurrent += hatchCurrents.get(0) / numberOfHatchCurrents;
 				return hatchState;
@@ -134,7 +136,7 @@ public class Intake extends SubsystemModule {
 
 	public boolean checkPumpState() {
 		if(pumpMotor.get() != 0) {
-			pumpCurrents.add(0, pumpMotor.getOutputCurrent());
+			pumpCurrents.add(0, Math.abs(pumpMotor.getOutputCurrent()));
 			if(pumpCurrents.size() != numberOfPumpCurrents) {
 				pumpAverageCurrent += pumpCurrents.get(0) / numberOfPumpCurrents;
 				return pumpState;
@@ -184,16 +186,20 @@ public class Intake extends SubsystemModule {
 	@Override
 	public void registerCommands() {
 
-		new SubsystemCommand(this.registeredCommands, "servo_down") {
+		new SubsystemCommand(this.registeredCommands, "intake_stop") {
 
 			@Override
 			public void initialize() {
-				hatchplateDown();
+				cargoMotor.set(0);
+				pumpMotor.set(0);
+
+				hatchState = false;
+				cargoState = false;
 			}
 
 			@Override
 			public void execute() {
-
+				pumpRelease();
 			}
 
 			@Override
@@ -206,12 +212,11 @@ public class Intake extends SubsystemModule {
 
 			}
 		};
-
-		new SubsystemCommand(this.registeredCommands, "servo_up") {
+		new SubsystemCommand(this.registeredCommands, "servo1") {
 
 			@Override
 			public void initialize() {
-				hatchplateUp();
+				valveServo1.setRaw(Integer.parseInt(args[0]));
 			}
 
 			@Override
@@ -221,7 +226,30 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return false;
+				return true;
+			}
+
+			@Override
+			public void end() {
+
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "servo2") {
+
+			@Override
+			public void initialize() {
+				valveServo2.setRaw(Integer.parseInt(args[0]));
+			}
+
+			@Override
+			public void execute() {
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				return true;
 			}
 
 			@Override
@@ -273,9 +301,10 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public void execute() {
+				pumpHatch();
+
 				if (!intaking && atPosition) {
 					cargoMotor.set(-0.75);
-					pumpHatch();
 					intaking = true;
 				}
 				else if(hatchState) {
@@ -314,10 +343,11 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public void execute() {
+				pumpHatch();
+
 				if(!intaking && atPosition) {
 					pumpMotor.set(1);
 					hatchplateDown();
-					pumpHatch();
 					intaking = true;
 				}
 			}
@@ -343,16 +373,15 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				if (pumpState) {
-					pumpRelease();
-				}
-				else {
+				if (cargoState) {
 					cargoMotor.set(-0.5);
 				}
 			}
-
+			
 			@Override
-			public void execute() { }
+			public void execute() {
+				pumpRelease();
+			}
 
 			@Override
 			public boolean isFinished() {

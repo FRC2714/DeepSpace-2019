@@ -10,7 +10,6 @@ import frc.robot.autontasks.DelayAutonTesterTask;
 import frc.robot.autontasks.LeftCargoHatchAuton;
 import frc.robot.autontasks.LeftRocketHatchAuton;
 import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.Intake;
 import frc.robot.util.AutonTask;
 import frc.robot.util.ControlsProcessor;
 
@@ -101,10 +100,10 @@ public class Robot extends TimedRobot {
 				append("back_score -p", this.launchpad.getButtonInstance(7, 2));
 
 				// Extake
-				append("extake -p", this.launchpad.getButtonInstance(0, 1));
-				append("extake -p", this.launchpad.getButtonInstance(0, 2));
-				append("extake -p", this.launchpad.getButtonInstance(1, 1));
-				append("extake -p", this.launchpad.getButtonInstance(1, 2));
+				append("extake -s", this.launchpad.getButtonInstance(0, 1));
+				append("extake -s", this.launchpad.getButtonInstance(0, 2));
+				append("extake -s", this.launchpad.getButtonInstance(1, 1));
+				append("extake -s", this.launchpad.getButtonInstance(1, 2));
 
 				// Jog
 				append("jog_up -s", this.launchpad.getButtonInstance(0, 0));
@@ -115,8 +114,11 @@ public class Robot extends TimedRobot {
 				// Toggle driver control
 				append("driver_control -p", this.rightStick);
 
-				append("servo_down -s", this.a);
-				append("servo_up -s", this.b);
+				append("intake_stop -s", this.start);
+				// append("servo1 -p 0", this.a);
+				// append("servo2 -p 0", this.b);
+				// append("servo1 -p 0", this.x);
+				// append("servo2 -p 0", this.y);
 
 				// // Toggle end game
 				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 1))
