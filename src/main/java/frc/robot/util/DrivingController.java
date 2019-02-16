@@ -51,7 +51,7 @@ public abstract class DrivingController {
 
 		this.period = period;
 
-		this.samsonControl.setMaxIOutput(0.25);
+		this.samsonControl.setMaxIOutput(0.15);
 
 	}
 

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.github.juchong:adis16470-java:2019-r1">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.juchong/adis16470-java/2019-r1/384bb54e57fadb06c02416febc4a077ad9f5c0d0/adis16470-java-2019-r1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.juchong/adis16470-java/2019-r1/72e3b8d8e2ff6e9e82a734e972b46095adf79942/adis16470-java-2019-r1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
