@@ -381,10 +381,13 @@ public class DriveTrain extends SubsystemModule {
 
 				double xInitial = Double.parseDouble(this.args[0]);
 				double xFinal = Double.parseDouble(this.args[4]);
+
 				double yInitial = Double.parseDouble(this.args[1]);
 				double yFinal = Double.parseDouble(this.args[5]);
+
 				double thetaInitial = Double.parseDouble(this.args[2]);
 				double thetaFinal = Double.parseDouble(this.args[6]);
+
 				double lInitial = Double.parseDouble(this.args[3]);
 				double lFinal = Double.parseDouble(this.args[7]);
 
@@ -524,6 +527,8 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 
+				double ySubstraction = Double.parseDouble(this.args[0]);
+
 				NetworkTableEntry camtran = table.getEntry("camtran");
 				double data[] = new double[6];
 
@@ -533,9 +538,13 @@ public class DriveTrain extends SubsystemModule {
 				double thetaFinal = Math.toRadians(data[4]);
 				double lInitial = 1;
 				double lFinal = 1;
+
+				double hypotenuse = Math.sqrt(Math.pow(data[0], 2) + Math.pow(data[1], 2));
 		
-				double xFinal = data[1]*Math.cos(Math.toRadians(odometer.getHeadingAngle() + data[4])) + odometer.getCurrentX();
-				double yFinal = data[1]*Math.sin(Math.toRadians(odometer.getHeadingAngle() + data[4])) + odometer.getCurrentY();
+				double xFinal = hypotenuse*Math.cos(Math.toRadians(odometer.getHeadingAngle() + data[4])) + odometer.getCurrentX();
+				double yFinal = hypotenuse*Math.sin(Math.toRadians(odometer.getHeadingAngle() + data[4])) + odometer.getCurrentY();
+
+//				yFinal -= ySubstraction;
 
 				double xInitial = odometer.getCurrentX();
 				double yInitial = odometer.getCurrentY();
@@ -543,9 +552,7 @@ public class DriveTrain extends SubsystemModule {
 				double x2 = lInitial * Math.cos(thetaInitial) + odometer.getCurrentX();
 				double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal; 
 				double y2 = lInitial * Math.sin(thetaInitial) + odometer.getCurrentY(); 
-				double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal; 
-
-
+				double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal;
 				
 				drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
 						10, 4, 0, 0, true);
