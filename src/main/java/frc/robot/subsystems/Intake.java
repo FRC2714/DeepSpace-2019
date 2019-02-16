@@ -98,7 +98,7 @@ public class Intake extends SubsystemModule {
 	}
 
 	public boolean checkCargoState() {
-		if(cargoMotor.get() == 0.75) {
+		if(cargoMotor.get() > 0.5) {
 			cargoCurrents.add(0, Math.abs(cargoMotor.getOutputCurrent()));
 			if(cargoCurrents.size() != numberOfCargoCurrents) {
 				cargoAverageCurrent += cargoCurrents.get(0) / numberOfCargoCurrents;
@@ -116,7 +116,7 @@ public class Intake extends SubsystemModule {
 	}
 
 	public boolean checkHatchState() {
-		if(cargoMotor.get() == -0.75) {
+		if(cargoMotor.get() < -0.5) {
 			hatchCurrents.add(0, Math.abs(cargoMotor.getOutputCurrent()));
 			if(hatchCurrents.size() != numberOfHatchCurrents) {
 				hatchAverageCurrent += hatchCurrents.get(0) / numberOfHatchCurrents;
@@ -134,7 +134,7 @@ public class Intake extends SubsystemModule {
 	}
 
 	public boolean checkPumpState() {
-		if(pumpMotor.get() == 1) {
+		if(pumpMotor.get() != 0) {
 			pumpCurrents.add(0, Math.abs(pumpMotor.getOutputCurrent()));
 			if(pumpCurrents.size() != numberOfPumpCurrents) {
 				pumpAverageCurrent += pumpCurrents.get(0) / numberOfPumpCurrents;
@@ -156,7 +156,7 @@ public class Intake extends SubsystemModule {
 	}
 
 	public boolean getHatchState() {
-		return hatchState;
+		return pumpState;
 	}
 
 	public boolean getHatchFloor() {
