@@ -60,7 +60,7 @@ public class DriveTrain extends SubsystemModule {
 
 	private final double sensitivity = 2.5;
 	private final double maxVelocity = 13;
-	private final double maxAcceleration = 30;
+	private final double maxAcceleration = 10;
 
 	// 
 	private double leftEncoderOffset = 0;
