@@ -10,7 +10,6 @@ import frc.robot.autontasks.DelayAutonTesterTask;
 import frc.robot.autontasks.LeftCargoHatchAuton;
 import frc.robot.autontasks.LeftRocketHatchAuton;
 import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.Intake;
 import frc.robot.util.AutonTask;
 import frc.robot.util.ControlsProcessor;
 
@@ -26,7 +25,6 @@ public class Robot extends TimedRobot {
 	// Initialize subsystems
 	private DriveTrain drivetrain;
 	private Arm arm;
-	private Intake intake;
 
 	// Initialize auton mode selector
 	private Command autonomousCommand;
@@ -45,37 +43,98 @@ public class Robot extends TimedRobot {
 		controlsProcessor = new ControlsProcessor(10000000, 2) {
 			@Override
 			public void registerOperatorControls() {
-				append("closed_loop_tank -s 2", this.launchpad.getButtonInstance(0, 0));
-				append("closed_loop_tank -s -2", this.launchpad.getButtonInstance(1, 0));
-				
-				// append("go_to_position -p 53,70,195,70", this.a); // Lower cargo rocket
-				append("go_to_position -p 85,70,200,200", this.b); // Middle cargo rocket
-				// append("go_to_position -p 110,70,230.8,70", this.y); // Top cargo rocket (No good)
-				
-				// append("go_to_position -p 15,70,80,70", this.x); // Lower hatch rocket
-				// append("go_to_position -p 62,70,122,70", this.y); // Middle hatch rocket
-				// append("go_to_position -p 110,70,230.8,70", this.y); // Top hatch rocket (No good)
+				// Go to start postion
+				append("start_position -p", this.launchpad.getButtonInstance(3, 1));
+				append("start_position -p", this.launchpad.getButtonInstance(3, 2));
+				append("start_position -p", this.launchpad.getButtonInstance(4, 1));
+				append("start_position -p", this.launchpad.getButtonInstance(4, 2));
 
-				// append("go_to_position -p 22.75,70,182,70", this.x); // Intake floor
+				// Intake cargo from ground
+				append("floor_position -p", this.launchpad.getButtonInstance(0, 7));
+				append("cargo_intake -s", this.launchpad.getButtonInstance(0, 7));
+				append("floor_position -p", this.launchpad.getButtonInstance(0, 8));
+				append("cargo_intake -s", this.launchpad.getButtonInstance(0, 8));
+				append("floor_position -p", this.launchpad.getButtonInstance(1, 7));
+				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 7));
+				append("floor_position -p", this.launchpad.getButtonInstance(1, 8));
+				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 8));
 
-				//append("hatchplate_up -p", this.a);
-				// append("hatchplate_down -p", this.b);
+				// Intake hatch from ground
+				append("floor_position -p", this.launchpad.getButtonInstance(3, 7));
+				append("hatch_floor_intake -s", this.launchpad.getButtonInstance(3, 7));
+				append("floor_position -p", this.launchpad.getButtonInstance(3, 8));
+				append("hatch_floor_intake -s", this.launchpad.getButtonInstance(3, 8));
+				append("floor_position -p", this.launchpad.getButtonInstance(4, 7));
+				append("hatch_floor_intake -s", this.launchpad.getButtonInstance(4, 7));
+				append("floor_position -p", this.launchpad.getButtonInstance(4, 8));
+				append("hatch_floor_intake -s", this.launchpad.getButtonInstance(4, 8));
 
-				// append("intake -s", this.rb);
-				// append("extake -s", this.lb);
+				// Intake cargo from station
+				append("cargo_station_position -p", this.launchpad.getButtonInstance(0, 4));
+				append("cargo_intake -s", this.launchpad.getButtonInstance(0, 4));
+				append("cargo_station_position -p", this.launchpad.getButtonInstance(0, 5));
+				append("cargo_intake -s", this.launchpad.getButtonInstance(0, 5));
+				append("cargo_station_position -p", this.launchpad.getButtonInstance(1, 4));
+				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 4));
+				append("cargo_station_position -p", this.launchpad.getButtonInstance(1, 5));
+				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 5));
 
-				//append("driver_control -p", this.rightStick);
+				// Intake hatch from station
+				append("hatch_station_position -p", this.launchpad.getButtonInstance(3, 4));
+				append("hatch_station_intake -s", this.launchpad.getButtonInstance(3, 4));
+				append("hatch_station_position -p", this.launchpad.getButtonInstance(3, 5));
+				append("hatch_station_intake -s", this.launchpad.getButtonInstance(3, 5));
+				append("hatch_station_position -p", this.launchpad.getButtonInstance(4, 4));
+				append("hatch_station_intake -s", this.launchpad.getButtonInstance(4, 4));
+				append("hatch_station_position -p", this.launchpad.getButtonInstance(4, 5));
+				append("hatch_station_intake -s", this.launchpad.getButtonInstance(4, 5));
+
+				// Score positions
+				append("lower_score -p", this.launchpad.getButtonInstance(6, 8));
+				append("lower_score -p", this.launchpad.getButtonInstance(7, 8));
+				append("middle_score -p", this.launchpad.getButtonInstance(6, 6));
+				append("middle_score -p", this.launchpad.getButtonInstance(7, 6));
+				append("upper_score -p", this.launchpad.getButtonInstance(6, 4));
+				append("upper_score -p", this.launchpad.getButtonInstance(7, 4));
+				append("back_score -p", this.launchpad.getButtonInstance(6, 2));
+				append("back_score -p", this.launchpad.getButtonInstance(7, 2));
+
+				// Extake
+				append("extake -s", this.launchpad.getButtonInstance(0, 1));
+				append("extake -s", this.launchpad.getButtonInstance(0, 2));
+				append("extake -s", this.launchpad.getButtonInstance(1, 1));
+				append("extake -s", this.launchpad.getButtonInstance(1, 2));
+
+				// Jog
+				append("jog_up -s", this.launchpad.getButtonInstance(0, 0));
+				append("jog_up -s", this.launchpad.getButtonInstance(8, 7));
+				append("jog_down -s", this.launchpad.getButtonInstance(1, 0));
+				append("jog_down -s", this.launchpad.getButtonInstance(8, 8));
+
+				// Toggle driver control
+				append("driver_control -p", this.rightStick);
+
+				append("intake_stop -s", this.start);
+				append("get_intake_servos -p", this.a);
+				append("servo_sweep -p", this.a);
+				// append("servo2 -p 0", this.b);
+				// append("servo1 -p 0", this.x);
+				// append("servo2 -p 0", this.y);
+
+				// // Toggle end game
+				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 1))
+				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 2))
+				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 3))
+				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 4))
 			}
 		};
 
 		drivetrain = new DriveTrain(controlsProcessor);
 		arm = new Arm(controlsProcessor);
-		intake = new Intake(controlsProcessor);
 
 		// Required to register all subsystems in order to be processed. 
 		controlsProcessor.registerController("DriveTrain", drivetrain);
 		controlsProcessor.registerController("Arm", arm);
-		controlsProcessor.registerController("Intake", intake);
 		controlsProcessor.start();
 		
 	}
@@ -88,7 +147,6 @@ public class Robot extends TimedRobot {
 	public void disabledInit() {
 		drivetrain.destruct();
 		arm.destruct();
-		intake.destruct();
 		Scheduler.getInstance().removeAll();
 
 		if (controlsProcessor != null) {
@@ -165,6 +223,5 @@ public class Robot extends TimedRobot {
 
 		drivetrain.init();
 		arm.init();
-		intake.init();
 	}
 }

@@ -9,13 +9,13 @@ import org.java_websocket.handshake.ServerHandshake;
 /** This example demonstrates how to create a websocket connection to a server. Only the most important callbacks are overloaded. */
 public class WebsocketButtonPad extends WebSocketClient {
 
-    private WebsocketButton[][] buttons = new WebsocketButton[8][8];
+    private WebsocketButton[][] buttons = new WebsocketButton[9][9];
     
 	public WebsocketButtonPad(URI serverURI) {
         super( serverURI );
 
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
                 this.buttons[i][j] = new WebsocketButton();
             }
         }
