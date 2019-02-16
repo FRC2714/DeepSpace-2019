@@ -8,6 +8,9 @@ import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -82,6 +85,9 @@ public class DriveTrain extends SubsystemModule {
 
 	// NavX gyro
 	private AHRS navX = new AHRS(SPI.Port.kMXP);
+
+	//limelight
+	NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
 
 	// Drivetrain initializations
 	public DriveTrain(ControlsProcessor controlsProcessor) {
@@ -407,6 +413,7 @@ public class DriveTrain extends SubsystemModule {
 				drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
 						Double.parseDouble(this.args[8]), Double.parseDouble(this.args[9]),
 						Double.parseDouble(this.args[10]), Double.parseDouble(this.args[11]), false);
+
 			}
 
 			@Override
@@ -471,6 +478,54 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void execute() {
 				System.out.println("DELAY TESTER running!" );
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {
+			}
+		};
+
+
+		new SubsystemCommand(this.registeredCommands, "drive_to_target"){
+			@Override
+			public void initialize() {
+
+				NetworkTableEntry camtran = table.getEntry("camtran");
+				double data[] = new double[6];
+
+				data = camtran.getDoubleArray(data);
+
+				double thetaInitial = Math.toRadians(odometer.getHeadingAngle());
+				double thetaFinal = Math.toRadians(data[4]);
+				double lInitial = 1;
+				double lFinal = 1;
+		
+				double xFinal = data[1]*Math.cos(Math.toRadians(odometer.getHeadingAngle() + data[4])) + odometer.getCurrentX();
+				double yFinal = data[1]*Math.sin(Math.toRadians(odometer.getHeadingAngle() + data[4])) + odometer.getCurrentY();
+
+				double xInitial = odometer.getCurrentX();
+				double yInitial = odometer.getCurrentY();
+
+				double x2 = lInitial * Math.cos(thetaInitial) + odometer.getCurrentX();
+				double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal; 
+				double y2 = lInitial * Math.sin(thetaInitial) + odometer.getCurrentY(); 
+				double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal; 
+
+
+				
+				drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
+						10, 4, 0, 0, true);
+								
+				enable();
+			}
+
+			@Override
+			public void execute() {
 			}
 
 			@Override
