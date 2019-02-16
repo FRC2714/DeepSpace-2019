@@ -23,7 +23,7 @@ public class Intake extends SubsystemModule {
 	// Maximum currents for cargo and hatch intakes
 	private double cargoCurrentThreshold = 30;
 	private double hatchCurrentThreshold = 100;
-	private double pumpCurrentThreshold = 5.5;
+	private double pumpCurrentThreshold = 6;
 
 	// ArrayList holding the read currents
 	private ArrayList<Double> cargoCurrents;
@@ -62,14 +62,14 @@ public class Intake extends SubsystemModule {
 	/**
 	 * Raises the hatchplate into tucked position
 	 */
-	public void hatchplateUp() {
+	public void hatchplateIn() {
 		hatchplateServo.set(0.88);
 	}
 
 	/**
 	 * Lowers the hatchplate into active position
 	 */
-	public void hatchplateDown() {
+	public void hatchplateOut() {
 		hatchplateServo.set(0.3);
 	}
 
@@ -97,6 +97,10 @@ public class Intake extends SubsystemModule {
 		valveServo2.set(0);
 	}
 
+	/**
+	 * Uses the roller's current draw to determine if the robot has a cargo
+	 * @return Cargo = true or 
+	 */
 	public boolean checkCargoState() {
 		if(cargoMotor.get() > 0.5) {
 			cargoCurrents.add(0, Math.abs(cargoMotor.getOutputCurrent()));
@@ -110,11 +114,15 @@ public class Intake extends SubsystemModule {
 				return cargoAverageCurrent > cargoCurrentThreshold;
 			}
 		}
-		cargoCurrents.clear();
+		cargoCurrents = new ArrayList<Double>(0);
 		cargoAverageCurrent = 0;
 		return cargoState;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public boolean checkHatchState() {
 		if(cargoMotor.get() < -0.5) {
 			hatchCurrents.add(0, Math.abs(cargoMotor.getOutputCurrent()));
@@ -128,7 +136,7 @@ public class Intake extends SubsystemModule {
 				return Math.abs(hatchAverageCurrent) > hatchCurrentThreshold;
 			}
 		}
-		hatchCurrents.clear();
+		hatchCurrents = new ArrayList<Double>(0);
 		hatchAverageCurrent = 0;
 		return hatchState;
 	}
@@ -146,7 +154,7 @@ public class Intake extends SubsystemModule {
 				return Math.abs(pumpAverageCurrent) < pumpCurrentThreshold;
 			}
 		}
-		pumpCurrents.clear();
+		pumpCurrents = new ArrayList<Double>(0);
 		pumpAverageCurrent = 0;
 		return pumpState;
 	}
@@ -177,8 +185,8 @@ public class Intake extends SubsystemModule {
 		hatchState = checkHatchState();
 		pumpState = checkPumpState();
 
-		if(cargoAverageCurrent != 0 || hatchAverageCurrent != 0 || pumpAverageCurrent != 0)
-			System.out.println("Cargo Current: " + cargoAverageCurrent + "\tHatch Current: " + hatchAverageCurrent + "\tPump Current: " + pumpAverageCurrent);
+		// if(cargoAverageCurrent != 0 || hatchAverageCurrent != 0 || pumpAverageCurrent != 0)
+		// 	System.out.println("Cargo Current: " + cargoAverageCurrent + "\tHatch Current: " + hatchAverageCurrent + "\tPump Current: " + pumpAverageCurrent);
     }
 
 	@Override
@@ -209,49 +217,6 @@ public class Intake extends SubsystemModule {
 			public void end() {}
 		};
 
-		new SubsystemCommand(this.registeredCommands, "get_intake_servos") {
-
-			@Override
-			public void initialize() {
-				System.out.println("Servo 1: " + valveServo1.get() + "\tServo 2: " + valveServo2.get());
-			}
-
-			@Override
-			public void execute() {}
-
-			@Override
-			public boolean isFinished() {
-				return true;
-			}
-
-			@Override
-			public void end() {}
-		};
-
-		new SubsystemCommand(this.registeredCommands, "servo_sweep") {
-			double servoPosition = 0;
-
-			@Override
-			public void initialize() {
-				valveServo1.set(servoPosition);
-
-				servoPosition += 0.02;
-			}
-
-			@Override
-			public void execute() {}
-
-			@Override
-			public boolean isFinished() {
-				return true;
-			}
-
-			@Override
-			public void end() {
-				if(servoPosition >= 1) { servoPosition = 0; }
-				System.out.println("Sweep: " + servoPosition);
-			}
-		};
 
         new SubsystemCommand(this.registeredCommands, "cargo_intake") {
 			boolean intaking;
@@ -267,6 +232,7 @@ public class Intake extends SubsystemModule {
 					cargoMotor.set(0.75);
 					intaking = true;
 				}
+				hatchplateIn();
 			}
 
 			@Override
@@ -304,7 +270,7 @@ public class Intake extends SubsystemModule {
 				}
 				else if(hatchState) {
 					pumpMotor.set(1);
-					hatchplateDown();
+					hatchplateOut();
 				}
 			}
 
@@ -342,7 +308,7 @@ public class Intake extends SubsystemModule {
 
 				if(!intaking && atPosition) {
 					pumpMotor.set(1);
-					hatchplateDown();
+					hatchplateOut();
 					intaking = true;
 				}
 			}
@@ -387,7 +353,7 @@ public class Intake extends SubsystemModule {
 			public void end() {
 				cargoMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
 
-				hatchplateUp();
+				hatchplateIn();
 				cargoMotor.set(0);
 
 				cargoState = false;
