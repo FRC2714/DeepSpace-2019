@@ -10,11 +10,6 @@ import frc.robot.RobotMap;
 import frc.robot.util.WebsocketButtonPad;
 
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Map;
-
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.handshake.ServerHandshake;
 
 public abstract class ControlsProcessor extends Thread {
 
