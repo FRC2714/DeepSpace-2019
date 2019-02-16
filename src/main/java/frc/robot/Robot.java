@@ -115,7 +115,8 @@ public class Robot extends TimedRobot {
 				append("driver_control -p", this.rightStick);
 
 				append("intake_stop -s", this.start);
-				// append("servo1 -p 0", this.a);
+				append("get_intake_servos -p", this.a);
+				append("servo_sweep -p", this.a);
 				// append("servo2 -p 0", this.b);
 				// append("servo1 -p 0", this.x);
 				// append("servo2 -p 0", this.y);
