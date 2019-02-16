@@ -170,6 +170,8 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousInit() {
 		generalInit();
+		
+		AutonTask leftRocket = new LeftRocketHatchAuton(controlsProcessor);
 		AutonTask leftCargo = new LeftCargoHatchAuton(controlsProcessor);
 
 		leftCargo.run();

@@ -9,7 +9,7 @@ public abstract class DrivingController {
 	 * Corrects both the anglular and perpendicular error
 	 */
 	//Samson control was originally at 0.25 * 0.6
-	private PID samsonControl = new PID(0.20*0.6, 0.0, 0.0);
+	private PID samsonControl = new PID(0.06, 0.0001, 0.0);
 	private double samsonOutput;
 
 	/**
