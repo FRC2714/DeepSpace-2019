@@ -65,8 +65,10 @@ public class DriveTrain extends SubsystemModule {
 	// 
 	private double leftEncoderOffset = 0;
 	private double rightEncoderOffset = 0;
-	
 	private double lastVelocity = 0;
+
+	// Ramp code
+	private double currentArcadePower;
 
 	// Robot characteristics
 	private double wheelSeparation = 2;
@@ -211,6 +213,20 @@ public class DriveTrain extends SubsystemModule {
 		drive.arcadeDrive(power, pivot);
 	}
 
+	public void arcadeDrive(double power, double pivot, double rampUp, double rampDown) {
+		if(currentArcadePower < power) {
+			currentArcadePower += rampUp;
+			if(currentArcadePower > power) { currentArcadePower = power; }
+		}
+		else if(currentArcadePower > power) {
+			currentArcadePower -= rampDown;
+			if(currentArcadePower < power) { currentArcadePower = power; }
+			
+		}
+
+		arcadeDrive(currentArcadePower, pivot);
+	}
+
 	// Closed loop velocity based tank without an acceleration limit
 	public void closedLoopTank(double leftVelocity, double rightVelocity) {
 		lPidController.setReference(leftVelocity / rpmToFeet, ControlType.kVelocity);
@@ -271,7 +287,7 @@ public class DriveTrain extends SubsystemModule {
 				if (Math.abs(controlsProcessor.getRightJoystick()) > .1)
 					pivot = controlsProcessor.getRightJoystick();
 
-				arcadeDrive(-power, pivot);
+				arcadeDrive(-power, pivot, 0.005, 0.1);
 
 				//System.out.println("Odometer heading angle " + odometer.getHeadingAngle());
 			}
@@ -359,7 +375,8 @@ public class DriveTrain extends SubsystemModule {
 				double y2 = lInitial * Math.sin(thetaInitial) + yInitial; 
 				double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal; 
 
-				
+				currentArcadePower = 0;
+
 				drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
 						Double.parseDouble(this.args[8]), Double.parseDouble(this.args[9]),
 						Double.parseDouble(this.args[10]), Double.parseDouble(this.args[11]), true);
