@@ -106,26 +106,27 @@ public class Robot extends TimedRobot {
 				append("extake -s", this.launchpad.getButtonInstance(1, 2));
 
 				// Jog
-				append("jog_up -s", this.launchpad.getButtonInstance(0, 0));
-				append("jog_up -s", this.launchpad.getButtonInstance(8, 7));
-				append("jog_down -s", this.launchpad.getButtonInstance(1, 0));
+				append("jog_up -s", this.launchpad.getButtonInstance(8, 6));
 				append("jog_down -s", this.launchpad.getButtonInstance(8, 8));
+
+				// Game Piece Override
+				append("cargo_true -p", this.launchpad.getButtonInstance(8, 1));
+				append("hatch_station_true -p", this.launchpad.getButtonInstance(8, 2));
+				append("hatch_floor_true -p", this.launchpad.getButtonInstance(8, 3));
 
 				// Toggle driver control
 				append("driver_control -p", this.rightStick);
 
-				append("intake_stop -s", this.start);
-				append("get_intake_servos -p", this.a);
-				append("servo_sweep -p", this.a);
+				append("intake_stop -s", this.launchpad.getButtonInstance(0, 0));
 				// append("servo2 -p 0", this.b);
 				// append("servo1 -p 0", this.x);
 				// append("servo2 -p 0", this.y);
 
 				// // Toggle end game
-				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 1))
-				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 2))
-				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 3))
-				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 4))
+				// append("endgame_toggle -p", this.launchpad.getButtonInstance(0, 4))
+				// append("endgame_toggle -p", this.launchpad.getButtonInstance(0, 5))
+				// append("endgame_toggle -p", this.launchpad.getButtonInstance(0, 6))
+				// append("endgame_toggle -p", this.launchpad.getButtonInstance(0, 7))
 			}
 		};
 
