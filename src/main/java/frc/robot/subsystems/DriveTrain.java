@@ -540,7 +540,7 @@ public class DriveTrain extends SubsystemModule {
 				double lFinal = 1;
 
 				double hypotenuse = Math.sqrt(Math.pow(data[0], 2) + Math.pow(data[1], 2));
-		
+
 				double xFinal = hypotenuse*Math.cos(Math.toRadians(odometer.getHeadingAngle() + data[4])) + odometer.getCurrentX();
 				double yFinal = hypotenuse*Math.sin(Math.toRadians(odometer.getHeadingAngle() + data[4])) + odometer.getCurrentY();
 
@@ -550,13 +550,49 @@ public class DriveTrain extends SubsystemModule {
 				double yInitial = odometer.getCurrentY();
 
 				double x2 = lInitial * Math.cos(thetaInitial) + odometer.getCurrentX();
-				double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal; 
-				double y2 = lInitial * Math.sin(thetaInitial) + odometer.getCurrentY(); 
+				double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal;
+				double y2 = lInitial * Math.sin(thetaInitial) + odometer.getCurrentY();
 				double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal;
 				
 				drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
 						10, 4, 0, 0, true);
 								
+				enable();
+			}
+
+			@Override
+			public void execute() {
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "drive_to_target"){
+			@Override
+			public void initialize() {
+
+				double ySubstraction = Double.parseDouble(this.args[0]);
+				NetworkTableEntry camtran = table.getEntry("camtran");
+				double data[] = new double[6];
+				data = camtran.getDoubleArray(data);
+
+				double limelightX = data[0];
+
+				double limelightY = data[1];
+				double customY = limelightY - ySubstraction;
+
+				double customHypotenuse = Math.sqrt(Math.pow(customY, 2) + Math.pow(limelightX, 2));
+
+				double customTheta = Math.toDegrees(Math.atan(limelightX/customY));
+
+
 				enable();
 			}
 
