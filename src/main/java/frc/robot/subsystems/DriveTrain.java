@@ -218,30 +218,35 @@ public class DriveTrain extends SubsystemModule {
 	}
 
 	public void arcadeDrive(double power, double pivot, double rampUp, double rampDown) {
-		if(currentOpenArcadePower < power) {
-			currentOpenArcadePower += rampUp;
-			if(currentOpenArcadePower < power) { currentOpenArcadePower = power; }
-		}
-		else if(currentOpenArcadePower > power) {
-			currentOpenArcadePower -= rampDown;
-			if(currentOpenArcadePower > power) { currentOpenArcadePower = power; }
+		int currentDirection = (int)(Math.abs(currentOpenArcadePower) / currentOpenArcadePower);
+		int desiredDirection = (int)(Math.abs(power) / power);
+
+		if (currentDirection * desiredDirection > 0) {
+			if(currentOpenArcadePower < power) {
+				currentOpenArcadePower += rampUp;
+				
+				if(currentOpenArcadePower > power) { currentOpenArcadePower = power; }
+			}
+			else if(currentOpenArcadePower > power) {
+				currentOpenArcadePower -= rampUp;
+
+				if(currentOpenArcadePower < power) { currentOpenArcadePower = power; }
+			}
+		} else {
+			if(currentOpenArcadePower < power) {
+				currentOpenArcadePower += rampDown;
+				
+				if(currentOpenArcadePower > power) { currentOpenArcadePower = power; }
+			}
+			else if(currentOpenArcadePower > power) {
+				currentOpenArcadePower -= rampDown;
+
+				if(currentOpenArcadePower < power) { currentOpenArcadePower = power; }
+			}
 		}
 
 		System.out.println("Current Arcade Power: " + currentOpenArcadePower + "\tCurrent Arcade Pivot: " + currentOpenArcadePivot);
-		// arcadeDrive(currentOpenArcadePower, pivot);
-	}
-
-	public void arcadeDrive(double power, double pivot, double rampUp, double rampDown, double pivotRampUp, double pivotRampDown) {
-		if(currentOpenArcadePivot < pivot) {
-			currentOpenArcadePivot += pivotRampUp;
-			if(currentOpenArcadePivot > pivot) { currentOpenArcadePivot = pivot; }
-		}
-		else if(currentOpenArcadePivot > pivot) {
-			currentOpenArcadePivot -= pivotRampDown;
-			if(currentOpenArcadePivot < pivot) { currentOpenArcadePivot = pivot; }
-		}
-		
-		arcadeDrive(power, currentOpenArcadePivot, rampUp, rampDown);
+		arcadeDrive(currentOpenArcadePower, pivot);
 	}
 
 	// Closed loop velocity based tank without an acceleration limit
@@ -304,7 +309,7 @@ public class DriveTrain extends SubsystemModule {
 				if (Math.abs(controlsProcessor.getRightJoystick()) > 0.1)
 					pivot = controlsProcessor.getRightJoystick();
 
-				arcadeDrive(-power, pivot, 0.01, 0.05, 0.01, 0.05);
+				arcadeDrive(-power, pivot * 0.75, 0.01, 0.025);
 
 				//System.out.println("Odometer heading angle " + odometer.getHeadingAngle());
 			}
