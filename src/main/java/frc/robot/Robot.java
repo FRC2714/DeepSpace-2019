@@ -111,7 +111,7 @@ public class Robot extends TimedRobot {
 
 				// Toggle driver control
 				append("driver_control -p", this.rightStick);
-				append("debug_print -p", this.leftStick);
+				//append("debug_print -p", this.leftStick);
 
 				append("intake_stop -s", this.start);
 				append("get_intake_servos -p", this.a);

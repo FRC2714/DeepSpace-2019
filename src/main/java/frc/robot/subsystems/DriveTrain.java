@@ -539,7 +539,7 @@ public class DriveTrain extends SubsystemModule {
 				double data[] = new double[6];
 
 				data = camtran.getDoubleArray(data);
-				//System.out.println(data[1] + " : " + data[2] + " : " + data[4]);
+				System.out.println(data[1] + " : " + data[2] + " : " + data[4]);
 
 				if(data[1] == 0){
 					this.cancel();
@@ -553,13 +553,13 @@ public class DriveTrain extends SubsystemModule {
 
 				double limelightX = data[1]/12;
 				double limelightY = data[2]/12;
-				double customY = limelightY - ySubtraction;
+				double customY = limelightY + ySubtraction;
 
 				double customHypotenuse = Math.sqrt(Math.pow(customY, 2) + Math.pow(limelightX, 2));
 
 				double customTheta = Math.atan(limelightX/customY);
-				double cameraXOffset = 1.25*Math.cos(Math.toRadians(odometer.getHeadingAngle()));
-				double cameraYOffset = 1.25*Math.sin(Math.toRadians(odometer.getHeadingAngle()));
+				double cameraXOffset = -1.25*Math.cos(Math.toRadians(odometer.getHeadingAngle()));
+				double cameraYOffset = -1.25*Math.sin(Math.toRadians(odometer.getHeadingAngle()));
 
 
 				double xFinal = customHypotenuse*Math.cos(Math.toRadians(odometer.getHeadingAngle()) + customTheta) + odometer.getCurrentX() - cameraXOffset;
@@ -573,7 +573,7 @@ public class DriveTrain extends SubsystemModule {
 				double y2 = lInitial * Math.sin(thetaInitial) + odometer.getCurrentY();
 				double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal;
 
-				System.out.println(xInitial + " : " + yInitial + " : " + odometer.getHeadingAngle() + " : " + xFinal + " : " + yFinal + " : " + (-data[4] + odometer.getHeadingAngle()));
+				//System.out.println(xInitial + " : " + yInitial + " : " + odometer.getHeadingAngle() + " : " + xFinal + " : " + yFinal + " : " + (-data[4] + odometer.getHeadingAngle()));
 				
 				// drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
 				//  		10, 4, 0, 0, true);
