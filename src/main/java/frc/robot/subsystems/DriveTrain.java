@@ -123,9 +123,9 @@ public class DriveTrain extends SubsystemModule {
 
 		@Override
 		public void updateEncodersAndHeading() {
-			this.headingAngle = 450 - navX.getFusedHeading();
-			if(this.headingAngle > 360) {
-				this.headingAngle -= 360;
+			this.headingAngle = -navX.getYaw() + 90;
+			if(this.headingAngle < 0) {
+				this.headingAngle += 360;
 			}	
 
 			this.leftPos = leftShaftEncoder.getDistance();
@@ -274,9 +274,9 @@ public class DriveTrain extends SubsystemModule {
 				double power = 0;
 				double pivot = 0;
 
-				if (Math.abs(controlsProcessor.getLeftJoystick()) > .1)	
+				if (Math.abs(controlsProcessor.getLeftJoystick()) > .2)
 					power = controlsProcessor.getLeftJoystick();
-				if (Math.abs(controlsProcessor.getRightJoystick()) > .1)
+				if (Math.abs(controlsProcessor.getRightJoystick()) > .2)
 					pivot = controlsProcessor.getRightJoystick();
 
 				closedLoopArcade(-power * maxVelocity, -pivot, maxAcceleration);
@@ -360,8 +360,9 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void execute() {
-				// getEncoderValues();
-				//System.out.println(odometer.getCurrentX() + " : " + odometer.getCurrentY());
+//				getEncoderValues();
+				System.out.println(odometer.getHeadingAngle());
+				//System.out.println(navX.getYaw());
 			}
 
 			@Override

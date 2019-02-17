@@ -1,0 +1,15 @@
+	// Robot characteristics
+	private final double wheelSeparation = 2;
+	private final double conversionFactor = 0;
+
+	// Configure PID Coefficients
+	private final double kMinOutput = -1;
+	private final double kMaxOutput = 1;
+
+	private final double kP = 4.8e-5;
+	private final double kI = 5.0e-7;
+	private final double kD = 0.0;
+	private final double kIS = 0.0;
+
+	private final double lKFF = 1.77e-4;
+	private final double rKFF = 1.78e-4;
