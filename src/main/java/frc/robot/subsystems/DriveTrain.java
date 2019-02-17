@@ -271,7 +271,7 @@ public class DriveTrain extends SubsystemModule {
 				if (Math.abs(controlsProcessor.getRightJoystick()) > .1)
 					pivot = controlsProcessor.getRightJoystick();
 
-				closedLoopArcade(-power * maxVelocity, -pivot, maxAcceleration);
+				arcadeDrive(-power, pivot);
 
 				//System.out.println("Odometer heading angle " + odometer.getHeadingAngle());
 			}
