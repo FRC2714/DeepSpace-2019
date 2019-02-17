@@ -274,9 +274,9 @@ public class DriveTrain extends SubsystemModule {
 				double power = 0;
 				double pivot = 0;
 
-				if (Math.abs(controlsProcessor.getLeftJoystick()) > .2)
+				if (Math.abs(controlsProcessor.getLeftJoystick()) > .15)	
 					power = controlsProcessor.getLeftJoystick();
-				if (Math.abs(controlsProcessor.getRightJoystick()) > .2)
+				if (Math.abs(controlsProcessor.getRightJoystick()) > .15)
 					pivot = controlsProcessor.getRightJoystick();
 
 				closedLoopArcade(-power * maxVelocity, -pivot, maxAcceleration);
@@ -528,24 +528,42 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 
-				double ySubstraction = Double.parseDouble(this.args[0]);
+				double ySubtraction = Double.parseDouble(this.args[0]);
 
 				NetworkTableEntry camtran = table.getEntry("camtran");
+				// double tv = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0);
+				// double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+				// double ty = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
+				// double ta = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
+
 				double data[] = new double[6];
 
 				data = camtran.getDoubleArray(data);
+				//System.out.println(data[1] + " : " + data[2] + " : " + data[4]);
+
+				if(data[1] == 0){
+					this.cancel();
+					return;
+				}
 
 				double thetaInitial = Math.toRadians(odometer.getHeadingAngle());
-				double thetaFinal = Math.toRadians(data[4]);
+				double thetaFinal = Math.toRadians(-data[4] + odometer.getHeadingAngle());
 				double lInitial = 1;
 				double lFinal = 1;
 
-				double hypotenuse = Math.sqrt(Math.pow(data[0], 2) + Math.pow(data[1], 2));
+				double limelightX = data[1]/12;
+				double limelightY = data[2]/12;
+				double customY = limelightY - ySubtraction;
 
-				double xFinal = hypotenuse*Math.cos(Math.toRadians(odometer.getHeadingAngle() + data[4])) + odometer.getCurrentX();
-				double yFinal = hypotenuse*Math.sin(Math.toRadians(odometer.getHeadingAngle() + data[4])) + odometer.getCurrentY();
+				double customHypotenuse = Math.sqrt(Math.pow(customY, 2) + Math.pow(limelightX, 2));
 
-//				yFinal -= ySubstraction;
+				double customTheta = Math.atan(limelightX/customY);
+				double cameraXOffset = 1.25*Math.cos(Math.toRadians(odometer.getHeadingAngle()));
+				double cameraYOffset = 1.25*Math.sin(Math.toRadians(odometer.getHeadingAngle()));
+
+
+				double xFinal = customHypotenuse*Math.cos(Math.toRadians(odometer.getHeadingAngle()) + customTheta) + odometer.getCurrentX() - cameraXOffset;
+				double yFinal = customHypotenuse*Math.sin(Math.toRadians(odometer.getHeadingAngle()) + customTheta) + odometer.getCurrentY() - cameraYOffset;
 
 				double xInitial = odometer.getCurrentX();
 				double yInitial = odometer.getCurrentY();
@@ -554,11 +572,13 @@ public class DriveTrain extends SubsystemModule {
 				double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal;
 				double y2 = lInitial * Math.sin(thetaInitial) + odometer.getCurrentY();
 				double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal;
+
+				System.out.println(xInitial + " : " + yInitial + " : " + odometer.getHeadingAngle() + " : " + xFinal + " : " + yFinal + " : " + (-data[4] + odometer.getHeadingAngle()));
 				
-				drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
-						10, 4, 0, 0, true);
+				// drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
+				//  		10, 4, 0, 0, true);
 								
-				enable();
+				// enable();
 			}
 
 			@Override
@@ -574,43 +594,6 @@ public class DriveTrain extends SubsystemModule {
 			public void end() {
 			}
 		};
-
-		new SubsystemCommand(this.registeredCommands, "drive_to_target"){
-			@Override
-			public void initialize() {
-
-				double ySubstraction = Double.parseDouble(this.args[0]);
-				NetworkTableEntry camtran = table.getEntry("camtran");
-				double data[] = new double[6];
-				data = camtran.getDoubleArray(data);
-
-				double limelightX = data[0];
-
-				double limelightY = data[1];
-				double customY = limelightY - ySubstraction;
-
-				double customHypotenuse = Math.sqrt(Math.pow(customY, 2) + Math.pow(limelightX, 2));
-
-				double customTheta = Math.toDegrees(Math.atan(limelightX/customY));
-
-
-				enable();
-			}
-
-			@Override
-			public void execute() {
-			}
-
-			@Override
-			public boolean isFinished() {
-				return false;
-			}
-
-			@Override
-			public void end() {
-			}
-		};
-
 
 	}
 
