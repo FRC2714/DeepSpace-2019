@@ -528,6 +528,9 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 
+				NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
+				NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
+
 				double ySubtraction = Double.parseDouble(this.args[0]);
 
 				NetworkTableEntry camtran = table.getEntry("camtran");
@@ -592,6 +595,42 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "vision_align"){
+			@Override
+			public void initialize() {
+				driverControlled = false;
+				enable();
+				NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
+				NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
+			}
+
+			@Override
+			public void execute() {
+				double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+				double kP = 1/27.0;
+
+				double power = 0;
+				double pivot = tx * kP;
+
+				if (Math.abs(controlsProcessor.getLeftJoystick()) > .10)
+					power = controlsProcessor.getLeftJoystick();
+
+
+				closedLoopArcade(-power * maxVelocity, pivot, maxAcceleration);
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				return driverControlled;
+			}
+
+			@Override
+			public void end() {
+				disable();
 			}
 		};
 
