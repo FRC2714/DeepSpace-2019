@@ -523,58 +523,96 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
-
 		new SubsystemCommand(this.registeredCommands, "drive_to_target"){
+			double initialX;
+			double initialY;
+			double theta1;
+			double tanTheta1;
+
 			@Override
 			public void initialize() {
 
-				NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
-				NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
+				initialX = odometer.getCurrentX();
+				initialY = odometer.getCurrentY();
 
-				double ySubtraction = Double.parseDouble(this.args[0]);
+				theta1 = odometer.getHeadingAngle() - NetworkTableInstance.getDefault().
+										getTable("limelight").getEntry("tx").getDouble(0);
 
-				NetworkTableEntry camtran = table.getEntry("camtran");
-				// double tv = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0);
-				// double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
-				// double ty = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
-				// double ta = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
+				if (theta1 > 360)
+					theta1 -= 360;
+				else if (theta1 < 0)
+					theta1 += 360;
 
-				double data[] = new double[6];
+				tanTheta1 = Math.tan(Math.toRadians(theta1));
 
-				data = camtran.getDoubleArray(data);
-				System.out.println(data[1] + " : " + data[2] + " : " + data[4]);
+				// //Stage 1	
+				// 	double currentX = odometer.getCurrentX();
+				// 	double currentY = odometer.getCurrentY();
+				// 	double odometerHeading = odometer.getHeadingAngle();
 
-				if(data[1] == 0){
-					this.cancel();
-					return;
-				}
+				// 	double limelightX = 1.25*Math.cos(Math.toRadians(odometer.getHeadingAngle()));
+				// 	double limelightY = -1.25*Math.sin(Math.toRadians(odometer.getHeadingAngle()));
 
-				double thetaInitial = Math.toRadians(odometer.getHeadingAngle());
-				double thetaFinal = Math.toRadians(-data[4] + odometer.getHeadingAngle());
-				double lInitial = 1;
-				double lFinal = 1;
+				// 	System.out.println(currentX + " : " + currentY + " : " + limelightX + " : " + limelightY);
 
-				double limelightX = data[1]/12;
-				double limelightY = data[2]/12;
-				double customY = limelightY + ySubtraction;
+				// //Stage 2
+				// 	NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
+				// 	double centerAngle = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+				// 	NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
+				// 	double rightAngle = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+				// 	double angleDifference = rightAngle - centerAngle;
 
-				double customHypotenuse = Math.sqrt(Math.pow(customY, 2) + Math.pow(limelightX, 2));
-
-				double customTheta = Math.atan(limelightX/customY);
-				double cameraXOffset = -1.25*Math.cos(Math.toRadians(odometer.getHeadingAngle()));
-				double cameraYOffset = -1.25*Math.sin(Math.toRadians(odometer.getHeadingAngle()));
+			
+				
 
 
-				double xFinal = customHypotenuse*Math.cos(Math.toRadians(odometer.getHeadingAngle()) + customTheta) + odometer.getCurrentX() - cameraXOffset;
-				double yFinal = customHypotenuse*Math.sin(Math.toRadians(odometer.getHeadingAngle()) + customTheta) + odometer.getCurrentY() - cameraYOffset;
+				// NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
+				// NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
 
-				double xInitial = odometer.getCurrentX();
-				double yInitial = odometer.getCurrentY();
+				// double ySubtraction = Double.parseDouble(this.args[0]);
 
-				double x2 = lInitial * Math.cos(thetaInitial) + odometer.getCurrentX();
-				double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal;
-				double y2 = lInitial * Math.sin(thetaInitial) + odometer.getCurrentY();
-				double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal;
+				// NetworkTableEntry camtran = table.getEntry("camtran");
+				// // double tv = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0);
+				// // double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+				// // double ty = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
+				// // double ta = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
+
+				// double data[] = new double[6];
+
+				// data = camtran.getDoubleArray(data);
+				// System.out.println(data[1] + " : " + data[2] + " : " + data[4]);
+
+				// if(data[1] == 0){
+				// 	this.cancel();
+				// 	return;
+				// }
+
+				// double thetaInitial = Math.toRadians(odometer.getHeadingAngle());
+				// double thetaFinal = Math.toRadians(-data[4] + odometer.getHeadingAngle());
+				// double lInitial = 1;
+				// double lFinal = 1;
+
+				// double limelightX = data[1]/12;
+				// double limelightY = data[2]/12;
+				// double customY = limelightY + ySubtraction;
+
+				// double customHypotenuse = Math.sqrt(Math.pow(customY, 2) + Math.pow(limelightX, 2));
+
+				// double customTheta = Math.atan(limelightX/customY);
+				// double cameraXOffset = 1.25*Math.cos(Math.toRadians(odometer.getHeadingAngle()));
+				// double cameraYOffset = -1.25*Math.sin(Math.toRadians(odometer.getHeadingAngle()));
+
+
+				// double xFinal = customHypotenuse*Math.cos(Math.toRadians(odometer.getHeadingAngle()) + customTheta) + odometer.getCurrentX() + cameraXOffset;
+				// double yFinal = customHypotenuse*Math.sin(Math.toRadians(odometer.getHeadingAngle()) + customTheta) + odometer.getCurrentY() + cameraYOffset;
+
+				// double xInitial = odometer.getCurrentX();
+				// double yInitial = odometer.getCurrentY();
+
+				// double x2 = lInitial * Math.cos(thetaInitial) + odometer.getCurrentX();
+				// double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal;
+				// double y2 = lInitial * Math.sin(thetaInitial) + odometer.getCurrentY();
+				// double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal;
 
 				//System.out.println(xInitial + " : " + yInitial + " : " + odometer.getHeadingAngle() + " : " + xFinal + " : " + yFinal + " : " + (-data[4] + odometer.getHeadingAngle()));
 				
@@ -586,6 +624,14 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void execute() {
+				double deltaX = odometer.getCurrentX() - initialX;
+				double deltaY = odometer.getCurrentY() - initialY;
+
+				double theta2 = odometer.getHeadingAngle() - NetworkTableInstance.getDefault().
+								getTable("limelight").getEntry("tx").getDouble(0);
+				
+				double l2 = (deltaY - tanTheta1*deltaX) / (Math.sin(Math.toRadians(theta2)) - tanTheta1*Math.cos(Math.toRadians(theta2)));
+				System.out.println(deltaX + " : " + deltaY);
 			}
 
 			@Override
@@ -598,11 +644,12 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
+		/*
 		new SubsystemCommand(this.registeredCommands, "vision_align"){
 			@Override
 			public void initialize() {
 				driverControlled = false;
-				enable();
+				// enable();
 				NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
 				NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
 			}
@@ -630,10 +677,10 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
-				disable();
+				// disable();
 			}
 		};
-
+		*/
 	}
 
 }
