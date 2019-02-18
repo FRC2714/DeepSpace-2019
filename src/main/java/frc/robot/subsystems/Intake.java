@@ -65,14 +65,14 @@ public class Intake extends SubsystemModule {
 	 * Raises the hatchplate into tucked position
 	 */
 	public void hatchplateIn() {
-		hatchplateServo.set(0.88);
+		hatchplateServo.set(1);
 	}
 
 	/**
 	 * Lowers the hatchplate into active position
 	 */
 	public void hatchplateOut() {
-		hatchplateServo.set(0.3);
+		hatchplateServo.set(0);
 	}
 
 	/**
