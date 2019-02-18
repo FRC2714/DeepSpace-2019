@@ -11,7 +11,7 @@ import frc.robot.util.SubsystemModule;
 public class Intake extends SubsystemModule {
 
 	// Intake Motors
-	private CANSparkMax cargoMotor = new CANSparkMax(9, MotorType.kBrushless);
+	protected CANSparkMax cargoMotor = new CANSparkMax(9, MotorType.kBrushless);
 	private CANSparkMax pumpMotor = new CANSparkMax(10, MotorType.kBrushless);
 
 	// Hatchplate Servo
@@ -20,9 +20,14 @@ public class Intake extends SubsystemModule {
 	private Servo valveServo2 = new Servo(2);
 
 	// Maximum currents for cargo and hatch intakes
-	private double cargoCurrentThreshold = 30;
-	private double hatchCurrentThreshold = 100;
-	private double pumpCurrentThreshold = 6;
+	private final double cargoCurrentThreshold = 30;
+	private final double hatchCurrentThreshold = 10;
+	private final double pumpCurrentDiffrence = 1; // 3.125 for two
+
+	// Pump state values
+	private double pumpStateFirstAvg;
+	private boolean pumpStateIsFirstAvg;
+	private int pumpStateCounter;
 
 	// ArrayList holding the read currents
 	private ArrayList<Double> cargoCurrents;
@@ -30,46 +35,39 @@ public class Intake extends SubsystemModule {
 	private ArrayList<Double> pumpCurrents;
 
 	// Average current
-	private double cargoAverageCurrent = 0;
-	private double hatchAverageCurrent = 0;
-	private double pumpAverageCurrent = 0;
+	private double cargoAverageCurrent;
+	private double hatchAverageCurrent;
+	private double pumpAverageCurrent;
 
 	// Number of current values stored
-	private int numberOfCargoCurrents = 50;
-	private int numberOfHatchCurrents = 50;
-	private int numberOfPumpCurrents = 100;
+	private final int numberOfCargoCurrents = 50;
+	private final int numberOfHatchCurrents = 50;
+	private final int numberOfPumpCurrents = 100;
 
 	// Intake States - Public so Arm can access the states for state-based logic
-	private boolean cargoState = false;
-	private boolean hatchState = false;
-	private boolean pumpState = false;
-
-	// Hatch intake types
-	private boolean hatchFloor = false;
-	private boolean hatchStation = false;
+	private boolean cargoState;
+	private boolean hatchState;
+	private boolean pumpState;
 
 	// Intake position
-	private boolean atPosition = false;
+	private boolean atPosition;
 
     public Intake() { 
 		registerCommands(); // Puts commands onto the hashmap
-		cargoCurrents = new ArrayList<Double>(0);
-		hatchCurrents = new ArrayList<Double>(0);
-		pumpCurrents = new ArrayList<Double>(0);
 	}
 
 	/**
 	 * Raises the hatchplate into tucked position
 	 */
 	public void hatchplateIn() {
-		hatchplateServo.set(0.88);
+		hatchplateServo.set(1);
 	}
 
 	/**
 	 * Lowers the hatchplate into active position
 	 */
 	public void hatchplateOut() {
-		hatchplateServo.set(0.3);
+		hatchplateServo.set(0);
 	}
 
 	/**
@@ -103,58 +101,94 @@ public class Intake extends SubsystemModule {
 	public boolean checkCargoState() {
 		if(cargoMotor.get() > 0.5) {
 			cargoCurrents.add(0, Math.abs(cargoMotor.getOutputCurrent()));
+
 			if(cargoCurrents.size() != numberOfCargoCurrents) {
 				cargoAverageCurrent += cargoCurrents.get(0) / numberOfCargoCurrents;
+
 				return cargoState;
 			}
 			else {
 				cargoAverageCurrent += (cargoCurrents.get(0) - cargoCurrents.get(cargoCurrents.size() - 1)) / numberOfCargoCurrents;
 				cargoCurrents.remove(cargoCurrents.size() - 1);
+
 				return cargoAverageCurrent > cargoCurrentThreshold;
 			}
 		}
+
+		// cargoCurrents.clear();
 		cargoCurrents = new ArrayList<Double>(0);
 		cargoAverageCurrent = 0;
+
 		return cargoState;
 	}
 
+	public void clearStates() {
+		cargoState = false;
+		hatchState = false;
+		pumpState = false;
+	}
+
 	/**
-	 * 
-	 * @return
+	 * Compares the first average of currents with all subsequent averages to determine if the robot has a hatch
+	 * @return if the robot has a hatch
 	 */
 	public boolean checkHatchState() {
 		if(cargoMotor.get() < -0.5) {
 			hatchCurrents.add(0, Math.abs(cargoMotor.getOutputCurrent()));
+
 			if(hatchCurrents.size() != numberOfHatchCurrents) {
 				hatchAverageCurrent += hatchCurrents.get(0) / numberOfHatchCurrents;
+
 				return hatchState;
 			}
 			else {
 				hatchAverageCurrent += (hatchCurrents.get(0) - hatchCurrents.get(hatchCurrents.size() - 1)) / numberOfHatchCurrents;
 				hatchCurrents.remove(hatchCurrents.size() - 1);
+
 				return Math.abs(hatchAverageCurrent) > hatchCurrentThreshold;
 			}
 		}
+
+		// hatchCurrents.clear();
 		hatchCurrents = new ArrayList<Double>(0);
 		hatchAverageCurrent = 0;
+
 		return hatchState;
 	}
 
 	public boolean checkPumpState() {
 		if(pumpMotor.get() != 0) {
 			pumpCurrents.add(0, Math.abs(pumpMotor.getOutputCurrent()));
+
 			if(pumpCurrents.size() != numberOfPumpCurrents) {
 				pumpAverageCurrent += pumpCurrents.get(0) / numberOfPumpCurrents;
+				pumpStateCounter = 0;
 				return pumpState;
 			}
 			else {
+				if(pumpStateCounter > 10 && pumpStateIsFirstAvg) {
+					pumpStateFirstAvg = pumpAverageCurrent;
+					System.out.println("First CD: " + pumpStateFirstAvg);
+					pumpStateIsFirstAvg = false;
+				}
+
+				pumpStateCounter++;
+
+				System.out.println("Current: " + pumpAverageCurrent);
 				pumpAverageCurrent += (pumpCurrents.get(0) - pumpCurrents.get(pumpCurrents.size() - 1)) / numberOfPumpCurrents;
 				pumpCurrents.remove(pumpCurrents.size() - 1);
-				return Math.abs(pumpAverageCurrent) < pumpCurrentThreshold;
+
+				return Math.abs(pumpAverageCurrent) < Math.abs(pumpStateFirstAvg) - pumpCurrentDiffrence;
 			}
 		}
+
+		// pumpCurrents.clear();
 		pumpCurrents = new ArrayList<Double>(0);
 		pumpAverageCurrent = 0;
+		pumpStateFirstAvg = 0;
+		pumpStateCounter = 0;
+		pumpStateIsFirstAvg = true;
+
 		return pumpState;
 	}
 
@@ -164,14 +198,6 @@ public class Intake extends SubsystemModule {
 
 	public boolean getHatchState() {
 		return pumpState;
-	}
-
-	public boolean getHatchFloor() {
-		return hatchFloor;
-	}
-
-	public boolean getHatchStation() {
-		return hatchStation;
 	}
 
 	public void setAtPosition(boolean atPosition) {
@@ -184,13 +210,80 @@ public class Intake extends SubsystemModule {
 		hatchState = checkHatchState();
 		pumpState = checkPumpState();
 
-		// if(cargoAverageCurrent != 0 || hatchAverageCurrent != 0 || pumpAverageCurrent != 0)
+		// if(cargoCurrents.size() >= numberOfCargoCurrents || hatchCurrents.size() >= numberOfHatchCurrents || pumpCurrents.size() >= numberOfPumpCurrents)
 		// 	System.out.println("Cargo Current: " + cargoAverageCurrent + "\tHatch Current: " + hatchAverageCurrent + "\tPump Current: " + pumpAverageCurrent);
     }
 
 	@Override
 	public void registerCommands() {
 
+		new SubsystemCommand(this.registeredCommands, "cargo_true") {
+
+			@Override
+			public void initialize() {
+				cargoState = true;
+				hatchState = false;
+				pumpState = false;
+
+				System.out.println("Override cargo");
+			}
+
+			@Override
+			public void execute() {}
+
+			@Override
+			public boolean isFinished() {
+				return true;
+			}
+
+			@Override
+			public void end() {}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "hatch_true") {
+
+			@Override
+			public void initialize() {
+				cargoState = false;
+				hatchState = false;
+				pumpState = true;
+				System.out.println("Override hatch station");
+			}
+
+			@Override
+			public void execute() {}
+
+			@Override
+			public boolean isFinished() {
+				return true;
+			}
+
+			@Override
+			public void end() {}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "hatch_floor_true") {
+
+			@Override
+			public void initialize() {
+				cargoState = false;
+				hatchState = false;
+				pumpState = true;
+				System.out.println("Override hatch floor");
+			}
+
+			@Override
+			public void execute() {}
+
+			@Override
+			public boolean isFinished() {
+				return true;
+			}
+
+			@Override
+			public void end() {}
+		};
+		
 		new SubsystemCommand(this.registeredCommands, "intake_stop") {
 
 			@Override
@@ -198,8 +291,9 @@ public class Intake extends SubsystemModule {
 				cargoMotor.set(0);
 				pumpMotor.set(0);
 
-				hatchState = false;
 				cargoState = false;
+				hatchState = false;
+				pumpState = false;
 			}
 
 			@Override
@@ -227,11 +321,12 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public void execute() {
+				hatchplateIn();
+
 				if (!intaking && atPosition) {
 					cargoMotor.set(0.75);
 					intaking = true;
 				}
-				hatchplateIn();
 			}
 
 			@Override
@@ -267,9 +362,12 @@ public class Intake extends SubsystemModule {
 					cargoMotor.set(-0.75);
 					intaking = true;
 				}
-				else if(hatchState) {
+				else if (hatchState) {
 					pumpMotor.set(1);
 					hatchplateOut();
+				}
+				else {
+					hatchplateIn();
 				}
 			}
 
@@ -280,16 +378,10 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public void end() {
-				cargoMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
-				if(!cargoState) { cargoMotor.set(0); }
 				pumpMotor.set(0);
-				
-				if (pumpState) {
-					hatchState = false;
 
-					hatchFloor = true;
-					hatchStation = false;
-				}
+				if(!cargoState) { cargoMotor.set(0); }
+				else if(pumpState) { hatchState = false; }
 			}
 		};
 
@@ -304,10 +396,10 @@ public class Intake extends SubsystemModule {
 			@Override
 			public void execute() {
 				pumpHatch();
+				hatchplateOut();
 
 				if(!intaking && atPosition) {
 					pumpMotor.set(1);
-					hatchplateOut();
 					intaking = true;
 				}
 			}
@@ -321,46 +413,6 @@ public class Intake extends SubsystemModule {
 			public void end() {
 				cargoMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 				pumpMotor.set(0);
-
-				if (pumpState) {
-					hatchFloor = false;
-					hatchStation = true;
-				}
-			}
-		};
-
-        new SubsystemCommand(this.registeredCommands, "extake") {
-
-			@Override
-			public void initialize() {
-				if (!pumpState) {
-					cargoMotor.set(-0.5);
-				}
-			}
-			
-			@Override
-			public void execute() {
-				pumpRelease();
-			}
-
-			@Override
-			public boolean isFinished() {
-				return false;
-			}
-
-			@Override
-			public void end() {
-				cargoMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
-
-				hatchplateIn();
-				cargoMotor.set(0);
-
-				cargoState = false;
-				hatchState = false;
-				pumpState = false;
-
-				hatchFloor = false;
-				hatchStation = false;
 			}
 		};
 
@@ -412,6 +464,21 @@ public class Intake extends SubsystemModule {
 
 		cargoMotor.set(0);
 		pumpMotor.set(0);
+
+		cargoCurrents = new ArrayList<Double>(0);
+		hatchCurrents = new ArrayList<Double>(0);
+		pumpCurrents = new ArrayList<Double>(0);
+
+		cargoAverageCurrent = 0;
+		hatchAverageCurrent = 0;
+		pumpAverageCurrent = 0;
+
+		cargoState = false;
+		hatchState = false;
+		pumpState = false;
+
+		atPosition = false;
+		pumpStateIsFirstAvg = true;
 	}
 
 	@Override

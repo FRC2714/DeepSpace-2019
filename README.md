@@ -1,6 +1,6 @@
 # 2019Competition
 
-<img src="https://github.com/FRC2714/2019Competition/blob/readme/pictures/logo%20for%20github.svg" width="200" height="200" />
+<img src="https://github.com/FRC2714/2019Competition/blob/master/pictures/logo%20for%20github.svg" width="200" height="200" />
 
 ## Subsystems
 
@@ -36,4 +36,4 @@
 
 ## Button Configuration
 
-<img src="https://github.com/FRC2714/2019Competition/blob/readme/pictures/ButtonBoxLayout.png" width="750" height="750" />
+<img src="https://github.com/FRC2714/2019Competition/blob/master/pictures/ButtonBoxLayout.png" width="750" height="750" />

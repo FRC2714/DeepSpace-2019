@@ -64,13 +64,16 @@ public class DriveTrain extends SubsystemModule {
 
 	private final double sensitivity = 2.5;
 	private final double maxVelocity = 13;
-	private final double maxAcceleration = 10;
+	private final double maxAcceleration = 5;
 
 	// 
 	private double leftEncoderOffset = 0;
 	private double rightEncoderOffset = 0;
-	
 	private double lastVelocity = 0;
+
+	// Ramp code
+	private double currentOpenArcadePower;
+	private double currentOpenArcadePivot;
 
 	// Robot characteristics
 	private double wheelSeparation = 2;
@@ -174,6 +177,11 @@ public class DriveTrain extends SubsystemModule {
 		navX.reset();
 		navX.zeroYaw();
 
+		currentOpenArcadePower = 0;
+		currentOpenArcadePivot = 0;
+
+		// leftEncoder.setDistancePerPulse(-0.0495);
+		// rightEncoder.setDistancePerPulse(0.00105);
 		leftShaftEncoder.reset();
 		rightShaftEncoder.reset();
 		leftShaftEncoder.setDistancePerPulse(0.0007819);
@@ -218,6 +226,38 @@ public class DriveTrain extends SubsystemModule {
 	// General arcade drive
 	public void arcadeDrive(double power, double pivot) {
 		drive.arcadeDrive(power, pivot);
+	}
+
+	public void arcadeDrive(double power, double pivot, double rampUp, double rampDown) {
+		int currentDirection = (int)(Math.abs(currentOpenArcadePower) / currentOpenArcadePower);
+		int desiredDirection = (int)(Math.abs(power) / power);
+
+		if (currentDirection * desiredDirection > 0) {
+			if(currentOpenArcadePower < power) {
+				currentOpenArcadePower += rampUp;
+				
+				if(currentOpenArcadePower > power) { currentOpenArcadePower = power; }
+			}
+			else if(currentOpenArcadePower > power) {
+				currentOpenArcadePower -= rampUp;
+
+				if(currentOpenArcadePower < power) { currentOpenArcadePower = power; }
+			}
+		} else {
+			if(currentOpenArcadePower < power) {
+				currentOpenArcadePower += rampDown;
+				
+				if(currentOpenArcadePower > power) { currentOpenArcadePower = power; }
+			}
+			else if(currentOpenArcadePower > power) {
+				currentOpenArcadePower -= rampDown;
+
+				if(currentOpenArcadePower < power) { currentOpenArcadePower = power; }
+			}
+		}
+
+		// System.out.println("Current Arcade Power: " + currentOpenArcadePower + "\tCurrent Arcade Pivot: " + currentOpenArcadePivot);
+		arcadeDrive(currentOpenArcadePower, pivot);
 	}
 
 	// Closed loop velocity based tank without an acceleration limit
@@ -268,6 +308,7 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 				driverControlled = true;
+				// System.out.println("Right Encoder: " + rightShaftEncoder.getDistance() + "\tLeft Encoder: " + leftShaftEncoder.getDistance());
 			}
 
 			@Override
@@ -280,7 +321,7 @@ public class DriveTrain extends SubsystemModule {
 				if (Math.abs(controlsProcessor.getRightJoystick()) > .15)
 					pivot = controlsProcessor.getRightJoystick();
 
-				closedLoopArcade(-power * maxVelocity, -pivot, maxAcceleration);
+				arcadeDrive(-power, pivot, 0.04, 0.08);
 
 				//System.out.println("Odometer heading angle " + odometer.getHeadingAngle());
 			}
@@ -402,7 +443,6 @@ public class DriveTrain extends SubsystemModule {
 				double y2 = lInitial * Math.sin(thetaInitial) + yInitial; 
 				double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal; 
 
-				
 				drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
 						Double.parseDouble(this.args[8]), Double.parseDouble(this.args[9]),
 						Double.parseDouble(this.args[10]), Double.parseDouble(this.args[11]), true);
