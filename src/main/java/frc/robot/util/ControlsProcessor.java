@@ -164,7 +164,7 @@ public abstract class ControlsProcessor extends Thread {
 	public void cancelAll() {
 		controllers.forEach((k, v) -> {
 			v.registeredCommands.forEach((k1, v1) -> {
-				v1.cancel();
+				if(v1.running) { v1.cancel(); }
 			});
 		});
 	}

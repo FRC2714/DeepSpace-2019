@@ -301,6 +301,7 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 				driverControlled = true;
+				// System.out.println("Right Encoder: " + rightShaftEncoder.getDistance() + "\tLeft Encoder: " + leftShaftEncoder.getDistance());
 			}
 
 			@Override
