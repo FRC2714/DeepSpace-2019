@@ -245,7 +245,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 		}
 
-		System.out.println("Current Arcade Power: " + currentOpenArcadePower + "\tCurrent Arcade Pivot: " + currentOpenArcadePivot);
+		// System.out.println("Current Arcade Power: " + currentOpenArcadePower + "\tCurrent Arcade Pivot: " + currentOpenArcadePivot);
 		arcadeDrive(currentOpenArcadePower, pivot);
 	}
 
@@ -309,7 +309,7 @@ public class DriveTrain extends SubsystemModule {
 				if (Math.abs(controlsProcessor.getRightJoystick()) > 0.1)
 					pivot = controlsProcessor.getRightJoystick();
 
-				arcadeDrive(-power, pivot * 0.75, 0.01, 0.025);
+				arcadeDrive(-power, pivot, 0.04, 0.08);
 
 				//System.out.println("Odometer heading angle " + odometer.getHeadingAngle());
 			}
