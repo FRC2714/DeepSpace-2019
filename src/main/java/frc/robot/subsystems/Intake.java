@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
 import edu.wpi.first.wpilibj.Servo;
 import frc.robot.util.SubsystemCommand;
 import frc.robot.util.SubsystemModule;

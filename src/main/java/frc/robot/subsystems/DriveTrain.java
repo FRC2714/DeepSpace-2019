@@ -361,7 +361,8 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void execute() {
 //				getEncoderValues();
-				System.out.println(odometer.getHeadingAngle());
+				//System.out.println(odometer.getHeadingAngle());
+				//System.out.println(odometer.getCurrentX() + " : " + odometer.getCurrentY());
 				//System.out.println(navX.getYaw());
 			}
 
@@ -527,7 +528,6 @@ public class DriveTrain extends SubsystemModule {
 			double initialX;
 			double initialY;
 			double theta1;
-			double tanTheta1;
 
 			@Override
 			public void initialize() {
@@ -542,8 +542,6 @@ public class DriveTrain extends SubsystemModule {
 					theta1 -= 360;
 				else if (theta1 < 0)
 					theta1 += 360;
-
-				tanTheta1 = Math.tan(Math.toRadians(theta1));
 
 				// //Stage 1	
 				// 	double currentX = odometer.getCurrentX();
@@ -561,10 +559,6 @@ public class DriveTrain extends SubsystemModule {
 				// 	NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
 				// 	double rightAngle = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
 				// 	double angleDifference = rightAngle - centerAngle;
-
-			
-				
-
 
 				// NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
 				// NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
@@ -599,8 +593,6 @@ public class DriveTrain extends SubsystemModule {
 				// double customHypotenuse = Math.sqrt(Math.pow(customY, 2) + Math.pow(limelightX, 2));
 
 				// double customTheta = Math.atan(limelightX/customY);
-				// double cameraXOffset = 1.25*Math.cos(Math.toRadians(odometer.getHeadingAngle()));
-				// double cameraYOffset = -1.25*Math.sin(Math.toRadians(odometer.getHeadingAngle()));
 
 
 				// double xFinal = customHypotenuse*Math.cos(Math.toRadians(odometer.getHeadingAngle()) + customTheta) + odometer.getCurrentX() + cameraXOffset;
@@ -629,9 +621,19 @@ public class DriveTrain extends SubsystemModule {
 
 				double theta2 = odometer.getHeadingAngle() - NetworkTableInstance.getDefault().
 								getTable("limelight").getEntry("tx").getDouble(0);
+
+				if (theta2 > 360)
+					theta2 -= 360;
+				else if (theta2 < 0)
+					theta2 += 360;
+
+				double num1 = deltaY*Math.cos(Math.toRadians(theta1));
+				double num2 = deltaX*Math.sin(Math.toRadians(theta1));
+				double denom1 = Math.sin(Math.toRadians(theta1))*Math.cos(Math.toRadians(theta2));
+				double denom2 = Math.sin(Math.toRadians(theta2))*Math.cos(Math.toRadians(theta2));
 				
-				double l2 = (deltaY - tanTheta1*deltaX) / (Math.sin(Math.toRadians(theta2)) - tanTheta1*Math.cos(Math.toRadians(theta2)));
-				System.out.println(deltaX + " : " + deltaY);
+				double l2 =  (num1 - num2) / (denom1 - denom2);
+				System.out.println("l2: " + l2);
 			}
 
 			@Override

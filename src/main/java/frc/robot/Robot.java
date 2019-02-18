@@ -120,7 +120,7 @@ public class Robot extends TimedRobot {
 				// append("servo1 -p 0", this.x);
 				// append("servo2 -p 0", this.y);
 
-				append("drive_to_target -s 3", this.leftStick);
+				append("drive_to_target -p 3", this.leftStick);
 				append("debug_print -p", this.rb);
 
 				// // Toggle end game
