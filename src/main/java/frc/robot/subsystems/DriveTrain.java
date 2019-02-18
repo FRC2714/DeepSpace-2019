@@ -5,6 +5,7 @@ import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
@@ -362,7 +363,7 @@ public class DriveTrain extends SubsystemModule {
 			public void execute() {
 //				getEncoderValues();
 				//System.out.println(odometer.getHeadingAngle());
-				//System.out.println(odometer.getCurrentX() + " : " + odometer.getCurrentY());
+				System.out.println(odometer.getCurrentX() + " : " + odometer.getCurrentY());
 				//System.out.println(navX.getYaw());
 			}
 
@@ -532,6 +533,13 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 
+				lMotor0.setIdleMode(IdleMode.kCoast);
+				rMotor0.setIdleMode(IdleMode.kCoast); 
+
+				lMotor0.set(0);    
+				rMotor0.set(0);
+
+
 				initialX = odometer.getCurrentX();
 				initialY = odometer.getCurrentY();
 
@@ -613,7 +621,7 @@ public class DriveTrain extends SubsystemModule {
 								
 				// enable();
 			}
-
+			double l2;
 			@Override
 			public void execute() {
 				double deltaX = odometer.getCurrentX() - initialX;
@@ -630,10 +638,10 @@ public class DriveTrain extends SubsystemModule {
 				double num1 = deltaY*Math.cos(Math.toRadians(theta1));
 				double num2 = deltaX*Math.sin(Math.toRadians(theta1));
 				double denom1 = Math.sin(Math.toRadians(theta1))*Math.cos(Math.toRadians(theta2));
-				double denom2 = Math.sin(Math.toRadians(theta2))*Math.cos(Math.toRadians(theta2));
+				double denom2 = Math.sin(Math.toRadians(theta2))*Math.cos(Math.toRadians(theta1));
 				
-				double l2 =  (num1 - num2) / (denom1 - denom2);
-				System.out.println("l2: " + l2);
+				l2 =  (num1 - num2) / (denom1 - denom2);
+				System.out.println(theta1 + " : " + theta2 + " ; " + deltaX + " : " + deltaY);
 			}
 
 			@Override
@@ -643,6 +651,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
+				System.out.println("l2: " + l2);
 			}
 		};
 
