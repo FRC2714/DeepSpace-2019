@@ -381,27 +381,23 @@ public class Arm extends SubsystemModule {
 		};
 
 
-		new SubsystemCommand(this.registeredCommands, "cargo_station_position") {
+		new SubsystemCommand(this.registeredCommands, "station_position") {
 			int iterator;
 
 			@Override
 			public void initialize() {
 				giveUp = false;
 
-				intake.setAtPosition(false);
+				shoulderPathFinished = false;
+				wristPathFinished = false;
 
-				if (!intake.getHatchState()) {
-					shoulderPathFinished = false;
-					wristPathFinished = false;
+				shoulderPath = generatePath(currentShoulderAngle, 1,
+						armMaxVelocity, armAcceleration, armJerk);
 
-					shoulderPath = generatePath(currentShoulderAngle, 1,
-							armMaxVelocity, armAcceleration, armJerk);
+				wristPath = generatePath(currentWristAngle, 76,
+						armMaxVelocity, armAcceleration, armJerk);
 
-					wristPath = generatePath(currentWristAngle, 76,
-							armMaxVelocity, armAcceleration, armJerk);
-
-					iterator = 0;
-				}
+				iterator = 0;
 			}
 
 			@Override
@@ -431,55 +427,6 @@ public class Arm extends SubsystemModule {
 
 				bumperPosition = true;
 				intake.setAtPosition(true);
-			}
-		};
-
-
-		new SubsystemCommand(this.registeredCommands, "hatch_station_position") {
-			int iterator;
-
-			@Override
-			public void initialize() {
-				giveUp = false;
-
-				if (!intake.getHatchState() && !intake.getCargoState()) {
-					shoulderPathFinished = false;
-					wristPathFinished = false;
-
-					shoulderPath = generatePath(currentShoulderAngle, 1,
-							armMaxVelocity, armAcceleration, armJerk);
-
-					wristPath = generatePath(currentWristAngle, 76,
-							armMaxVelocity, armAcceleration, armJerk);
-
-					iterator = 0;
-				}
-			}
-
-			@Override
-			public void execute() {
-				iterator++;
-
-				if (iterator < shoulderPath.size())
-					setShoulderAngle(shoulderPath.get(iterator));
-				else
-					shoulderPathFinished = true;
-				
-				if (iterator < wristPath.size())
-					setWristAngle(wristPath.get(iterator));
-				else
-					wristPathFinished = true;
-			}
-
-			@Override
-			public boolean isFinished() {
-				return shoulderPathFinished && wristPathFinished;
-			}
-
-			@Override
-			public void end() {
-				shoulderPath = new ArrayList<Double>(0);
-				wristPath = new ArrayList<Double>(0);
 			}
 		};
 
@@ -677,10 +624,10 @@ public class Arm extends SubsystemModule {
 					shoulderPathFinished = false;
 					wristPathFinished = false;
 					
-					shoulderPath = generatePath(currentShoulderAngle, 155,
+					shoulderPath = generatePath(currentShoulderAngle, 126,
 							armMaxVelocity, armAcceleration, armJerk);
 
-					wristPath = generatePath(currentWristAngle, 90,
+					wristPath = generatePath(currentWristAngle, 58,
 							armMaxVelocity, armAcceleration, armJerk);
 
 					iterator = 0;
@@ -775,6 +722,8 @@ public class Arm extends SubsystemModule {
 				}
 
 				if(intake.getHatchState() || intake.getCargoState()) { giveUp = true; }
+
+				bumperPosition = false;
 			}
 			
 			@Override
@@ -792,7 +741,6 @@ public class Arm extends SubsystemModule {
 				intake.hatchplateIn();
 				intake.cargoMotor.set(0);
 				intake.clearStates();
-				bumperPosition = false;
 			}
 		};
 
