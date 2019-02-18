@@ -76,9 +76,8 @@ public class DriveTrain extends SubsystemModule {
 	private ControlsProcessor controlsProcessor;
 
 	// Gearbox encoders
-	//private Encoder leftEncoder = new Encoder(RobotMap.p_leftEncoderA, RobotMap.p_leftEncoderB, true, EncodingType.k4X);
-	//private Encoder rightEncoder = new Encoder(RobotMap.p_rightEncoderA, RobotMap.p_rightEncoderB, true,
-	//		EncodingType.k4X);
+	private Encoder leftEncoder = new Encoder(RobotMap.p_leftEncoderA, RobotMap.p_leftEncoderB, true, EncodingType.k4X);
+	private Encoder rightEncoder = new Encoder(RobotMap.p_rightEncoderA, RobotMap.p_rightEncoderB, true, EncodingType.k4X);
 
 	// NavX gyro
 	private AHRS navX = new AHRS(SPI.Port.kMXP);
@@ -259,6 +258,7 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 				driverControlled = true;
+				System.out.println("Right Encoder: " + rightEncoder.getDistance() + "\tLeft Encoder: " + leftEncoder.getDistance());
 			}
 
 			@Override

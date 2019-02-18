@@ -111,11 +111,13 @@ public class Robot extends TimedRobot {
 
 				// Game Piece Override
 				append("cargo_true -p", this.launchpad.getButtonInstance(8, 1));
-				append("hatch_station_true -p", this.launchpad.getButtonInstance(8, 2));
-				append("hatch_floor_true -p", this.launchpad.getButtonInstance(8, 3));
+				append("hatch_true -p", this.launchpad.getButtonInstance(8, 3));
 
 				// Toggle driver control
 				append("driver_control -p", this.rightStick);
+				// append("get_arm_position -s", this.rb);
+
+				// append("go_to_position -p 126,58", this.a);
 
 				append("intake_stop -s", this.launchpad.getButtonInstance(0, 0));
 				// append("servo2 -p 0", this.b);
@@ -146,15 +148,14 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void disabledInit() {
-		drivetrain.destruct();
-		arm.destruct();
-		Scheduler.getInstance().removeAll();
-
 		if (controlsProcessor != null) {
 			controlsProcessor.cancelAll();
 			controlsProcessor.disable();
 		}
 
+		drivetrain.destruct();
+		arm.destruct();
+		Scheduler.getInstance().removeAll();
 	}
 
 	/**

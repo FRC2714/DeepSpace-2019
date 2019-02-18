@@ -21,9 +21,9 @@ public class Intake extends SubsystemModule {
 	private Servo valveServo2 = new Servo(2);
 
 	// Maximum currents for cargo and hatch intakes
-	private double cargoCurrentThreshold = 30;
-	private double hatchCurrentThreshold = 10;
-	private double pumpCurrentDiffrence = 1; // 3.125 for two
+	private final double cargoCurrentThreshold = 30;
+	private final double hatchCurrentThreshold = 10;
+	private final double pumpCurrentDiffrence = 1; // 3.125 for two
 
 	// Pump state values
 	private double pumpStateFirstAvg;
@@ -36,26 +36,22 @@ public class Intake extends SubsystemModule {
 	private ArrayList<Double> pumpCurrents;
 
 	// Average current
-	private double cargoAverageCurrent = 0;
-	private double hatchAverageCurrent = 0;
-	private double pumpAverageCurrent = 0;
+	private double cargoAverageCurrent;
+	private double hatchAverageCurrent;
+	private double pumpAverageCurrent;
 
 	// Number of current values stored
-	private int numberOfCargoCurrents = 50;
-	private int numberOfHatchCurrents = 50;
-	private int numberOfPumpCurrents = 100;
+	private final int numberOfCargoCurrents = 50;
+	private final int numberOfHatchCurrents = 50;
+	private final int numberOfPumpCurrents = 100;
 
 	// Intake States - Public so Arm can access the states for state-based logic
-	private boolean cargoState = false;
-	private boolean hatchState = false;
-	private boolean pumpState = false;
-
-	// Hatch intake types
-	private boolean hatchFloor = false;
-	private boolean hatchStation = false;
+	private boolean cargoState;
+	private boolean hatchState;
+	private boolean pumpState;
 
 	// Intake position
-	private boolean atPosition = false;
+	private boolean atPosition;
 
     public Intake() { 
 		registerCommands(); // Puts commands onto the hashmap
@@ -131,9 +127,6 @@ public class Intake extends SubsystemModule {
 		cargoState = false;
 		hatchState = false;
 		pumpState = false;
-
-		hatchFloor = false;
-		hatchStation = false;
 	}
 
 	/**
@@ -208,14 +201,6 @@ public class Intake extends SubsystemModule {
 		return pumpState;
 	}
 
-	public boolean getHatchFloor() {
-		return hatchFloor;
-	}
-
-	public boolean getHatchStation() {
-		return hatchStation;
-	}
-
 	public void setAtPosition(boolean atPosition) {
 		this.atPosition = atPosition;
 	}
@@ -241,8 +226,6 @@ public class Intake extends SubsystemModule {
 				hatchState = false;
 				pumpState = false;
 
-				hatchFloor = false;
-				hatchStation = false;
 				System.out.println("Override cargo");
 			}
 
@@ -258,16 +241,13 @@ public class Intake extends SubsystemModule {
 			public void end() {}
 		};
 
-		new SubsystemCommand(this.registeredCommands, "hatch_station_true") {
+		new SubsystemCommand(this.registeredCommands, "hatch_true") {
 
 			@Override
 			public void initialize() {
 				cargoState = false;
 				hatchState = false;
 				pumpState = true;
-				
-				hatchFloor = false;
-				hatchStation = true;
 				System.out.println("Override hatch station");
 			}
 
@@ -290,9 +270,6 @@ public class Intake extends SubsystemModule {
 				cargoState = false;
 				hatchState = false;
 				pumpState = true;
-				
-				hatchFloor = true;
-				hatchStation = false;
 				System.out.println("Override hatch floor");
 			}
 
@@ -404,15 +381,8 @@ public class Intake extends SubsystemModule {
 			public void end() {
 				pumpMotor.set(0);
 
-				if(!cargoState) {
-					cargoMotor.set(0);
-				}
-				else if (pumpState) {
-					hatchState = false;
-
-					hatchFloor = true;
-					hatchStation = false;
-				}
+				if(!cargoState) { cargoMotor.set(0); }
+				else if(pumpState) { hatchState = false; }
 			}
 		};
 
@@ -444,11 +414,6 @@ public class Intake extends SubsystemModule {
 			public void end() {
 				cargoMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 				pumpMotor.set(0);
-
-				if (pumpState) {
-					hatchFloor = false;
-					hatchStation = true;
-				}
 			}
 		};
 
@@ -505,6 +470,15 @@ public class Intake extends SubsystemModule {
 		hatchCurrents = new ArrayList<Double>(0);
 		pumpCurrents = new ArrayList<Double>(0);
 
+		cargoAverageCurrent = 0;
+		hatchAverageCurrent = 0;
+		pumpAverageCurrent = 0;
+
+		cargoState = false;
+		hatchState = false;
+		pumpState = false;
+
+		atPosition = false;
 		pumpStateIsFirstAvg = true;
 	}
 
