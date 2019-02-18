@@ -70,23 +70,23 @@ public class Robot extends TimedRobot {
 				append("hatch_floor_intake -s", this.launchpad.getButtonInstance(4, 8));
 
 				// Intake cargo from station
-				append("cargo_station_position -p", this.launchpad.getButtonInstance(0, 4));
+				append("station_position -p", this.launchpad.getButtonInstance(0, 4));
 				append("cargo_intake -s", this.launchpad.getButtonInstance(0, 4));
-				append("cargo_station_position -p", this.launchpad.getButtonInstance(0, 5));
+				append("station_position -p", this.launchpad.getButtonInstance(0, 5));
 				append("cargo_intake -s", this.launchpad.getButtonInstance(0, 5));
-				append("cargo_station_position -p", this.launchpad.getButtonInstance(1, 4));
+				append("station_position -p", this.launchpad.getButtonInstance(1, 4));
 				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 4));
-				append("cargo_station_position -p", this.launchpad.getButtonInstance(1, 5));
+				append("station_position -p", this.launchpad.getButtonInstance(1, 5));
 				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 5));
 
 				// Intake hatch from station
-				append("hatch_station_position -p", this.launchpad.getButtonInstance(3, 4));
+				append("station_position -p", this.launchpad.getButtonInstance(3, 4));
 				append("hatch_station_intake -s", this.launchpad.getButtonInstance(3, 4));
-				append("hatch_station_position -p", this.launchpad.getButtonInstance(3, 5));
+				append("station_position -p", this.launchpad.getButtonInstance(3, 5));
 				append("hatch_station_intake -s", this.launchpad.getButtonInstance(3, 5));
-				append("hatch_station_position -p", this.launchpad.getButtonInstance(4, 4));
+				append("station_position -p", this.launchpad.getButtonInstance(4, 4));
 				append("hatch_station_intake -s", this.launchpad.getButtonInstance(4, 4));
-				append("hatch_station_position -p", this.launchpad.getButtonInstance(4, 5));
+				append("station_position -p", this.launchpad.getButtonInstance(4, 5));
 				append("hatch_station_intake -s", this.launchpad.getButtonInstance(4, 5));
 
 				// Score positions
