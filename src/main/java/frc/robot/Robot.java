@@ -5,10 +5,8 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.autontasks.*;
 import frc.robot.subsystems.Arm;
-import frc.robot.autontasks.DelayAutonTesterTask;
-import frc.robot.autontasks.LeftCargoHatchAuton;
-import frc.robot.autontasks.LeftRocketHatchAuton;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.util.AutonTask;
 import frc.robot.util.ControlsProcessor;
@@ -116,6 +114,7 @@ public class Robot extends TimedRobot {
 
 				// Toggle driver control
 				append("driver_control -p", this.rightStick);
+				append("debug_print -p", this.leftStick);
 
 				append("intake_stop -s", this.launchpad.getButtonInstance(0, 0));
 				// append("servo2 -p 0", this.b);
@@ -171,9 +170,14 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousInit() {
 		generalInit();
+		
+		AutonTask leftRocket = new LeftRocketHatchAuton(controlsProcessor);
 		AutonTask leftCargo = new LeftCargoHatchAuton(controlsProcessor);
+		AutonTask rightRocket = new RightRocketHatchAuton(controlsProcessor);
+		AutonTask rightCargo = new RightCargoHatchAuton(controlsProcessor);
+		AutonTask test123 = new test1(controlsProcessor);
 
-		leftCargo.run();
+		test123.run();
 	}
 
 	/**
