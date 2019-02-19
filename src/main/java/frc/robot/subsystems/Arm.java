@@ -42,7 +42,7 @@ public class Arm extends SubsystemModule {
 	// PID coefficients
 	private final double sMinOutput = -1;
 	private final double sMaxOutput = 1;
-	private final double sP = 0.014; // 0.014
+	private final double sP = 0.01; // 0.014
 	private final double sI = 0.0;
 	private final double sD = 0.006;
 	
@@ -343,10 +343,10 @@ public class Arm extends SubsystemModule {
 					shoulderPathFinished = false;
 					wristPathFinished = false;
 
-					shoulderPath = generatePath(currentShoulderAngle, 13,
+					shoulderPath = generatePath(currentShoulderAngle, 20,
 							armMaxVelocity, armAcceleration, armJerk);
 
-					wristPath = generatePath(currentWristAngle, 182,
+					wristPath = generatePath(currentWristAngle, 216,
 							armMaxVelocity, armAcceleration, armJerk);
 
 					iterator = 0;
