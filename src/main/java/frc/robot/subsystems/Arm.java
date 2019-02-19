@@ -343,7 +343,7 @@ public class Arm extends SubsystemModule {
 					shoulderPathFinished = false;
 					wristPathFinished = false;
 
-					shoulderPath = generatePath(currentShoulderAngle, 13,
+					shoulderPath = generatePath(currentShoulderAngle, 22,
 							armMaxVelocity, armAcceleration, armJerk);
 
 					wristPath = generatePath(currentWristAngle, 182,
@@ -446,10 +446,10 @@ public class Arm extends SubsystemModule {
 				shoulderPathFinished = false;
 				wristPathFinished = false;
 
-				shoulderPath = generatePath(currentShoulderAngle, 26,
+				shoulderPath = generatePath(currentShoulderAngle, 1,
 						armMaxVelocity, armAcceleration, armJerk);
 
-				wristPath = generatePath(currentWristAngle, 100,
+				wristPath = generatePath(currentWristAngle, 76,
 						armMaxVelocity, armAcceleration, armJerk);
 
 				iterator = 0;
