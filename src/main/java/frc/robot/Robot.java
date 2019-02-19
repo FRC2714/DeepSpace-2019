@@ -48,23 +48,23 @@ public class Robot extends TimedRobot {
 				append("start_position -p", this.launchpad.getButtonInstance(4, 2));
 
 				// Intake cargo from ground
-				append("floor_position -p", this.launchpad.getButtonInstance(0, 7));
+				append("floor_cargo_position -p", this.launchpad.getButtonInstance(0, 7));
 				append("cargo_intake -s", this.launchpad.getButtonInstance(0, 7));
-				append("floor_position -p", this.launchpad.getButtonInstance(0, 8));
+				append("floor_cargo_position -p", this.launchpad.getButtonInstance(0, 8));
 				append("cargo_intake -s", this.launchpad.getButtonInstance(0, 8));
-				append("floor_position -p", this.launchpad.getButtonInstance(1, 7));
+				append("floor_cargo_position -p", this.launchpad.getButtonInstance(1, 7));
 				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 7));
-				append("floor_position -p", this.launchpad.getButtonInstance(1, 8));
+				append("floor_cargo_position -p", this.launchpad.getButtonInstance(1, 8));
 				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 8));
 
 				// Intake hatch from ground
-				append("floor_position -p", this.launchpad.getButtonInstance(3, 7));
+				append("floor_hatch_position -p", this.launchpad.getButtonInstance(3, 7));
 				append("hatch_floor_intake -s", this.launchpad.getButtonInstance(3, 7));
-				append("floor_position -p", this.launchpad.getButtonInstance(3, 8));
+				append("floor_hatch_position -p", this.launchpad.getButtonInstance(3, 8));
 				append("hatch_floor_intake -s", this.launchpad.getButtonInstance(3, 8));
-				append("floor_position -p", this.launchpad.getButtonInstance(4, 7));
+				append("floor_hatch_position -p", this.launchpad.getButtonInstance(4, 7));
 				append("hatch_floor_intake -s", this.launchpad.getButtonInstance(4, 7));
-				append("floor_position -p", this.launchpad.getButtonInstance(4, 8));
+				append("floor_hatch_position -p", this.launchpad.getButtonInstance(4, 8));
 				append("hatch_floor_intake -s", this.launchpad.getButtonInstance(4, 8));
 
 				// Intake cargo from station
@@ -113,10 +113,10 @@ public class Robot extends TimedRobot {
 
 				// Toggle driver control
 				append("driver_control -p", this.rightStick);
-				// append("get_arm_position -s", this.rb);
+				append("get_arm_position -s", this.rb);
 
 				// append("go_to_position -p 126,58", this.a);
-				append("debug_print -p", this.leftStick);
+				// append("debug_print -p", this.leftStick);
 
 				append("intake_stop -s", this.launchpad.getButtonInstance(0, 0));
 				// append("servo2 -p 0", this.b);
