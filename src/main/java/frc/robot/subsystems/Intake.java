@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 
 import edu.wpi.first.wpilibj.Servo;
 import frc.robot.util.SubsystemCommand;
@@ -55,6 +56,12 @@ public class Intake extends SubsystemModule {
 
     public Intake() { 
 		registerCommands(); // Puts commands onto the hashmap
+
+		cargoMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
+		cargoMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 5);
+
+		pumpMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
+		pumpMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 5);
 	}
 
 	/**
@@ -248,7 +255,7 @@ public class Intake extends SubsystemModule {
 				cargoState = false;
 				hatchState = false;
 				pumpState = true;
-				
+
 				System.out.println("Override hatch station");
 			}
 
