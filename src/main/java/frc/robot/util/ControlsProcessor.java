@@ -2,7 +2,6 @@ package frc.robot.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import frc.robot.RobotMap;
@@ -199,27 +198,27 @@ public abstract class ControlsProcessor extends Thread {
 		// TODO: Test time delay
 		if (this.commandQueue.size() > 0 && (this.commandQueue.get(0).type().equals(CommandDetails.CommandType.PARALLEL)
 				|| this.commandQueue.get(0).type().equals(CommandDetails.CommandType.TIMEDELAY))) {
-			System.out.println(this.commandQueue.get(0).name());
+			System.out.println("parallel" + this.commandQueue.get(0).name());
 			callCommand(this.commandQueue.get(0));
 			this.commandQueue.remove(0);
 		}
 
 		// Checks to see if there are any commands currently running, and if there, it exits the method
 		// This would prevent any sequential commands from running
-				
-		controllers.forEach((k, v) -> {
-			v.registeredCommands.forEach((a,b) -> {
-				if (b.running)
+		for(java.util.Map.Entry<String, SubsystemModule> sub : controllers.entrySet()) {
+			for(java.util.Map.Entry<String, SubsystemCommand> cmds : sub.getValue().registeredCommands.entrySet()) {
+				if (cmds.getValue().running) {
 					return;
-			});
-		});
+				}
+			}
+		}
 
 		/**
 		 * If it is a sequential command, we can clear the list and then we add
 		 * the next sequential command.
 		 */
 		if (this.commandQueue.size() > 0 && (this.commandQueue.get(0).type().equals(CommandDetails.CommandType.SERIES))) {
-			// System.out.println(this.commandQueue.get(0).name());
+			System.out.println("series" + this.commandQueue.get(0).name());
 			callCommand(this.commandQueue.get(0));
 			this.commandQueue.remove(0);
 		}
