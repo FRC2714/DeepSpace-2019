@@ -168,13 +168,13 @@ public class Intake extends SubsystemModule {
 			else {
 				if(pumpStateCounter > 10 && pumpStateIsFirstAvg) {
 					pumpStateFirstAvg = pumpAverageCurrent;
-					System.out.println("First CD: " + pumpStateFirstAvg);
+					//System.out.println("First CD: " + pumpStateFirstAvg);
 					pumpStateIsFirstAvg = false;
 				}
 
 				pumpStateCounter++;
 
-				System.out.println("Current: " + pumpAverageCurrent);
+				//System.out.println("Current: " + pumpAverageCurrent);
 				pumpAverageCurrent += (pumpCurrents.get(0) - pumpCurrents.get(pumpCurrents.size() - 1)) / numberOfPumpCurrents;
 				pumpCurrents.remove(pumpCurrents.size() - 1);
 

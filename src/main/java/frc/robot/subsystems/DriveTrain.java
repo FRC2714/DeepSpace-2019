@@ -14,6 +14,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import frc.robot.RobotMap;
 import frc.robot.util.ControlsProcessor;
@@ -404,7 +405,7 @@ public class DriveTrain extends SubsystemModule {
 			public void execute() {
 //				getEncoderValues();
 				//System.out.println(odometer.getHeadingAngle());
-				System.out.println(odometer.getCurrentX() + " : " + odometer.getCurrentY());
+				//System.out.println(odometer.getCurrentX() + " : " + odometer.getCurrentY());
 				//System.out.println(navX.getYaw());
 			}
 
@@ -518,6 +519,7 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 				enable();
+				System.out.println("starting path");
 			}
 
 			@Override
@@ -732,6 +734,30 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 		*/
+
+		new SubsystemCommand(this.registeredCommands, "wait") {
+
+			Timer waitTimer = new Timer();
+			@Override
+			public void initialize() {
+				waitTimer.reset();
+				waitTimer.start();
+				
+			}
+
+			@Override
+			public void execute() {
+			}
+
+			@Override
+			public boolean isFinished() {
+				return waitTimer.get() > Double.parseDouble(this.args[0]);
+			}
+
+			@Override
+			public void end() {
+			}
+		};
 	}
 
 }

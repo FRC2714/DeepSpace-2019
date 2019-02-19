@@ -15,9 +15,11 @@ public class PickupAutonHatch extends AutonTask {
 		queueTask("add_forwards_spline -s -4,12,270,4,-6.75,-2.5,270,5,10,5,0,0");
 
 
-		queueTask("go_to_position -s 26,100");
+		queueTask("station_position -s");
 		queueTask("hatch_station_intake -t 4");
 		queueTask("start_path -s");
+		queueTask("wait -s 5");
+
 
 		// queueTask("add_backwards_spline -s -6.75,-2.5,270,5,-6.75,3,270,3,10,5,0,0");
 		// queueTask("start_path -t ");

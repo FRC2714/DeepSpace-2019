@@ -18,7 +18,6 @@ public abstract class ControlsProcessor extends Thread {
 
 	private HashMap<String, SubsystemModule> controllers = new HashMap<String, SubsystemModule>();
 	private ArrayList<CommandDetails> commandQueue = new ArrayList<CommandDetails>();
-	private ArrayList<String> runningCommands = new ArrayList<String>();
 
 	private int commandDivider;
 	private int counter = 0;
@@ -70,6 +69,19 @@ public abstract class ControlsProcessor extends Thread {
 		registerOperatorControls();
 	}
 
+	public void connectButtonPad(){
+		if(!launchpad.isOpen()){
+			try {
+				launchpad.connect();
+			} catch (Exception e) {
+				System.out.println("Websocket connection failure");
+			}
+		}
+		else {
+			System.out.println("Websocket connected");
+		}	
+
+	}
 	/**
 	 * Function to add the subsystem into the collection
 	 * All the runs are added and called periodically
@@ -84,6 +96,8 @@ public abstract class ControlsProcessor extends Thread {
 	 * Runs periodically as required by extension of Java Thread
 	 */
 	public void run() {
+
+		connectButtonPad();
 		double timestamp = System.nanoTime();
 
 		// Runs even when robot is disabled
@@ -192,15 +206,13 @@ public abstract class ControlsProcessor extends Thread {
 
 		// Checks to see if there are any commands currently running, and if there, it exits the method
 		// This would prevent any sequential commands from running
-		if (this.runningCommands != null) {
-			this.runningCommands.forEach(i -> {
-				controllers.forEach((k, v) -> {
-					SubsystemCommand foundCommand = v.registeredCommands.get(i);
-					if (foundCommand != null && foundCommand.running)
-						return;
-				});
+				
+		controllers.forEach((k, v) -> {
+			v.registeredCommands.forEach((a,b) -> {
+				if (b.running)
+					return;
 			});
-		}
+		});
 
 		/**
 		 * If it is a sequential command, we can clear the list and then we add
