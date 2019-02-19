@@ -758,6 +758,52 @@ public class DriveTrain extends SubsystemModule {
 			public void end() {
 			}
 		};
+
+		new SubsystemCommand(this.registeredCommands, "vision_align"){
+			@Override
+			public void initialize() {
+				// driverControlled = false;
+				NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
+				NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
+
+				System.out.println("initializing");
+			}
+
+			@Override
+			public void execute() {
+				double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+				double kP = 0.7;
+
+				double power = 0;
+				double pivot = tx * kP;
+
+				if (Math.abs(controlsProcessor.getLeftJoystick()) > .10)
+					power = -controlsProcessor.getLeftJoystick();
+
+
+				closedLoopArcade(power*(maxVelocity/2), -pivot);
+
+				if (tx > 0){
+					System.out.println("Turning Right Pivot: " + pivot);
+					closedLoopTank((power * maxVelocity) + pivot, (power * maxVelocity));
+				} else if (tx < 0){
+					System.out.println("Turning Left Pivot: " + pivot);
+					closedLoopTank((power * maxVelocity), (power * maxVelocity) - pivot);
+				}
+
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {
+			}
+		};
+		
 	}
 
 }
