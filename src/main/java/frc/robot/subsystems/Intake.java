@@ -248,29 +248,8 @@ public class Intake extends SubsystemModule {
 				cargoState = false;
 				hatchState = false;
 				pumpState = true;
+				
 				System.out.println("Override hatch station");
-			}
-
-			@Override
-			public void execute() {}
-
-			@Override
-			public boolean isFinished() {
-				return true;
-			}
-
-			@Override
-			public void end() {}
-		};
-
-		new SubsystemCommand(this.registeredCommands, "hatch_floor_true") {
-
-			@Override
-			public void initialize() {
-				cargoState = false;
-				hatchState = false;
-				pumpState = true;
-				System.out.println("Override hatch floor");
 			}
 
 			@Override
