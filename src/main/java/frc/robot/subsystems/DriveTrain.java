@@ -396,7 +396,7 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void execute() {
 //				getEncoderValues();
-				System.out.println(odometer.getHeadingAngle());
+				// System.out.println(odometer.getHeadingAngle());
 				//System.out.println(navX.getYaw());
 			}
 
