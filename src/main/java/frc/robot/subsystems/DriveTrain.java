@@ -403,7 +403,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void execute() {
-//				getEncoderValues();
+				getEncoderValues();
 				//System.out.println(odometer.getHeadingAngle());
 				//System.out.println(odometer.getCurrentX() + " : " + odometer.getCurrentY());
 				//System.out.println(navX.getYaw());
@@ -772,7 +772,7 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void execute() {
 				double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
-				double kP = 0.7;
+				double kP = 0.06;
 
 				double power = 0;
 				double pivot = tx * kP;
@@ -780,16 +780,15 @@ public class DriveTrain extends SubsystemModule {
 				if (Math.abs(controlsProcessor.getLeftJoystick()) > .10)
 					power = -controlsProcessor.getLeftJoystick();
 
-
 				closedLoopArcade(power*(maxVelocity/2), -pivot);
-
-				if (tx > 0){
-					System.out.println("Turning Right Pivot: " + pivot);
-					closedLoopTank((power * maxVelocity) + pivot, (power * maxVelocity));
-				} else if (tx < 0){
-					System.out.println("Turning Left Pivot: " + pivot);
-					closedLoopTank((power * maxVelocity), (power * maxVelocity) - pivot);
-				}
+//
+//				if (tx > 0){
+//					System.out.println("Turning Right Pivot: " + pivot);
+//					closedLoopTank((power * maxVelocity) + pivot, (power * maxVelocity));
+//				} else if (tx < 0){
+//					System.out.println("Turning Left Pivot: " + pivot);
+//					closedLoopTank((power * maxVelocity), (power * maxVelocity) - pivot);
+//				}
 
 
 			}
@@ -801,6 +800,8 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
+				NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(0);
+				closedLoopArcade(0, 0);
 			}
 		};
 		

@@ -59,7 +59,7 @@ public abstract class ControlsProcessor extends Thread {
 		this.commandDivider = commandDivider;
 
 		try {
-			launchpad = new WebsocketButtonPad( new URI( "ws://10.27.14.192:9001" ));
+			launchpad = new WebsocketButtonPad( new URI( "ws://10.27.14.207:9001" ));
 			launchpad.connect();
 		} catch (Exception e) {
 			System.out.println("Websocket failure");
@@ -200,6 +200,7 @@ public abstract class ControlsProcessor extends Thread {
 				|| this.commandQueue.get(0).type().equals(CommandDetails.CommandType.TIMEDELAY))) {
 			System.out.println("parallel" + this.commandQueue.get(0).name());
 			callCommand(this.commandQueue.get(0));
+			System.out.println("Calling Command : " + this.commandQueue.get(0));
 			this.commandQueue.remove(0);
 		}
 

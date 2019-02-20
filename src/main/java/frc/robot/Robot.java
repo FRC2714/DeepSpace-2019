@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -21,8 +22,8 @@ import frc.robot.util.ControlsProcessor;
 public class Robot extends TimedRobot {
 
 	// Initialize subsystems
-	private DriveTrain drivetrain;
 	private Arm arm;
+	private DriveTrain drivetrain;
 
 	// Initialize auton mode selector
 	private Command autonomousCommand;
@@ -75,6 +76,7 @@ public class Robot extends TimedRobot {
 				append("station_position -p", this.launchpad.getButtonInstance(1, 4));
 				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 4));
 				append("station_position -p", this.launchpad.getButtonInstance(1, 5));
+//				append("station_position -p", this.a);
 				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 5));
 
 				// Intake hatch from station
@@ -114,9 +116,11 @@ public class Robot extends TimedRobot {
 				// Toggle driver control
 				append("driver_control -p", this.rightStick);
 				append("get_arm_position -s", this.rb);
+				append("vision_align -s", this.leftStick);
+
 
 				// append("go_to_position -p 126,58", this.a);
-				// append("debug_print -p", this.leftStick);
+				append("debug_print -p", this.lb);
 
 				append("intake_stop -s", this.launchpad.getButtonInstance(0, 0));
 				// append("servo2 -p 0", this.b);
@@ -188,13 +192,16 @@ public class Robot extends TimedRobot {
 	 * Runs periodically during auton
 	 */
 	@Override
-	public void autonomousPeriodic() { Scheduler.getInstance().run(); }
+	public void autonomousPeriodic() {
+		Scheduler.getInstance().run(); }
 
 	/**
 	 * Runs at the start of teleop mode
 	 */
 	@Override
 	public void teleopInit() {
+		NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
+
 		if (autonomousCommand != null)
 			autonomousCommand.cancel();
 
@@ -207,7 +214,9 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
-		//drivetrain.odometer.printEncoderPosition();
+		SmartDashboard.putNumber("Heading Angle", drivetrain.odometer.getHeadingAngle());
+		SmartDashboard.putNumber("X Value", drivetrain.odometer.getCurrentX());
+		SmartDashboard.putNumber("Y Value", drivetrain.odometer.getCurrentY());
 	}
 
 	/**
