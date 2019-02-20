@@ -7,6 +7,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.Spark;
 import frc.robot.util.SubsystemCommand;
 import frc.robot.util.SubsystemModule;
 
@@ -20,6 +21,9 @@ public class Intake extends SubsystemModule {
 	private Servo hatchplateServo = new Servo(0);
 	private Servo valveServo1 = new Servo(1);
 	private Servo valveServo2 = new Servo(2);
+
+	// Blinkin
+	private Spark blinkin = new Spark(0);
 
 	// Maximum currents for cargo and hatch intakes
 	private final double cargoCurrentThreshold = 30;
@@ -123,7 +127,6 @@ public class Intake extends SubsystemModule {
 			}
 		}
 
-		// cargoCurrents.clear();
 		cargoCurrents = new ArrayList<Double>(0);
 		cargoAverageCurrent = 0;
 
@@ -218,6 +221,9 @@ public class Intake extends SubsystemModule {
 		hatchState = checkHatchState();
 		pumpState = checkPumpState();
 
+		if(cargoState || pumpState) { blinkin.set(0.65); }
+		else { blinkin.set(0.99); }
+
 		// if(cargoCurrents.size() >= numberOfCargoCurrents || hatchCurrents.size() >= numberOfHatchCurrents || pumpCurrents.size() >= numberOfPumpCurrents)
 		// 	System.out.println("Cargo Current: " + cargoAverageCurrent + "\tHatch Current: " + hatchAverageCurrent + "\tPump Current: " + pumpAverageCurrent);
     }
@@ -304,6 +310,7 @@ public class Intake extends SubsystemModule {
 			@Override
 			public void initialize() {
 				intaking = false;
+				if(!hatchState) { pumpMotor.set(0); }
 			}
 
 			@Override
@@ -365,8 +372,6 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public void end() {
-				pumpMotor.set(0);
-
 				if(!cargoState) { cargoMotor.set(0); }
 				else if(pumpState) { hatchState = false; }
 			}
@@ -399,7 +404,6 @@ public class Intake extends SubsystemModule {
 			@Override
 			public void end() {
 				cargoMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
-				pumpMotor.set(0);
 			}
 		};
 
@@ -466,6 +470,8 @@ public class Intake extends SubsystemModule {
 
 		atPosition = false;
 		pumpStateIsFirstAvg = true;
+
+		blinkin.set(0.99);
 	}
 
 	@Override
@@ -475,5 +481,7 @@ public class Intake extends SubsystemModule {
 
 		cargoMotor.set(0);
 		pumpMotor.set(0);
+
+		blinkin.set(-0.57);
 	}
 }

@@ -57,6 +57,12 @@ public class Arm extends SubsystemModule {
 	// Initialize PID
 	private PID shoulderPID = new PID(sP, sI, sD);
 	
+	// ArrayLists for tuning PID
+	private ArrayList<Double> truePositions;
+	private ArrayList<Double> desiredPositions;
+
+
+
 	// All angles are in degrees
 	private double wristOffset;
 	private double currentShoulderAngle;
@@ -247,10 +253,12 @@ public class Arm extends SubsystemModule {
 		currentShoulderAngle = shoulderOutputEncoder.getDistance();
 		currentWristAngle = ((wristMotorEncoder.getPosition() / wristRatio) * 360) - wristOffset;
 
+		truePositions.add(currentShoulderAngle);
+		desiredPositions.add(currentShoulderSetpoint);
+
 		if(giveUp) { currentShoulderSetpoint = shoulderOutputEncoder.getDistance(); }
-		
 		shoulderMotor.set(shoulderPID.getOutput(currentShoulderAngle, currentShoulderSetpoint));
-		
+
 		// System.out.println("Shoulder encoder: " + shoulderOutputEncoder.getDistance());
 		// System.out.println("PID Output: " + shoulderPID.getOutput(currentShoulderAngle, currentShoulderSetpoint) + "\tEncoder Distance: " + shoulderOutputEncoder.getDistance());
 	}
@@ -667,7 +675,6 @@ public class Arm extends SubsystemModule {
 		};
 
 
-		//TODO: Positions are wrong for this		
 		new SubsystemCommand(this.registeredCommands, "back_score") {
 			int iterator;
 
@@ -804,6 +811,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void initialize() {
+				giveUp = false;
 				currentWristSetpoint = currentWristAngle;
 			}
 
@@ -828,6 +836,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void initialize() {
+				giveUp = false;
 				currentShoulderSetpoint = currentShoulderAngle;
 				currentWristSetpoint = currentWristAngle;
 			}
@@ -843,9 +852,7 @@ public class Arm extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-				System.out.println("Current Position: " + currentShoulderAngle);
-			}
+			public void end() { }
 		};
     }
 
@@ -868,6 +875,9 @@ public class Arm extends SubsystemModule {
 		shoulderPath = new ArrayList<Double>(0);
 		wristPath = new ArrayList<Double>(0);
 
+		truePositions = new ArrayList<Double>(0);
+		desiredPositions = new ArrayList<Double>(0);
+
 		wristOffset = (wristMotorEncoder.getPosition() / wristRatio) * 360;
 
 		giveUp = false;
@@ -886,6 +896,9 @@ public class Arm extends SubsystemModule {
 
 		shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		wristMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
+
+		System.out.println("True: " + truePositions);
+		System.out.println("Desired: " + desiredPositions);
 		
 		intake.destruct();
 	}
