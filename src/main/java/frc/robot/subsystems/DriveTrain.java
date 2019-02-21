@@ -23,6 +23,7 @@ import frc.robot.util.Odometer;
 import frc.robot.util.SubsystemCommand;
 import frc.robot.util.SubsystemModule;
 
+@SuppressWarnings("Duplicates")
 public class DriveTrain extends SubsystemModule {
 
 	// Drivetrain motors
@@ -802,6 +803,26 @@ public class DriveTrain extends SubsystemModule {
 			public void end() {
 				NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(0);
 				closedLoopArcade(0, 0);
+			}
+		};
+
+		double targetArea = 30;
+		new SubsystemCommand(this.registeredCommands, "auton_vision_align"){
+			@Override
+			public void initialize() {
+				NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
+			}
+
+			@Override
+			public void execute() {
+				double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+
+				double kP = 0.09;
+				double power = 0.5;
+				double pivot = tx * kP;
+
+				closedLoopArcade(0.5 * maxVelocity, -pivot);
+
 			}
 		};
 		

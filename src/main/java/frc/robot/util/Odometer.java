@@ -84,6 +84,7 @@ public abstract class Odometer {
 	 * @param offset Initial offset
 	 */
 	public void setOffset(double offset) {
+
 		startOffset = offset;
 	}
 
@@ -110,4 +111,6 @@ public abstract class Odometer {
 	public void printOdometerPosition() {
 		System.out.println("X: " + current_x + " Y: " + current_y);
 	}
+
+
 }
