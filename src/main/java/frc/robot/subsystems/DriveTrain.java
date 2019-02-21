@@ -806,7 +806,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
-		double targetArea = 30;
+		double maxTargetArea = 30;
 		new SubsystemCommand(this.registeredCommands, "auton_vision_align"){
 			@Override
 			public void initialize() {
@@ -816,12 +816,15 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void execute() {
 				double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+				double blobArea = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
 
 				double kP = 0.09;
 				double power = 0.5;
 				double pivot = tx * kP;
 
-				closedLoopArcade(0.5 * maxVelocity, -pivot);
+				if (blobArea <= maxTargetArea){
+					closedLoopArcade(0.5 * maxVelocity, -pivot);
+				}
 
 			}
 		};
