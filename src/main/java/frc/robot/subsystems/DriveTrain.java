@@ -70,6 +70,10 @@ public class DriveTrain extends SubsystemModule {
 	private double collisionThreshold = 0;
 	private double tippingThreshold = 0;
 
+	private double prevAccelX = 0;
+	private double prevAccelY = 0;
+	private double mPrevTimeAccel = 0;
+
 	// 
 	private double leftEncoderOffset = 0;
 	private double rightEncoderOffset = 0;
@@ -283,6 +287,34 @@ public class DriveTrain extends SubsystemModule {
 	public boolean isTipping() {
 		return Math.abs(navX.getPitch()) > tippingThreshold ||
 				Math.abs(navX.getRoll()) > tippingThreshold;
+	}
+
+	public boolean isCollisionOccurring() {
+		boolean collisionOccurring = false;
+
+		double accelX = navX.getWorldLinearAccelX();
+		double accelY = navX.getWorldLinearAccelY();
+
+
+		double currTime = Timer.getFPGATimestamp();
+		double dt = currTime - mPrevTimeAccel;
+
+		double jerkX = (accelX - prevAccelX) / (dt);
+		double jerkY = (accelY - prevAccelY) / (dt);
+
+		if (Math.abs(jerkX) > collisionThreshold || Math.abs(jerkY) > collisionThreshold)
+			collisionOccurring = true;
+
+		prevAccelX = accelX;
+		prevAccelY = accelY;
+
+		if (mPrevTimeAccel == 0) {
+			mPrevTimeAccel = currTime;
+			return false;
+		}
+
+		mPrevTimeAccel = currTime;
+		return collisionOccurring;
 	}
 
 	// Closed loop arcade based tank
