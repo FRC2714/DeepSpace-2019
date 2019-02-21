@@ -10,7 +10,6 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SPI;
@@ -67,6 +66,9 @@ public class DriveTrain extends SubsystemModule {
 	private final double sensitivity = 2.5;
 	private final double maxVelocity = 13;
 	private final double maxAcceleration = 5;
+
+	private double collisionThreshold = 0;
+	private double tippingThreshold = 0;
 
 	// 
 	private double leftEncoderOffset = 0;
@@ -267,6 +269,20 @@ public class DriveTrain extends SubsystemModule {
 		lPidController.setReference(leftVelocity / rpmToFeet, ControlType.kVelocity);
 		rPidController.setReference(-rightVelocity / rpmToFeet, ControlType.kVelocity);
 		//System.out.println("ls: " + leftVelocity / rpmToFeet + " rs: " + -rightVelocity / rpmToFeet);
+	}
+
+	public synchronized void setCollisionJerkThreshold(double jerkCollisionThreshold) {
+		collisionThreshold = jerkCollisionThreshold;
+	}
+
+	public synchronized void setTippingThreshold(double tippingThreshold) {
+		this.tippingThreshold = tippingThreshold;
+	}
+
+
+	public boolean isTipping() {
+		return Math.abs(navX.getPitch()) > tippingThreshold ||
+				Math.abs(navX.getRoll()) > tippingThreshold;
 	}
 
 	// Closed loop arcade based tank
