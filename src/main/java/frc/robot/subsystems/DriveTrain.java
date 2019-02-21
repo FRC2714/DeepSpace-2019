@@ -773,10 +773,10 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void execute() {
 				double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
-				double kP = 0.06;
+				double kAngleP = 0.06;
 
 				double power = 0;
-				double pivot = tx * kP;
+				double pivot = tx * kAngleP;
 
 				if (Math.abs(controlsProcessor.getLeftJoystick()) > .10)
 					power = -controlsProcessor.getLeftJoystick();
@@ -818,13 +818,15 @@ public class DriveTrain extends SubsystemModule {
 				double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
 				double blobArea = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
 
-				double kP = 0.09;
+				double kAngleP = 0.09;
 				double power = 0.5;
-				double pivot = tx * kP;
+				double pivot = tx * kAngleP;
 
 				if (blobArea <= maxTargetArea){
-					closedLoopArcade(0.5 * maxVelocity, -pivot);
+					closedLoopArcade(power * maxVelocity, -pivot);
 				}
+
+
 
 			}
 		};
