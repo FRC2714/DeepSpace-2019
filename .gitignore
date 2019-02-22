@@ -155,6 +155,10 @@ gradle-app.setting
 .project
 .settings/
 bin/
+.class
+build/
+.build/
+
 
 # IDEA Files
 .idea/

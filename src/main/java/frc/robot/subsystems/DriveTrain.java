@@ -875,8 +875,10 @@ public class DriveTrain extends SubsystemModule {
 				double power = kDistanceDivisor / blobArea;
 				double pivot = tx * kAngleP;
 
+				System.out.println("Power:- " + power);
+
 				if (blobArea <= maxBlobArea) {
-					closedLoopArcade(power * (maxVelocity/2), -pivot);
+//					closedLoopArcade(power * (maxVelocity/2), -pivot);
 				}
 
 			}
