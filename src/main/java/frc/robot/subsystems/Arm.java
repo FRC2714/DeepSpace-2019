@@ -42,7 +42,7 @@ public class Arm extends SubsystemModule {
 	// PID coefficients
 	private final double sMinOutput = -1;
 	private final double sMaxOutput = 1;
-	private final double sP = 0.012; // 0.018
+	private final double sP = 0.01; // 0.018
 	private final double sI = 0.0; // 0.000038
 	private final double sD = 0.0; // 0.001
 	
@@ -51,15 +51,9 @@ public class Arm extends SubsystemModule {
 	private final double wP = 0.4;
 	private final double wI = 0;
 	private final double wD = 0;
-	private final double wIS = 0;
-	private final double wFF = 0;
 
 	// Initialize PID
 	private PID shoulderPID = new PID(sP, sI, sD);
-	
-	// ArrayLists for tuning PID
-	private ArrayList<Double> truePositions;
-	private ArrayList<Double> desiredPositions;
 
 	// All angles are in degrees
 	private double wristOffset;
@@ -102,15 +96,13 @@ public class Arm extends SubsystemModule {
 
 		shoulderMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
 
-		wristMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
-		wristMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 5);
+		wristMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 10);
+		wristMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10);
 
 		// Setup up PID coefficients
 		wristPidController.setP(wP);
 		wristPidController.setI(wI);
 		wristPidController.setD(wD);
-		wristPidController.setIZone(wIS);
-		wristPidController.setFF(wFF);
 		wristPidController.setOutputRange(wMinOutput, wMaxOutput);
 	}
 	
@@ -293,6 +285,7 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void initialize() {
 				giveUp = false;
+				bumperPosition = false;
 
 				if (!intake.getHatchState()) {
 					shoulderPathFinished = false;
@@ -342,6 +335,7 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void initialize() {
 				giveUp = false;
+				bumperPosition = false;
 
 				intake.setAtPosition(false);
 
@@ -395,6 +389,7 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void initialize() {
 				giveUp = false;
+				bumperPosition = false;
 
 				intake.setAtPosition(false);
 
@@ -448,6 +443,7 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void initialize() {
 				giveUp = false;
+				bumperPosition = false;
 
 				shoulderPathFinished = false;
 				wristPathFinished = false;
@@ -455,9 +451,9 @@ public class Arm extends SubsystemModule {
 				shoulderPath = generatePath(currentShoulderAngle, 4,
 						armMaxVelocity, armAcceleration, armJerk);
 
-				wristPath = generatePath(currentWristAngle, 86,
+				wristPath = generatePath(currentWristAngle, 76,
 						armMaxVelocity, armAcceleration, armJerk);
-
+				// 86
 				iterator = 0;
 			}
 
@@ -499,15 +495,16 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void initialize() {
 				giveUp = false;
+				bumperPosition = false;
 
 				if (!intake.getHatchState() && intake.getCargoState()) {
 					shoulderPathFinished = false;
 					wristPathFinished = false;
 					
-					shoulderPath = generatePath(currentShoulderAngle, 38,
+					shoulderPath = generatePath(currentShoulderAngle, 50,
 							armMaxVelocity, armAcceleration, armJerk);
-
-					wristPath = generatePath(currentWristAngle, 198,
+					// 38
+					wristPath = generatePath(currentWristAngle, 195,
 							armMaxVelocity, armAcceleration, armJerk);
 
 					iterator = 0;
@@ -518,9 +515,9 @@ public class Arm extends SubsystemModule {
 					shoulderPath = generatePath(currentShoulderAngle, 4,
 							armMaxVelocity, armAcceleration, armJerk);
 
-					wristPath = generatePath(currentWristAngle, 86,
+					wristPath = generatePath(currentWristAngle, 76,
 							armMaxVelocity, armAcceleration, armJerk);
-
+					// 86
 					iterator = 0;
 				}
 			}
@@ -559,28 +556,30 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void initialize() {
 				giveUp = false;
+				bumperPosition = false;
 
 				if (!intake.getHatchState() && intake.getCargoState()) {
 					shoulderPathFinished = false;
 					wristPathFinished = false;
 					
-					shoulderPath = generatePath(currentShoulderAngle, 77,
+					shoulderPath = generatePath(currentShoulderAngle, 83,
 							armMaxVelocity, armAcceleration, armJerk);
-
-					wristPath = generatePath(currentWristAngle, 227,
+					// 77
+					wristPath = generatePath(currentWristAngle, 200,
 							armMaxVelocity, armAcceleration, armJerk);
+					// 227
 
 					iterator = 0;
 				} else if (intake.getHatchState() && !intake.getCargoState()) {
 					shoulderPathFinished = false;
 					wristPathFinished = false;
 					
-					shoulderPath = generatePath(currentShoulderAngle, 50,
+					shoulderPath = generatePath(currentShoulderAngle, 62,
 							armMaxVelocity, armAcceleration, armJerk);
-
-					wristPath = generatePath(currentWristAngle, 143,
+					// 50
+					wristPath = generatePath(currentWristAngle, 122,
 							armMaxVelocity, armAcceleration, armJerk);
-
+					// 143
 					iterator = 0;
 				}
 			}
@@ -619,28 +618,29 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void initialize() {
 				giveUp = false;
+				bumperPosition = false;
 
 				if (!intake.getHatchState() && intake.getCargoState()) {
 					shoulderPathFinished = false;
 					wristPathFinished = false;
 					
-					shoulderPath = generatePath(currentShoulderAngle, 117,
+					shoulderPath = generatePath(currentShoulderAngle, 120,
 							armMaxVelocity, armAcceleration, armJerk);
-
-					wristPath = generatePath(currentWristAngle, 233,
+					// 122
+					wristPath = generatePath(currentWristAngle, 221,
 							armMaxVelocity, armAcceleration, armJerk);
-
+					// 233
 					iterator = 0;
 				} else if (intake.getHatchState() && !intake.getCargoState()) {
 					shoulderPathFinished = false;
 					wristPathFinished = false;
 					
-					shoulderPath = generatePath(currentShoulderAngle, 91,
+					shoulderPath = generatePath(currentShoulderAngle, 117,
 							armMaxVelocity, armAcceleration, armJerk);
-
-					wristPath = generatePath(currentWristAngle, 178,
+					// 91
+					wristPath = generatePath(currentWristAngle, 204,
 							armMaxVelocity, armAcceleration, armJerk);
-
+					// 178
 					iterator = 0;
 				}
 			}
@@ -648,9 +648,6 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void execute() {
 				iterator++;
-
-				truePositions.add(currentShoulderAngle);
-				desiredPositions.add(currentShoulderSetpoint);
 
 				if (iterator < shoulderPath.size())
 					setShoulderAngle(shoulderPath.get(iterator));
@@ -682,15 +679,16 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void initialize() {
 				giveUp = false;
+				bumperPosition = false;
 
 				if (intake.getHatchState() && !intake.getCargoState()) {
 					shoulderPathFinished = false;
 					wristPathFinished = false;
 					
-					shoulderPath = generatePath(currentShoulderAngle, 132,
+					shoulderPath = generatePath(currentShoulderAngle, 130,
 							armMaxVelocity, armAcceleration, armJerk);
 
-					wristPath = generatePath(currentWristAngle, 42,
+					wristPath = generatePath(currentWristAngle, 58,
 							armMaxVelocity, armAcceleration, armJerk);
 
 					iterator = 0;
@@ -731,6 +729,7 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void initialize() {
 				giveUp = false;
+				bumperPosition = false;
 
 				shoulderPathFinished = false;
 				wristPathFinished = false;
@@ -783,7 +782,7 @@ public class Arm extends SubsystemModule {
 					intake.cargoMotor.set(-1);
 				}
 				else if (!intake.checkPumpState()) {
-					intake.cargoMotor.set(-0.5);
+					intake.cargoMotor.set(-1);
 				}
 
 				if(intake.getHatchState() || intake.getCargoState()) { giveUp = true; }
@@ -877,9 +876,6 @@ public class Arm extends SubsystemModule {
 		shoulderPath = new ArrayList<Double>(0);
 		wristPath = new ArrayList<Double>(0);
 
-		truePositions = new ArrayList<Double>();
-		desiredPositions = new ArrayList<Double>();
-
 		wristOffset = (wristMotorEncoder.getPosition() / wristRatio) * 360;
 
 		giveUp = false;
@@ -898,9 +894,6 @@ public class Arm extends SubsystemModule {
 
 		shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		wristMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
-
-		System.out.println(truePositions);
-		System.out.println("Desired: " + desiredPositions);
 		
 		intake.destruct();
 	}

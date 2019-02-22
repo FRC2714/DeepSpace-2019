@@ -122,15 +122,15 @@ public class Robot extends TimedRobot {
 
 
 				// append("go_to_position -p 126,58", this.a);
-				append("debug_print -p", this.lb);
+				// append("debug_print -p", this.lb);
 
 				append("intake_stop -s", this.launchpad.getButtonInstance(0, 0));
 				// append("servo2 -p 0", this.b);
 				// append("servo1 -p 0", this.x);
 				// append("servo2 -p 0", this.y);
 
-				append("drive_to_target -s 3", this.leftStick);
-				append("debug_print -p", this.rb);
+				// append("drive_to_target -s 3", this.leftStick);
+				// append("debug_print -p", this.rb);
 
 				// // Toggle end game
 				// append("endgame_toggle -p", this.launchpad.getButtonInstance(0, 4))
