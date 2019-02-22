@@ -60,13 +60,13 @@ public class Robot extends TimedRobot {
 
 				// Intake hatch from ground
 				append("floor_hatch_position -p", this.launchpad.getButtonInstance(3, 7));
-				append("hatch_floor_intake -s", this.launchpad.getButtonInstance(3, 7));
+				append("hatch_station_intake -s", this.launchpad.getButtonInstance(3, 7));
 				append("floor_hatch_position -p", this.launchpad.getButtonInstance(3, 8));
-				append("hatch_floor_intake -s", this.launchpad.getButtonInstance(3, 8));
+				append("hatch_station_intake -s", this.launchpad.getButtonInstance(3, 8));
 				append("floor_hatch_position -p", this.launchpad.getButtonInstance(4, 7));
-				append("hatch_floor_intake -s", this.launchpad.getButtonInstance(4, 7));
+				append("hatch_station_intake -s", this.launchpad.getButtonInstance(4, 7));
 				append("floor_hatch_position -p", this.launchpad.getButtonInstance(4, 8));
-				append("hatch_floor_intake -s", this.launchpad.getButtonInstance(4, 8));
+				append("hatch_station_intake -s", this.launchpad.getButtonInstance(4, 8));
 
 				// Intake cargo from station
 				append("station_position -p", this.launchpad.getButtonInstance(0, 4));
