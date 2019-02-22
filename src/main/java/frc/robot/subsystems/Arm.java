@@ -42,9 +42,9 @@ public class Arm extends SubsystemModule {
 	// PID coefficients
 	private final double sMinOutput = -1;
 	private final double sMaxOutput = 1;
-	private final double sP = 0.01; // 0.02
-	private final double sI = 0.0;
-	private final double sD = 0.0;
+	private final double sP = 0.012; // 0.018
+	private final double sI = 0.0; // 0.000038
+	private final double sD = 0.0; // 0.001
 	
 	private final double wMinOutput = -1;
 	private final double wMaxOutput = 1;
@@ -648,8 +648,8 @@ public class Arm extends SubsystemModule {
 			public void execute() {
 				iterator++;
 
-				// truePositions.add(currentShoulderAngle);
-				// desiredPositions.add(currentShoulderSetpoint);
+				truePositions.add(currentShoulderAngle);
+				desiredPositions.add(currentShoulderSetpoint);
 
 				if (iterator < shoulderPath.size())
 					setShoulderAngle(shoulderPath.get(iterator));
@@ -895,10 +895,10 @@ public class Arm extends SubsystemModule {
 		shoulderMotor.set(0);
 		wristMotor.set(0);
 
-		shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
+		shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		wristMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
 
-		System.out.println("True: " + truePositions);
+		System.out.println(truePositions);
 		System.out.println("Desired: " + desiredPositions);
 		
 		intake.destruct();
