@@ -746,7 +746,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
-		/*
+
 		new SubsystemCommand(this.registeredCommands, "vision_align"){
 			@Override
 			public void initialize() {
@@ -782,7 +782,7 @@ public class DriveTrain extends SubsystemModule {
 				// disable();
 			}
 		};
-		*/
+
 
 		new SubsystemCommand(this.registeredCommands, "wait") {
 
@@ -821,7 +821,8 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void execute() {
 				double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
-				double kAngleP = 0.06;
+
+				double kAngleP = 0.05;
 
 				double power = 0;
 				double pivot = tx * kAngleP;
@@ -830,6 +831,8 @@ public class DriveTrain extends SubsystemModule {
 					power = -controlsProcessor.getLeftJoystick();
 
 				closedLoopArcade(power*(maxVelocity/2), -pivot);
+
+				System.out.println("Pivot : " + pivot);
 //
 //				if (tx > 0){
 //					System.out.println("Turning Right Pivot: " + pivot);
@@ -849,12 +852,12 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
-				NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(0);
+				NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
 				closedLoopArcade(0, 0);
 			}
 		};
 
-		double maxBlobArea = 30;
+		double maxBlobArea = 6.4;
 		new SubsystemCommand(this.registeredCommands, "auton_vision_align"){
 			@Override
 			public void initialize() {
@@ -866,8 +869,8 @@ public class DriveTrain extends SubsystemModule {
 				double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
 				double blobArea = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
 
-				double kAngleP = 0.09;
-				double kDistanceDivisor = 5; // Untested value. Direct proportionality.
+				double kAngleP = 0.01;
+				double kDistanceDivisor = 5; // Untested value. Direct prop ortionality.
 
 				double power = kDistanceDivisor / blobArea;
 				double pivot = tx * kAngleP;
