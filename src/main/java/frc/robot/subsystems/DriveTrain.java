@@ -99,7 +99,7 @@ public class DriveTrain extends SubsystemModule {
 	private AHRS navX = new AHRS(SPI.Port.kMXP);
 
 	//limelight
-	NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+	NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
 
 	// Drivetrain initializations
 	public DriveTrain(ControlsProcessor controlsProcessor) {
@@ -179,7 +179,6 @@ public class DriveTrain extends SubsystemModule {
 	@Override
 	public void init() {
 		System.out.println("resetting");
-
 		leftEncoderOffset = lEncoder.getPosition();
 		rightEncoderOffset = -rEncoder.getPosition();
 		navX.reset();
@@ -634,8 +633,7 @@ public class DriveTrain extends SubsystemModule {
 				initialX = odometer.getCurrentX();
 				initialY = odometer.getCurrentY();
 
-				theta1 = odometer.getHeadingAngle() - NetworkTableInstance.getDefault().
-										getTable("limelight").getEntry("tx").getDouble(0);
+				theta1 = odometer.getHeadingAngle() - limelightTable.getEntry("tx").getDouble(0);
 
 				if (theta1 > 360)
 					theta1 -= 360;
@@ -718,8 +716,7 @@ public class DriveTrain extends SubsystemModule {
 				double deltaX = odometer.getCurrentX() - initialX;
 				double deltaY = odometer.getCurrentY() - initialY;
 
-				double theta2 = odometer.getHeadingAngle() - NetworkTableInstance.getDefault().
-								getTable("limelight").getEntry("tx").getDouble(0);
+				double theta2 = odometer.getHeadingAngle() - limelightTable.getEntry("tx").getDouble(0);
 
 				if (theta2 > 360)
 					theta2 -= 360;
@@ -752,13 +749,13 @@ public class DriveTrain extends SubsystemModule {
 			public void initialize() {
 				driverControlled = false;
 				// enable();
-				NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
-				NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
+				limelightTable.getEntry("ledMode").setNumber(3);
+				limelightTable.getEntry("camMode").setNumber(0);
 			}
 
 			@Override
 			public void execute() {
-				double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+				double tx = limelightTable.getEntry("tx").getDouble(0);
 				double kP = 1/27.0;
 
 				double power = 0;
@@ -812,15 +809,15 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 				// driverControlled = false;
-				NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
-				NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
+				limelightTable.getEntry("ledMode").setNumber(3);
+				limelightTable.getEntry("camMode").setNumber(0);
 
 				System.out.println("initializing");
 			}
 
 			@Override
 			public void execute() {
-				double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+				double tx = limelightTable.getEntry("tx").getDouble(0);
 
 				double kAngleP = 0.065;
 
@@ -851,35 +848,52 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
-				NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
+				limelightTable.getEntry("ledMode").setNumber(1);
 				closedLoopArcade(0, 0);
 			}
 		};
 
-		double maxBlobArea = 6.4;
+
 		new SubsystemCommand(this.registeredCommands, "auton_vision_align"){
+			double maxBlobArea = 6.4;
+			double currentBlobArea;
+
 			@Override
 			public void initialize() {
-				NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
+				limelightTable.getEntry("ledMode").setNumber(3);
 			}
+
 
 			@Override
 			public void execute() {
-				double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
-				double blobArea = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
-				
-				double kAngleP = 0.01;
-				double kDistanceDivisor = 0.1; // Untested value. Direct prop ortionality.
+				System.out.println("Running");
+				double tx = limelightTable.getEntry("tx").getDouble(0);
+				currentBlobArea = limelightTable.getEntry("ta").getDouble(0);
 
-				double power = kDistanceDivisor / blobArea;
+				double kAngleP = 0.05;
+				double kDistanceDivisor = 0.4; // Untested value. Direct prop ortionality.
+        
+				double power = kDistanceDivisor / currentBlobArea;
 				double pivot = tx * kAngleP;
 
-				System.out.println("Power:- " + power);
+				System.out.println("kDistanceDivisor: " + kDistanceDivisor + "| blobArea : " + currentBlobArea);
+				System.out.println("power: " + power);
 
 				if (blobArea <= maxBlobArea) {
 					closedLoopArcade(power * maxVelocity, -pivot);
 				}
 
+			}
+
+			@Override
+			public boolean isFinished() {
+				System.out.println("Boolean : " + (currentBlobArea > maxBlobArea));
+				return (currentBlobArea > maxBlobArea);
+			}
+
+			@Override
+			public void end() {
+				limelightTable.getEntry("ledMode").setNumber(1);
 			}
 		};
 		

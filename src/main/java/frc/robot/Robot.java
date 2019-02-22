@@ -90,7 +90,7 @@ public class Robot extends TimedRobot {
 				append("hatch_station_intake -s", this.launchpad.getButtonInstance(4, 5));
 
 				// Score positions
-				
+
 				append("lower_score -p", this.launchpad.getButtonInstance(6, 8));
 				append("lower_score -p", this.launchpad.getButtonInstance(7, 8));
 				append("middle_score -p", this.launchpad.getButtonInstance(6, 6));
@@ -116,11 +116,9 @@ public class Robot extends TimedRobot {
 
 				// Toggle driver control
 				append("driver_control -p", this.rightStick);
-				// append("get_arm_position -s", this.rb);
+				append("get_arm_position -s", this.rb);
+				append("vision_align -s", this.a);
 				append("auton_vision_align -s", this.y);
-				append("vision_align -s", this.leftStick);
-				append("vision_align -s", this.lb);
-				// append("get_arm_position -s", this.a);
 
 
 				// append("go_to_position -p 126,58", this.a);
@@ -149,7 +147,7 @@ public class Robot extends TimedRobot {
 		controlsProcessor.registerController("DriveTrain", drivetrain);
 		controlsProcessor.registerController("Arm", arm);
 		controlsProcessor.start();
-		
+
 	}
 
 	/**
@@ -182,7 +180,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousInit() {
 		generalInit();
-		
+
 		AutonTask leftRocket = new LeftRocketHatchAuton(controlsProcessor);
 		AutonTask leftCargo = new LeftCargoHatchAuton(controlsProcessor);
 		AutonTask rightRocket = new RightRocketHatchAuton(controlsProcessor);
@@ -197,7 +195,8 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		Scheduler.getInstance().run(); }
+		Scheduler.getInstance().run();
+	}
 
 	/**
 	 * Runs at the start of teleop mode
@@ -227,13 +226,16 @@ public class Robot extends TimedRobot {
 	 * Unused
 	 */
 	@Override
-	public void testInit() { }
+	public void testInit() {
+		NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
+	}
 
 	/**
 	 * Unused
 	 */
 	@Override
-	public void testPeriodic() { }
+	public void testPeriodic() {
+	}
 
 	/**
 	 * Called at the start of both auton and teleop init
@@ -245,5 +247,7 @@ public class Robot extends TimedRobot {
 
 		drivetrain.init();
 		arm.init();
+
+
 	}
 }
