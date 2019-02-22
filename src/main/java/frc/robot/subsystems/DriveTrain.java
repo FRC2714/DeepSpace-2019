@@ -5,11 +5,15 @@ import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import frc.robot.RobotMap;
 import frc.robot.util.ControlsProcessor;
@@ -18,6 +22,7 @@ import frc.robot.util.Odometer;
 import frc.robot.util.SubsystemCommand;
 import frc.robot.util.SubsystemModule;
 
+@SuppressWarnings("Duplicates")
 public class DriveTrain extends SubsystemModule {
 
 	// Drivetrain motors
@@ -62,6 +67,13 @@ public class DriveTrain extends SubsystemModule {
 	private final double maxVelocity = 13;
 	private final double maxAcceleration = 5;
 
+	private double collisionThreshold = 0;
+	private double tippingThreshold = 0;
+
+	private double prevAccelX = 0;
+	private double prevAccelY = 0;
+	private double mPrevTimeAccel = 0;
+
 	// 
 	private double leftEncoderOffset = 0;
 	private double rightEncoderOffset = 0;
@@ -85,6 +97,9 @@ public class DriveTrain extends SubsystemModule {
 
 	// NavX gyro
 	private AHRS navX = new AHRS(SPI.Port.kMXP);
+
+	//limelight
+	NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
 
 	// Drivetrain initializations
 	public DriveTrain(ControlsProcessor controlsProcessor) {
@@ -260,6 +275,48 @@ public class DriveTrain extends SubsystemModule {
 		//System.out.println("ls: " + leftVelocity / rpmToFeet + " rs: " + -rightVelocity / rpmToFeet);
 	}
 
+	public synchronized void setCollisionJerkThreshold(double jerkCollisionThreshold) {
+		collisionThreshold = jerkCollisionThreshold;
+	}
+
+	public synchronized void setTippingThreshold(double tippingThreshold) {
+		this.tippingThreshold = tippingThreshold;
+	}
+
+
+	public boolean isTipping() {
+		return Math.abs(navX.getPitch()) > tippingThreshold ||
+				Math.abs(navX.getRoll()) > tippingThreshold;
+	}
+
+	public boolean isCollisionOccurring() {
+		boolean collisionOccurring = false;
+
+		double accelX = navX.getWorldLinearAccelX();
+		double accelY = navX.getWorldLinearAccelY();
+
+
+		double currTime = Timer.getFPGATimestamp();
+		double dt = currTime - mPrevTimeAccel;
+
+		double jerkX = (accelX - prevAccelX) / (dt);
+		double jerkY = (accelY - prevAccelY) / (dt);
+
+		if (Math.abs(jerkX) > collisionThreshold || Math.abs(jerkY) > collisionThreshold)
+			collisionOccurring = true;
+
+		prevAccelX = accelX;
+		prevAccelY = accelY;
+
+		if (mPrevTimeAccel == 0) {
+			mPrevTimeAccel = currTime;
+			return false;
+		}
+
+		mPrevTimeAccel = currTime;
+		return collisionOccurring;
+	}
+
 	// Closed loop arcade based tank
 	public void closedLoopArcade(double velocity, double pivot) {
 		pivot = pivot * sensitivity;
@@ -309,9 +366,9 @@ public class DriveTrain extends SubsystemModule {
 				double power = 0;
 				double pivot = 0;
 
-				if (Math.abs(controlsProcessor.getLeftJoystick()) > 0.2)
+				if (Math.abs(controlsProcessor.getLeftJoystick()) > .15)	
 					power = controlsProcessor.getLeftJoystick();
-				if (Math.abs(controlsProcessor.getRightJoystick()) > 0.2)
+				if (Math.abs(controlsProcessor.getRightJoystick()) > .15)
 					pivot = controlsProcessor.getRightJoystick();
 
 				arcadeDrive(-power, pivot, 0.04, 0.08);
@@ -395,8 +452,9 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void execute() {
-//				getEncoderValues();
-				// System.out.println(odometer.getHeadingAngle());
+				getEncoderValues();
+				//System.out.println(odometer.getHeadingAngle());
+				//System.out.println(odometer.getCurrentX() + " : " + odometer.getCurrentY());
 				//System.out.println(navX.getYaw());
 			}
 
@@ -417,10 +475,13 @@ public class DriveTrain extends SubsystemModule {
 
 				double xInitial = Double.parseDouble(this.args[0]);
 				double xFinal = Double.parseDouble(this.args[4]);
+
 				double yInitial = Double.parseDouble(this.args[1]);
 				double yFinal = Double.parseDouble(this.args[5]);
+
 				double thetaInitial = Double.parseDouble(this.args[2]);
 				double thetaFinal = Double.parseDouble(this.args[6]);
+
 				double lInitial = Double.parseDouble(this.args[3]);
 				double lFinal = Double.parseDouble(this.args[7]);
 
@@ -479,6 +540,7 @@ public class DriveTrain extends SubsystemModule {
 				drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
 						Double.parseDouble(this.args[8]), Double.parseDouble(this.args[9]),
 						Double.parseDouble(this.args[10]), Double.parseDouble(this.args[11]), false);
+
 			}
 
 			@Override
@@ -506,6 +568,7 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 				enable();
+				System.out.println("starting path");
 			}
 
 			@Override
@@ -553,7 +616,274 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
+		new SubsystemCommand(this.registeredCommands, "drive_to_target"){
+			double initialX;
+			double initialY;
+			double theta1;
 
+			@Override
+			public void initialize() {
+
+				lMotor0.setIdleMode(IdleMode.kCoast);
+				rMotor0.setIdleMode(IdleMode.kCoast); 
+
+				lMotor0.set(0);    
+				rMotor0.set(0);
+
+
+				initialX = odometer.getCurrentX();
+				initialY = odometer.getCurrentY();
+
+				theta1 = odometer.getHeadingAngle() - NetworkTableInstance.getDefault().
+										getTable("limelight").getEntry("tx").getDouble(0);
+
+				if (theta1 > 360)
+					theta1 -= 360;
+				else if (theta1 < 0)
+					theta1 += 360;
+
+				// //Stage 1	
+				// 	double currentX = odometer.getCurrentX();
+				// 	double currentY = odometer.getCurrentY();
+				// 	double odometerHeading = odometer.getHeadingAngle();
+
+				// 	double limelightX = 1.25*Math.cos(Math.toRadians(odometer.getHeadingAngle()));
+				// 	double limelightY = -1.25*Math.sin(Math.toRadians(odometer.getHeadingAngle()));
+
+				// 	System.out.println(currentX + " : " + currentY + " : " + limelightX + " : " + limelightY);
+
+				// //Stage 2
+				// 	NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
+				// 	double centerAngle = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+				// 	NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
+				// 	double rightAngle = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+				// 	double angleDifference = rightAngle - centerAngle;
+
+				// NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
+				// NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
+
+				// double ySubtraction = Double.parseDouble(this.args[0]);
+
+				// NetworkTableEntry camtran = table.getEntry("camtran");
+				// // double tv = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0);
+				// // double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+				// // double ty = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
+				// // double ta = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
+
+				// double data[] = new double[6];
+
+				// data = camtran.getDoubleArray(data);
+				// System.out.println(data[1] + " : " + data[2] + " : " + data[4]);
+
+				// if(data[1] == 0){
+				// 	this.cancel();
+				// 	return;
+				// }
+
+				// double thetaInitial = Math.toRadians(odometer.getHeadingAngle());
+				// double thetaFinal = Math.toRadians(-data[4] + odometer.getHeadingAngle());
+				// double lInitial = 1;
+				// double lFinal = 1;
+
+				// double limelightX = data[1]/12;
+				// double limelightY = data[2]/12;
+				// double customY = limelightY + ySubtraction;
+
+				// double customHypotenuse = Math.sqrt(Math.pow(customY, 2) + Math.pow(limelightX, 2));
+
+				// double customTheta = Math.atan(limelightX/customY);
+
+
+				// double xFinal = customHypotenuse*Math.cos(Math.toRadians(odometer.getHeadingAngle()) + customTheta) + odometer.getCurrentX() + cameraXOffset;
+				// double yFinal = customHypotenuse*Math.sin(Math.toRadians(odometer.getHeadingAngle()) + customTheta) + odometer.getCurrentY() + cameraYOffset;
+
+				// double xInitial = odometer.getCurrentX();
+				// double yInitial = odometer.getCurrentY();
+
+				// double x2 = lInitial * Math.cos(thetaInitial) + odometer.getCurrentX();
+				// double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal;
+				// double y2 = lInitial * Math.sin(thetaInitial) + odometer.getCurrentY();
+				// double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal;
+
+				//System.out.println(xInitial + " : " + yInitial + " : " + odometer.getHeadingAngle() + " : " + xFinal + " : " + yFinal + " : " + (-data[4] + odometer.getHeadingAngle()));
+				
+				// drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
+				//  		10, 4, 0, 0, true);
+								
+				// enable();
+			}
+			double l2;
+			@Override
+			public void execute() {
+				double deltaX = odometer.getCurrentX() - initialX;
+				double deltaY = odometer.getCurrentY() - initialY;
+
+				double theta2 = odometer.getHeadingAngle() - NetworkTableInstance.getDefault().
+								getTable("limelight").getEntry("tx").getDouble(0);
+
+				if (theta2 > 360)
+					theta2 -= 360;
+				else if (theta2 < 0)
+					theta2 += 360;
+
+				double num1 = deltaY*Math.cos(Math.toRadians(theta1));
+				double num2 = deltaX*Math.sin(Math.toRadians(theta1));
+				double denom1 = Math.sin(Math.toRadians(theta1))*Math.cos(Math.toRadians(theta2));
+				double denom2 = Math.sin(Math.toRadians(theta2))*Math.cos(Math.toRadians(theta1));
+				
+				l2 =  (num1 - num2) / (denom1 - denom2);
+				System.out.println(theta1 + " : " + theta2 + " ; " + deltaX + " : " + deltaY);
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {
+				System.out.println("l2: " + l2);
+			}
+		};
+
+
+		new SubsystemCommand(this.registeredCommands, "vision_align"){
+			@Override
+			public void initialize() {
+				driverControlled = false;
+				// enable();
+				NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
+				NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
+			}
+
+			@Override
+			public void execute() {
+				double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+				double kP = 1/27.0;
+
+				double power = 0;
+				double pivot = tx * kP;
+
+				if (Math.abs(controlsProcessor.getLeftJoystick()) > .10)
+					power = controlsProcessor.getLeftJoystick();
+
+
+				closedLoopArcade(-power * maxVelocity, pivot, maxAcceleration);
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				return driverControlled;
+			}
+
+			@Override
+			public void end() {
+				// disable();
+			}
+		};
+
+
+		new SubsystemCommand(this.registeredCommands, "wait") {
+
+			Timer waitTimer = new Timer();
+			@Override
+			public void initialize() {
+				waitTimer.reset();
+				waitTimer.start();
+				
+			}
+
+			@Override
+			public void execute() {
+			}
+
+			@Override
+			public boolean isFinished() {
+				return waitTimer.get() > Double.parseDouble(this.args[0]);
+			}
+
+			@Override
+			public void end() {
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "vision_align"){
+			@Override
+			public void initialize() {
+				// driverControlled = false;
+				NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
+				NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
+
+				System.out.println("initializing");
+			}
+
+			@Override
+			public void execute() {
+				double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+
+				double kAngleP = 0.05;
+
+				double power = 0;
+				double pivot = tx * kAngleP;
+
+				if (Math.abs(controlsProcessor.getLeftJoystick()) > .10)
+					power = -controlsProcessor.getLeftJoystick();
+
+				closedLoopArcade(power*(maxVelocity/2), -pivot);
+
+				System.out.println("Pivot : " + pivot);
+//
+//				if (tx > 0){
+//					System.out.println("Turning Right Pivot: " + pivot);
+//					closedLoopTank((power * maxVelocity) + pivot, (power * maxVelocity));
+//				} else if (tx < 0){
+//					System.out.println("Turning Left Pivot: " + pivot);
+//					closedLoopTank((power * maxVelocity), (power * maxVelocity) - pivot);
+//				}
+
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {
+				NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
+				closedLoopArcade(0, 0);
+			}
+		};
+
+		double maxBlobArea = 6.4;
+		new SubsystemCommand(this.registeredCommands, "auton_vision_align"){
+			@Override
+			public void initialize() {
+				NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
+			}
+
+			@Override
+			public void execute() {
+				double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+				double blobArea = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
+
+				double kAngleP = 0.01;
+				double kDistanceDivisor = 5; // Untested value. Direct prop ortionality.
+
+				double power = kDistanceDivisor / blobArea;
+				double pivot = tx * kAngleP;
+
+				System.out.println("Power:- " + power);
+
+				if (blobArea <= maxBlobArea) {
+//					closedLoopArcade(power * (maxVelocity/2), -pivot);
+				}
+
+			}
+		};
+		
 	}
 
 }

@@ -66,7 +66,7 @@ public abstract class SubsystemModule extends Subsystem {
 			// Call the initializer if the first run is active
 			if (v.firstRun && v.checkDelayExpired()) {
 				v.firstRun = false;
-				v.running = true;
+				// v.running = true;
 			}
 
 			// Call the execute function if the command is still active

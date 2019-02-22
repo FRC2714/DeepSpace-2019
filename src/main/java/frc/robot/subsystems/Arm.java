@@ -75,8 +75,8 @@ public class Arm extends SubsystemModule {
 
 	// Arm movement constants
 	private final double armMaxVelocity = 220; // 120
-	private final double armAcceleration = 271400; // 250
-	private final double armJerk = 400; // 100
+	private final double armAcceleration = 2714; // 250
+	private final double armJerk = 100; // 100
 
 	// Array Lists
 	private ArrayList<Double> shoulderPath;
@@ -488,6 +488,7 @@ public class Arm extends SubsystemModule {
 
 				bumperPosition = true;
 				intake.setAtPosition(true);
+				System.out.println("station position end");
 			}
 		};
 
