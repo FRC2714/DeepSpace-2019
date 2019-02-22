@@ -822,7 +822,7 @@ public class DriveTrain extends SubsystemModule {
 			public void execute() {
 				double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
 
-				double kAngleP = 0.05;
+				double kAngleP = 0.065;
 
 				double power = 0;
 				double pivot = tx * kAngleP;
@@ -832,7 +832,6 @@ public class DriveTrain extends SubsystemModule {
 
 				closedLoopArcade(power*(maxVelocity/2), -pivot);
 
-				System.out.println("Pivot : " + pivot);
 //
 //				if (tx > 0){
 //					System.out.println("Turning Right Pivot: " + pivot);
@@ -868,9 +867,9 @@ public class DriveTrain extends SubsystemModule {
 			public void execute() {
 				double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
 				double blobArea = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
-
+				
 				double kAngleP = 0.01;
-				double kDistanceDivisor = 5; // Untested value. Direct prop ortionality.
+				double kDistanceDivisor = 0.1; // Untested value. Direct prop ortionality.
 
 				double power = kDistanceDivisor / blobArea;
 				double pivot = tx * kAngleP;
@@ -878,7 +877,7 @@ public class DriveTrain extends SubsystemModule {
 				System.out.println("Power:- " + power);
 
 				if (blobArea <= maxBlobArea) {
-//					closedLoopArcade(power * (maxVelocity/2), -pivot);
+					closedLoopArcade(power * maxVelocity, -pivot);
 				}
 
 			}
