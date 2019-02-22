@@ -117,8 +117,8 @@ public class Robot extends TimedRobot {
 				// Toggle driver control
 				append("driver_control -p", this.rightStick);
 				append("get_arm_position -s", this.rb);
-//				append("vision_align -s", this.a);
-				append("auton_vision_align -s", this.a);
+				append("vision_align -s", this.a);
+				append("auton_vision_align -s", this.y);
 
 
 				// append("go_to_position -p 126,58", this.a);
@@ -225,7 +225,9 @@ public class Robot extends TimedRobot {
 	 * Unused
 	 */
 	@Override
-	public void testInit() { }
+	public void testInit() {
+		NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
+	}
 
 	/**
 	 * Unused

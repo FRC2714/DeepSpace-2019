@@ -857,30 +857,47 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
-		double maxBlobArea = 6.4;
+
 		new SubsystemCommand(this.registeredCommands, "auton_vision_align"){
+			double maxBlobArea = 6.4;
+			double currentBlobArea;
+
 			@Override
 			public void initialize() {
 				NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
 			}
 
+
 			@Override
 			public void execute() {
+				System.out.println("Running");
 				double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
-				double blobArea = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
+				currentBlobArea = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
 
-				double kAngleP = 0.01;
-				double kDistanceDivisor = 5; // Untested value. Direct prop ortionality.
+				double kAngleP = 0.05;
+				double kDistanceDivisor = 0.4; // Untested value. Direct prop ortionality.
 
-				double power = kDistanceDivisor / blobArea;
+				double power = kDistanceDivisor / currentBlobArea;
 				double pivot = tx * kAngleP;
 
-				System.out.println("Power:- " + power);
+				System.out.println("kDistanceDivisor: " + kDistanceDivisor + "| blobArea : " + currentBlobArea);
+				System.out.println("power: " + power);
 
-				if (blobArea <= maxBlobArea) {
-//					closedLoopArcade(power * (maxVelocity/2), -pivot);
+				if (currentBlobArea <= maxBlobArea) {
+					closedLoopArcade(power * (maxVelocity), -pivot);
 				}
 
+			}
+
+			@Override
+			public boolean isFinished() {
+				System.out.println("Boolean : " + (currentBlobArea > maxBlobArea));
+				return (currentBlobArea > maxBlobArea);
+			}
+
+			@Override
+			public void end() {
+				NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
 			}
 		};
 		
