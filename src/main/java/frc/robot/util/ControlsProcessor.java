@@ -2,7 +2,6 @@ package frc.robot.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import frc.robot.RobotMap;
@@ -18,7 +17,6 @@ public abstract class ControlsProcessor extends Thread {
 
 	private HashMap<String, SubsystemModule> controllers = new HashMap<String, SubsystemModule>();
 	private ArrayList<CommandDetails> commandQueue = new ArrayList<CommandDetails>();
-	private ArrayList<String> runningCommands = new ArrayList<String>();
 
 	private int commandDivider;
 	private int counter = 0;
@@ -61,7 +59,7 @@ public abstract class ControlsProcessor extends Thread {
 		this.commandDivider = commandDivider;
 
 		try {
-			launchpad = new WebsocketButtonPad( new URI( "ws://10.27.14.192:9001" ));
+			launchpad = new WebsocketButtonPad( new URI( "ws://10.27.14.207:9001" ));
 			launchpad.connect();
 		} catch (Exception e) {
 			System.out.println("Websocket failure");
@@ -70,6 +68,19 @@ public abstract class ControlsProcessor extends Thread {
 		registerOperatorControls();
 	}
 
+	public void connectButtonPad(){
+		if(!launchpad.isOpen()){
+			try {
+				launchpad.connect();
+			} catch (Exception e) {
+				System.out.println("Websocket connection failure");
+			}
+		}
+		else {
+			System.out.println("Websocket connected");
+		}	
+
+	}
 	/**
 	 * Function to add the subsystem into the collection
 	 * All the runs are added and called periodically
@@ -84,6 +95,8 @@ public abstract class ControlsProcessor extends Thread {
 	 * Runs periodically as required by extension of Java Thread
 	 */
 	public void run() {
+
+		connectButtonPad();
 		double timestamp = System.nanoTime();
 
 		// Runs even when robot is disabled
@@ -185,29 +198,30 @@ public abstract class ControlsProcessor extends Thread {
 		// TODO: Test time delay
 		if (this.commandQueue.size() > 0 && (this.commandQueue.get(0).type().equals(CommandDetails.CommandType.PARALLEL)
 				|| this.commandQueue.get(0).type().equals(CommandDetails.CommandType.TIMEDELAY))) {
-			System.out.println(this.commandQueue.get(0).name());
+			System.out.println("parallel" + this.commandQueue.get(0).name());
 			callCommand(this.commandQueue.get(0));
+			System.out.println("Calling Command : " + this.commandQueue.get(0));
 			this.commandQueue.remove(0);
 		}
 
 		// Checks to see if there are any commands currently running, and if there, it exits the method
 		// This would prevent any sequential commands from running
-		if (this.runningCommands != null) {
-			this.runningCommands.forEach(i -> {
-				controllers.forEach((k, v) -> {
-					SubsystemCommand foundCommand = v.registeredCommands.get(i);
-					if (foundCommand != null && foundCommand.running)
-						return;
-				});
+//		for(java.util.Map.Entry<String, SubsystemModule> sub : controllers.entrySet()) {
+//			for(java.util.Map.Entry<String, SubsystemCommand> cmds : sub.getValue().registeredCommands.entrySet()) {
+//				if (cmds.getValue().running) {
+		controllers.forEach((k, v) -> {
+			v.registeredCommands.forEach((a,b) -> {
+				if (b.running)
+					return;
 			});
-		}
+		});
 
 		/**
 		 * If it is a sequential command, we can clear the list and then we add
 		 * the next sequential command.
 		 */
 		if (this.commandQueue.size() > 0 && (this.commandQueue.get(0).type().equals(CommandDetails.CommandType.SERIES))) {
-			// System.out.println(this.commandQueue.get(0).name());
+			System.out.println("series" + this.commandQueue.get(0).name());
 			callCommand(this.commandQueue.get(0));
 			this.commandQueue.remove(0);
 		}

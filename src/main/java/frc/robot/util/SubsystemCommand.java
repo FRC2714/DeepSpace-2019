@@ -28,6 +28,9 @@ public abstract class SubsystemCommand {
         commands.put(this.commandName, this);
     }
 
+    public boolean getRunning(){
+        return running;
+    }
     /**
      * TODO: Test
      * @param delay Delay in seconds before calling a command
@@ -69,7 +72,7 @@ public abstract class SubsystemCommand {
         if (this.delay > 0) {
             this.delayTimer.start();
         }
-
+        this.running = true;
         initialize();
     }
 
@@ -78,7 +81,7 @@ public abstract class SubsystemCommand {
      */
     public void call() {
         this.firstRun = true;
-
+        this.running = true;
         initialize();
     }
 
@@ -87,7 +90,6 @@ public abstract class SubsystemCommand {
      */
     public void cancel() {
         end();
-        
         this.running = false;
     }
 

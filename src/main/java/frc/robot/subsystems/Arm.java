@@ -42,7 +42,7 @@ public class Arm extends SubsystemModule {
 	// PID coefficients
 	private final double sMinOutput = -1;
 	private final double sMaxOutput = 1;
-	private final double sP = 0.014; // 0.014
+	private final double sP = 0.01; // 0.014
 	private final double sI = 0.0;
 	private final double sD = 0.006;
 	
@@ -71,8 +71,8 @@ public class Arm extends SubsystemModule {
 
 	// Arm movement constants
 	private final double armMaxVelocity = 220; // 120
-	private final double armAcceleration = 271400; // 250
-	private final double armJerk = 400; // 100
+	private final double armAcceleration = 2714; // 250
+	private final double armJerk = 100; // 100
 
 	// Array Lists
 	private ArrayList<Double> shoulderPath;
@@ -96,7 +96,9 @@ public class Arm extends SubsystemModule {
 		
 		this.controlsProcessor = controlsProcessor;
 
-		shoulderMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 5);
+		shoulderMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
+
+		wristMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
 		wristMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 5);
 
 		// Setup up PID coefficients
@@ -328,7 +330,60 @@ public class Arm extends SubsystemModule {
 		};
 
 
-		new SubsystemCommand(this.registeredCommands, "floor_position") {
+		new SubsystemCommand(this.registeredCommands, "floor_cargo_position") {
+			int iterator;
+
+			@Override
+			public void initialize() {
+				giveUp = false;
+
+				intake.setAtPosition(false);
+
+				if (!intake.getHatchState() && !intake.getCargoState()) {
+					shoulderPathFinished = false;
+					wristPathFinished = false;
+
+					shoulderPath = generatePath(currentShoulderAngle, 20,
+							armMaxVelocity, armAcceleration, armJerk);
+
+					wristPath = generatePath(currentWristAngle, 216,
+							armMaxVelocity, armAcceleration, armJerk);
+
+					iterator = 0;
+				}
+			}
+
+			@Override
+			public void execute() {
+				iterator++;
+
+				if (iterator < shoulderPath.size())
+					setShoulderAngle(shoulderPath.get(iterator));
+				else
+					shoulderPathFinished = true;
+				
+				if (iterator < wristPath.size())
+					setWristAngle(wristPath.get(iterator));
+				else
+					wristPathFinished = true;
+			}
+
+			@Override
+			public boolean isFinished() {
+				return shoulderPathFinished && wristPathFinished;
+			}
+
+			@Override
+			public void end() {
+				shoulderPath = new ArrayList<Double>(0);
+				wristPath = new ArrayList<Double>(0);
+				
+				intake.setAtPosition(true);
+			}
+		};
+
+
+		new SubsystemCommand(this.registeredCommands, "floor_hatch_position") {
 			int iterator;
 
 			@Override
@@ -427,6 +482,7 @@ public class Arm extends SubsystemModule {
 
 				bumperPosition = true;
 				intake.setAtPosition(true);
+				System.out.println("station position end");
 			}
 		};
 
