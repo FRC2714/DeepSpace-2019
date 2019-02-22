@@ -245,5 +245,6 @@ public class Robot extends TimedRobot {
 
 		drivetrain.init();
 		arm.init();
+		
 	}
 }
