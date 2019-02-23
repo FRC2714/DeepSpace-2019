@@ -24,37 +24,36 @@ public class Arm extends SubsystemModule {
 	// Arm motors
 	private final CANSparkMax shoulderMotor = new CANSparkMax(7, MotorType.kBrushless);
 	private final CANSparkMax wristMotor = new CANSparkMax(8, MotorType.kBrushless);
-
-	// PID controllers
-	private PID shoulderPID;
-	private CANPIDController wristPID;
-
-	// MAX encoder for wrist
 	
 	// Initialize arm encoders
 	private Encoder shoulderEncoder = new Encoder(RobotMap.p_shoulderEncoderA, RobotMap.p_shoulderEncoderB, true, EncodingType.k4X);
 	private CANEncoder wristEncoder = wristMotor.getEncoder();
 
 	// Shoulder linearization
-	private final double shoulderLoadPosition = 0.0; // In degrees
-	private final double shoulderFeedforward = 0.0; // In degrees per second
+	private final double shoulderLoadPosition = 47.0; // In degrees
+	private final double shoulderFeedforward = 0.045; // In degrees per second
 
 	// PID coefficients for the shoulder
 	private final double sMinOutput = -1;
 	private final double sMaxOutput = 1;
-	private final double sP = 0.0;
-	private final double sI = 0.0;
-	private final double sD = 0.0;
+	private final double sRate = 0.025;
+	private final double sP = 0.00525;
+	private final double sI = 0.000005;
+	private final double sD = 0.0005;
 	
 	// PID coefficients for the wrist
 	private final double wMinOutput = -1;
 	private final double wMaxOutput = 1;
-	private final double wP = 0.0;
+	private final double wP = 0.00525;
 	private final double wI = 0.0;
 	private final double wD = 0.0;
 
+	// PID controllers
+	private PID shoulderPID = new PID(sP, sI, sD);
+	private CANPIDController wristPID =  wristMotor.getPIDController();
+
 	// Arm characteristics
-	private final double wristRatio = -140;
+	private final double wristRatio = 140;
 
 	// Current arm angles in degrees
 	private double currentShoulderAngle;
@@ -71,17 +70,29 @@ public class Arm extends SubsystemModule {
 	// Arm initialization
     public Arm(ControlsProcessor controlsProcessor) {
 		intake = new Intake();
-
+		
 		controlsProcessor.registerController("Intake", intake);
 		registerCommands();
+
+		// Enable voltage compensation for arm motors
+		shoulderMotor.enableVoltageCompensation(12.0);
+		wristMotor.enableVoltageCompensation(12.0);
 
 		// Set SparkMax CAN periods
 		shoulderMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
 		wristMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 10);
 		wristMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10);
+		
+		// Inverts wrist motor direction
+		wristMotor.setInverted(true);
 
+		// Set encoder conversion factors
+		shoulderEncoder.setDistancePerPulse(45.0 / 512);
+		wristEncoder.setPositionConversionFactor(360.0 / wristRatio);
+		
 		// Set PID coefficients
 		shoulderPID.setOutputLimits(sMinOutput, sMaxOutput);
+		shoulderPID.setOutputRampRate(sRate);
 		shoulderPID.setP(sP);
 		shoulderPID.setI(sI);
 		shoulderPID.setD(sD);
@@ -90,13 +101,13 @@ public class Arm extends SubsystemModule {
 		wristPID.setI(wI);
 		wristPID.setD(wD);
 
-		// Set encoder conversion factors
-		shoulderEncoder.setDistancePerPulse(45.0 / 512);
-		wristEncoder.setPositionConversionFactor(360.0 / wristRatio);
+		// Initialize ArrayLists
+		shoulderMovement = new ArrayList<Double>(0);
+		wristMovement = new ArrayList<Double>(0);
 	}
 
 	/**
-	 * 
+	 * Sets currentShoulderAngle and currentWristAngle to the encoder values
 	 */
 	public void updateCurrentAngles() {
 		currentShoulderAngle = shoulderEncoder.getDistance();
@@ -104,7 +115,7 @@ public class Arm extends SubsystemModule {
 	}
 
 	/**
-	 * @return the required feed forward for the shoulder to stay in place
+	 * @return the required feedforward for the shoulder to stay in place
 	 */
 	public double getShoulderFeedforward() {
 		double angleDelta = Math.abs(shoulderLoadPosition - currentShoulderAngle);
@@ -114,7 +125,7 @@ public class Arm extends SubsystemModule {
 	}
 
 	/**
-	 * Uses the shoulder PID and feedforward value to determine shoulder motor power
+	 * Uses the shoulder PID and feedforward value to set shoulder motor power
 	 */
 	public void setShoulderPower() {
 		double motorPower = shoulderPID.getOutput(currentShoulderAngle, desiredShoulderAngle);
@@ -124,20 +135,20 @@ public class Arm extends SubsystemModule {
 	}
 
 	/**
-	 * 
+	 * Plugs in desired wrist angle to the wrist PID
 	 */
 	public void setWristPower() {
 		wristPID.setReference(desiredWristAngle, ControlType.kPosition);
 	}
 
 	/**
-	 * 
+	 * Sets the arm to the desired overall position
 	 * @param shoulderAngle the desired shoulder angle in degrees
 	 * @param wristAngle the desired wrist angle in degrees
 	 */
 	public void goToPosition(double shoulderAngle, double wristAngle) {
 		desiredShoulderAngle = shoulderAngle;
-		desiredShoulderAngle = shoulderAngle;
+		desiredWristAngle = wristAngle;
 	}
 
 	/**
@@ -153,8 +164,8 @@ public class Arm extends SubsystemModule {
 		double shoulderAngleDelta = Math.abs(currentShoulderAngle - shoulderAngle);
 		double wristAngleDelta = Math.abs(currentWristAngle - wristAngle);
 
-		if(shoulderAngleDelta < 5.0) { atShoulderAngle = true; }
-		if(wristAngleDelta < 5.0) { atWristAngle = true; }
+		if(shoulderAngleDelta < 2.0) { atShoulderAngle = true; }
+		if(wristAngleDelta < 2.0) { atWristAngle = true; }
 
 		return atShoulderAngle && atWristAngle;
 	}
@@ -163,16 +174,18 @@ public class Arm extends SubsystemModule {
 	 * 
 	 */
 	public void trackMovement() {
-		shoulderMovement.add(currentShoulderAngle);
-		wristMovement.add(currentWristAngle);
+		if(desiredShoulderAngle != 0 || desiredWristAngle != 0) {
+			shoulderMovement.add(currentShoulderAngle);
+			wristMovement.add(currentWristAngle);
+		}
 	}
 
 	/**
 	 * 
 	 */
 	public void printMovement() {
-		System.out.println(shoulderMovement);
-		System.out.println(wristMovement);
+		System.out.println("Shoulder\t" + shoulderMovement);
+		System.out.println("Wrist\t" + wristMovement);
 	}
 
 	@Override
@@ -208,7 +221,9 @@ public class Arm extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {}
+			public void end() {
+				System.out.println("atPosition = true");
+			}
 		};
     }
 
@@ -220,6 +235,8 @@ public class Arm extends SubsystemModule {
 		wristMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		
 		wristEncoder.setPosition(0);
+
+		shoulderPID.reset();
 
 		desiredShoulderAngle = 0;
 		desiredWristAngle = 0;
