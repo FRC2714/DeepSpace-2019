@@ -880,7 +880,7 @@ public class DriveTrain extends SubsystemModule {
 			public void execute() {
 				double tx = limelightTable.getEntry("tx").getDouble(0);
 
-				double kAngleP = 0.05;
+				double kAngleP = 0.065;
 
 				double power = 0;
 				double pivot = tx * kAngleP;
@@ -890,7 +890,6 @@ public class DriveTrain extends SubsystemModule {
 
 				closedLoopArcade(power*(maxVelocity/2), -pivot);
 
-				System.out.println("Pivot : " + pivot);
 //
 //				if (tx > 0){
 //					System.out.println("Turning Right Pivot: " + pivot);
@@ -953,8 +952,8 @@ public class DriveTrain extends SubsystemModule {
 
 				System.out.println("power: " + power);
 
-				if (currentBlobArea <= maxBlobArea) {
-					closedLoopArcade(power * (maxVelocity), -pivot);
+				if (blobArea <= maxBlobArea) {
+					closedLoopArcade(power * maxVelocity, -pivot);
 				}
 
 
