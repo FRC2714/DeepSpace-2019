@@ -206,15 +206,23 @@ public abstract class ControlsProcessor extends Thread {
 
 		// Checks to see if there are any commands currently running, and if there, it exits the method
 		// This would prevent any sequential commands from running
-//		for(java.util.Map.Entry<String, SubsystemModule> sub : controllers.entrySet()) {
-//			for(java.util.Map.Entry<String, SubsystemCommand> cmds : sub.getValue().registeredCommands.entrySet()) {
-//				if (cmds.getValue().running) {
-		controllers.forEach((k, v) -> {
-			v.registeredCommands.forEach((a,b) -> {
-				if (b.running)
+		for(java.util.Map.Entry<String, SubsystemModule> sub : controllers.entrySet()) {
+			for (java.util.Map.Entry<String, SubsystemCommand> cmds : sub.getValue().registeredCommands.entrySet()) {
+				if (cmds.getValue().running) {
 					return;
-			});
-		});
+				}
+			}
+		}
+
+//
+//		controllers.forEach((k, v) -> {
+//			v.registeredCommands.forEach((a,b) -> {
+//				if (b.running){
+//					return;
+//				}
+//
+//			});
+//		});
 
 		/**
 		 * If it is a sequential command, we can clear the list and then we add
