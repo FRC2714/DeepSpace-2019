@@ -41,7 +41,7 @@ public class Arm extends SubsystemModule {
 
 	// PID coefficients for the shoulder
 	private final double sMinOutput = -1;
-	private final double sMaxOutput = 1 - shoulderFeedforward;
+	private final double sMaxOutput = 1;
 	private final double sP = 0.0;
 	private final double sI = 0.0;
 	private final double sD = 0.0;
@@ -216,8 +216,8 @@ public class Arm extends SubsystemModule {
 	public void init() {
 		intake.init();
 
-		shoulderMotor.setIdleMode(CANSparkMax.IdleMode.);
-		wristMotor.setIdleMode(CANSparkMax.IdleMode.);
+		shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+		wristMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		
 		wristEncoder.setPosition(0);
 
@@ -235,8 +235,8 @@ public class Arm extends SubsystemModule {
 		shoulderMotor.set(0);
 		wristMotor.set(0);
 		
-		shoulderMotor.setIdleMode(CANSparkMax.IdleMode.);
-		wristMotor.setIdleMode(CANSparkMax.IdleMode.);
+		shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
+		wristMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
 
 		printMovement();
 	}
