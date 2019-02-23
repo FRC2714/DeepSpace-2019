@@ -936,7 +936,7 @@ public class DriveTrain extends SubsystemModule {
 				currentBlobArea = limelightTable.getEntry("ta").getDouble(0);
 
 				double kAngleP = 0.05;
-				double kDistanceDivisor = 0.4; // Untested value. Direct proportionality.
+				double kDistanceDivisor = 0.55; // Untested value. Direct proportionality.
 
 				double power = 0;
 				if (currentBlobArea < maxBlobArea && currentBlobArea != 0)
