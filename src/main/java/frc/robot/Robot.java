@@ -187,7 +187,7 @@ public class Robot extends TimedRobot {
 		AutonTask rightCargo = new RightCargoHatchAuton(controlsProcessor);
 		AutonTask pickupHatch = new PickupAutonHatch(controlsProcessor);
 
-		leftRocket.run();
+		rightRocket.run();
 	}
 
 	/**

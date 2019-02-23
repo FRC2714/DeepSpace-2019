@@ -582,6 +582,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
+				System.out.println("driving controller finished? " + ":" + drivingController.isFinished());
 				return drivingController.isFinished();
 			}
 
@@ -744,43 +745,6 @@ public class DriveTrain extends SubsystemModule {
 		};
 
 
-		new SubsystemCommand(this.registeredCommands, "vision_align"){
-			@Override
-			public void initialize() {
-				driverControlled = false;
-				// enable();
-				limelightTable.getEntry("ledMode").setNumber(3);
-				limelightTable.getEntry("camMode").setNumber(0);
-			}
-
-			@Override
-			public void execute() {
-				double tx = limelightTable.getEntry("tx").getDouble(0);
-				double kP = 1/27.0;
-
-				double power = 0;
-				double pivot = tx * kP;
-
-				if (Math.abs(controlsProcessor.getLeftJoystick()) > .10)
-					power = controlsProcessor.getLeftJoystick();
-
-
-				closedLoopArcade(-power * maxVelocity, pivot, maxAcceleration);
-
-			}
-
-			@Override
-			public boolean isFinished() {
-				return driverControlled;
-			}
-
-			@Override
-			public void end() {
-				// disable();
-			}
-		};
-
-
 		new SubsystemCommand(this.registeredCommands, "wait") {
 
 			Timer waitTimer = new Timer();
@@ -856,12 +820,13 @@ public class DriveTrain extends SubsystemModule {
 
 
 		new SubsystemCommand(this.registeredCommands, "auton_vision_align"){
-			double maxBlobArea = 6.4;
+			double maxBlobArea = 6.1;
 			double currentBlobArea;
 
 			@Override
 			public void initialize() {
 				limelightTable.getEntry("ledMode").setNumber(3);
+				limelightTable.getEntry("camMode").setNumber(0);
 			}
 
 
@@ -872,17 +837,28 @@ public class DriveTrain extends SubsystemModule {
 				currentBlobArea = limelightTable.getEntry("ta").getDouble(0);
 
 				double kAngleP = 0.05;
-				double kDistanceDivisor = 0.4; // Untested value. Direct prop ortionality.
+				double kDistanceDivisor = 0.4; // Untested value. Direct proportionality.
 
-				double power = kDistanceDivisor / currentBlobArea;
+				double power = 0;
+				if (currentBlobArea < maxBlobArea && currentBlobArea != 0)
+					power = kDistanceDivisor / currentBlobArea;
+				else
+					power = 0;
+
 				double pivot = tx * kAngleP;
 
 				System.out.println("kDistanceDivisor: " + kDistanceDivisor + "| blobArea : " + currentBlobArea);
+
+
+				if (power > 0.25)
+					power = 0.25;
+
 				System.out.println("power: " + power);
 
 				if (currentBlobArea <= maxBlobArea) {
 					closedLoopArcade(power * (maxVelocity), -pivot);
 				}
+
 
 			}
 
@@ -894,6 +870,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
+				closedLoopArcade(0, 0);
 				limelightTable.getEntry("ledMode").setNumber(1);
 			}
 		};
