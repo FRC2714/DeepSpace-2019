@@ -565,6 +565,7 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 
+
 				double xInitial = Double.parseDouble(this.args[0]);
 				double yInitial = Double.parseDouble(this.args[1]);
 				double thetaInitial = Double.parseDouble(this.args[2]);
@@ -610,6 +611,9 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 
+				System.out.println("Current X : " + odometer.getCurrentX() + " || Current Y : " + odometer.getCurrentY());
+				System.out.println("DYNAMIC HEADING ANGLE:- " + odometer.getHeadingAngle());
+
 				double xInitial = odometer.getCurrentX();
 				double xFinal = Double.parseDouble(this.args[1]);
 
@@ -624,6 +628,7 @@ public class DriveTrain extends SubsystemModule {
 
 				thetaInitial = Math.toRadians(thetaInitial);
 				thetaFinal = Math.toRadians(thetaFinal);
+				System.out.println("Theta Final:- " + thetaFinal);
 
 				double x2 = lInitial * Math.cos(thetaInitial) + xInitial;
 				double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal;
@@ -657,6 +662,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void initialize() {
+				drivingController.setIsFinished(false);
 				enable();
 				System.out.println("starting path");
 			}
@@ -666,14 +672,16 @@ public class DriveTrain extends SubsystemModule {
 				if(counter < 5){
 					startTime = System.nanoTime();
 				}
+				System.out.println("CURRENT HEADING ANGLE");
 				double averageTime = (System.nanoTime() - startTime)/counter;
+
 				//System.out.println("average time " + averageTime);
 				counter++;
 			}
 
 			@Override
 			public boolean isFinished() {
-				System.out.println("driving controller finished? " + ":" + drivingController.isFinished());
+//				System.out.println("driving controller finished? " + ":" + drivingController.isFinished());
 				return drivingController.isFinished();
 			}
 
@@ -681,7 +689,7 @@ public class DriveTrain extends SubsystemModule {
 			public void end() {
 				closedLoopArcade(0, 0);
 				disable();
-				System.out.println(odometer.getCurrentX() + " : " + odometer.getCurrentY());
+				System.out.println(odometer.getCurrentX() + " : " + odometer.getCurrentY() + "Final Heading : " + odometer.getHeadingAngle());
 			}
 		};
 
