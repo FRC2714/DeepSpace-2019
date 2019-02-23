@@ -952,7 +952,7 @@ public class DriveTrain extends SubsystemModule {
 
 				System.out.println("power: " + power);
 
-				if (blobArea <= maxBlobArea) {
+				if (currentBlobArea <= maxBlobArea) {
 					closedLoopArcade(power * maxVelocity, -pivot);
 				}
 
