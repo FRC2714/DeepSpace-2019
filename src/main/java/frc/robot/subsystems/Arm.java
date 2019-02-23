@@ -42,18 +42,18 @@ public class Arm extends SubsystemModule {
 	// PID coefficients
 	private final double sMinOutput = -1;
 	private final double sMaxOutput = 1;
-	private final double sP = 0.01; // 0.018
+	private final double sP = 0.012; // 0.018
 	private final double sI = 0.0; // 0.000038
 	private final double sD = 0.0; // 0.001
 	
 	private final double wMinOutput = -1;
 	private final double wMaxOutput = 1;
-	private final double wP = 0.4;
+	private final double wP = 0.05;
 	private final double wI = 0;
 	private final double wD = 0;
 
 	// Initialize PID
-	private PID shoulderPID = new PID(sP, sI, sD);
+	private final PID shoulderPID = new PID(sP, sI, sD);
 
 	// All angles are in degrees
 	private double wristOffset;
@@ -62,7 +62,12 @@ public class Arm extends SubsystemModule {
 	private double currentShoulderSetpoint;
 	private double currentWristSetpoint;
 	
-	private final double maxDegreesPerSecond = 5;
+	// Shoulder linearization
+	private final double shoulderHoldPower = 0.045;
+	private final double parallelOffset = 47;
+	private double shoulderFF;
+
+	private final double maxDegreesPerSecond = 10;
 
 	// Arm characteristics
 	private final double wristRatio = -140;
@@ -76,8 +81,10 @@ public class Arm extends SubsystemModule {
 	private ArrayList<Double> shoulderPath;
 	private ArrayList<Double> wristPath;
 
-	private boolean shoulderPathFinished = false;
-	private boolean wristPathFinished = false;
+	private boolean shoulderPathFinished;
+	private boolean wristPathFinished;
+
+	private ArrayList<Double> currentShoulderPosition;
 
 	// Makes the arm give up
 	private boolean giveUp;
@@ -94,7 +101,7 @@ public class Arm extends SubsystemModule {
 		
 		this.controlsProcessor = controlsProcessor;
 
-		shoulderMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
+		shoulderMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 2);
 
 		wristMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 10);
 		wristMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10);
@@ -245,7 +252,8 @@ public class Arm extends SubsystemModule {
 
 		if(giveUp) { currentShoulderSetpoint = shoulderOutputEncoder.getDistance(); }
 		
-		shoulderMotor.set(shoulderPID.getOutput(currentShoulderAngle, currentShoulderSetpoint));
+		shoulderFF = shoulderHoldPower * Math.cos(Math.abs(currentShoulderSetpoint - parallelOffset) * (Math.PI / 180));
+		shoulderMotor.set(shoulderPID.getOutput(currentShoulderAngle, currentShoulderSetpoint) + shoulderFF);
 
 		// System.out.println("Shoulder encoder: " + shoulderOutputEncoder.getDistance());
 		// System.out.println("PID Output: " + shoulderPID.getOutput(currentShoulderAngle, currentShoulderSetpoint) + "\tEncoder Distance: " + shoulderOutputEncoder.getDistance());
@@ -649,6 +657,8 @@ public class Arm extends SubsystemModule {
 			public void execute() {
 				iterator++;
 
+				currentShoulderPosition.add(shoulderOutputEncoder.getDistance());
+
 				if (iterator < shoulderPath.size())
 					setShoulderAngle(shoulderPath.get(iterator));
 				else
@@ -873,10 +883,17 @@ public class Arm extends SubsystemModule {
 		currentWristAngle = 0;
 		currentShoulderSetpoint = 0;
 
+		shoulderFF = 0;
+
 		shoulderPath = new ArrayList<Double>(0);
 		wristPath = new ArrayList<Double>(0);
 
 		wristOffset = (wristMotorEncoder.getPosition() / wristRatio) * 360;
+
+		currentShoulderPosition = new ArrayList<Double>(0);
+
+		shoulderPathFinished = false;
+		wristPathFinished = false;
 
 		giveUp = false;
 		bumperPosition = false;
@@ -891,6 +908,8 @@ public class Arm extends SubsystemModule {
 
 		shoulderMotor.set(0);
 		wristMotor.set(0);
+
+		System.out.println(currentShoulderPosition);
 
 		shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		wristMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
