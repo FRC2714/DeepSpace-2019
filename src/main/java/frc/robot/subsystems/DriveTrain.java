@@ -513,6 +513,53 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
+
+		new SubsystemCommand(this.registeredCommands, "add_forwards_spline_dynamic") {
+
+			@Override
+			public void initialize() {
+
+				double xInitial = odometer.getCurrentX();
+				double xFinal = Double.parseDouble(this.args[1]);
+
+				double yInitial = odometer.getCurrentY();
+				double yFinal = Double.parseDouble(this.args[2]);
+
+				double thetaInitial = odometer.getHeadingAngle();
+				double thetaFinal = Double.parseDouble(this.args[3]);
+
+				double lInitial = Double.parseDouble(this.args[0]);
+				double lFinal = Double.parseDouble(this.args[4]);
+
+				thetaInitial = Math.toRadians(thetaInitial);
+				thetaFinal = Math.toRadians(thetaFinal);
+
+				double x2 = lInitial * Math.cos(thetaInitial) + xInitial;
+				double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal;
+				double y2 = lInitial * Math.sin(thetaInitial) + yInitial;
+				double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal;
+
+				drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
+						Double.parseDouble(this.args[5]), Double.parseDouble(this.args[6]),
+						Double.parseDouble(this.args[7]), Double.parseDouble(this.args[8]), true);
+			}
+
+			@Override
+			public void execute() {
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				return true;
+			}
+
+			@Override
+			public void end() {
+
+			}
+		};
+
 		new SubsystemCommand(this.registeredCommands, "add_backwards_spline") {
 
 			@Override
@@ -558,7 +605,51 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
-		
+		new SubsystemCommand(this.registeredCommands, "add_backwards_spline_dynamic") {
+
+			@Override
+			public void initialize() {
+
+				double xInitial = odometer.getCurrentX();
+				double xFinal = Double.parseDouble(this.args[1]);
+
+				double yInitial = odometer.getCurrentY();
+				double yFinal = Double.parseDouble(this.args[2]);
+
+				double thetaInitial = odometer.getHeadingAngle();
+				double thetaFinal = Double.parseDouble(this.args[3]);
+
+				double lInitial = Double.parseDouble(this.args[0]);
+				double lFinal = Double.parseDouble(this.args[4]);
+
+				thetaInitial = Math.toRadians(thetaInitial);
+				thetaFinal = Math.toRadians(thetaFinal);
+
+				double x2 = lInitial * Math.cos(thetaInitial) + xInitial;
+				double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal;
+				double y2 = lInitial * Math.sin(thetaInitial) + yInitial;
+				double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal;
+
+				drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
+						Double.parseDouble(this.args[5]), Double.parseDouble(this.args[6]),
+						Double.parseDouble(this.args[7]), Double.parseDouble(this.args[8]), false);
+			}
+
+			@Override
+			public void execute() {
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				return true;
+			}
+
+			@Override
+			public void end() {
+
+			}
+		};
 
 		new SubsystemCommand(this.registeredCommands, "start_path") {
 			double startTime;
@@ -850,8 +941,8 @@ public class DriveTrain extends SubsystemModule {
 				System.out.println("kDistanceDivisor: " + kDistanceDivisor + "| blobArea : " + currentBlobArea);
 
 
-				if (power > 0.25)
-					power = 0.25;
+				if (power > 0.4)
+					power = 0.4;
 
 				System.out.println("power: " + power);
 
