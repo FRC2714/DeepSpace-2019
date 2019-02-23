@@ -339,6 +339,7 @@ public class DriveTrain extends SubsystemModule {
 		closedLoopArcade(velocitySetpoint, pivot);
 
 		lastVelocity = velocitySetpoint;
+		System.out.println("velocity setpoint: " + velocitySetpoint);
 	}
 
 	// Output encoder values
