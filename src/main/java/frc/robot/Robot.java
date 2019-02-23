@@ -116,10 +116,10 @@ public class Robot extends TimedRobot {
 
 				// Toggle driver control
 				append("driver_control -p", this.rightStick);
-				append("get_arm_position -s", this.rb);
-				append("vision_align -s", this.a);
-				append("auton_vision_align -s", this.y);
-
+				// append("get_arm_position -s", this.rb);
+				append("vision_align -s", this.leftStick);
+				append("vision_align -s", this.lb);
+				// append("auton_vision_align -s", this.y);
 
 				// append("go_to_position -p 126,58", this.a);
 				// append("debug_print -p", this.lb);
