@@ -670,8 +670,8 @@ public class DriveTrain extends SubsystemModule {
 				if(counter < 5){
 					startTime = System.nanoTime();
 				}
-				System.out.println("CURRENT HEADING ANGLE: " + odometer.getHeadingAngle());
-				double averageTime = (System.nanoTime() - startTime)/counter;
+//				System.out.println("CURRENT HEADING ANGLE: " + odometer.getHeadingAngle());
+//				double averageTime = (System.nanoTime() - startTime)/counter;
 
 				//System.out.println("average time " + averageTime);
 				counter++;
@@ -973,6 +973,19 @@ public class DriveTrain extends SubsystemModule {
 				closedLoopArcade(0, 0);
 				limelightTable.getEntry("ledMode").setNumber(1);
 				System.out.println("x: " + odometer.getCurrentX() + "y: " + odometer.getCurrentY() + "thetaF: " + odometer.getHeadingAngle());
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "set_current_position"){
+			@Override
+			public void initialize() {
+				odometer.setCurrentPosition(Double.parseDouble(this.args[0]), Double.parseDouble(this.args[1]));
+				System.out.println("SET POSITIONS: " + " X = " + odometer.getCurrentX() + " Y = " + odometer.getCurrentY());
+			}
+
+			@Override
+			public boolean isFinished() {
+				return true;
 			}
 		};
 		
