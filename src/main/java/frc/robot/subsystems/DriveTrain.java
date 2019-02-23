@@ -565,7 +565,6 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 
-
 				double xInitial = Double.parseDouble(this.args[0]);
 				double yInitial = Double.parseDouble(this.args[1]);
 				double thetaInitial = Double.parseDouble(this.args[2]);
@@ -602,7 +601,6 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
-
 			}
 		};
 
@@ -622,13 +620,13 @@ public class DriveTrain extends SubsystemModule {
 
 				double thetaInitial = odometer.getHeadingAngle();
 				double thetaFinal = Double.parseDouble(this.args[3]);
+				System.out.println("Theta Final:- " + this.args[3]);
 
 				double lInitial = Double.parseDouble(this.args[0]);
 				double lFinal = Double.parseDouble(this.args[4]);
 
 				thetaInitial = Math.toRadians(thetaInitial);
 				thetaFinal = Math.toRadians(thetaFinal);
-				System.out.println("Theta Final:- " + thetaFinal);
 
 				double x2 = lInitial * Math.cos(thetaInitial) + xInitial;
 				double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal;
@@ -672,7 +670,7 @@ public class DriveTrain extends SubsystemModule {
 				if(counter < 5){
 					startTime = System.nanoTime();
 				}
-				System.out.println("CURRENT HEADING ANGLE");
+				System.out.println("CURRENT HEADING ANGLE: " + odometer.getHeadingAngle());
 				double averageTime = (System.nanoTime() - startTime)/counter;
 
 				//System.out.println("average time " + averageTime);
@@ -912,6 +910,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
+				limelightTable.getEntry("camMode").setNumber(1);
 				limelightTable.getEntry("ledMode").setNumber(1);
 				closedLoopArcade(0, 0);
 			}
@@ -969,8 +968,10 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
+				limelightTable.getEntry("camMode").setNumber(1);
 				closedLoopArcade(0, 0);
 				limelightTable.getEntry("ledMode").setNumber(1);
+				drivingController.clearControlPath();
 			}
 		};
 		

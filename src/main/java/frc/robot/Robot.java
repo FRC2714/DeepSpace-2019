@@ -186,6 +186,7 @@ public class Robot extends TimedRobot {
 		AutonTask rightRocket = new RightRocketHatchAuton(controlsProcessor);
 		AutonTask rightCargo = new RightCargoHatchAuton(controlsProcessor);
 		AutonTask pickupHatch = new PickupAutonHatch(controlsProcessor);
+		AutonTask testS = new TestTask(controlsProcessor);
 
 		rightRocket.run();
 	}
@@ -204,6 +205,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
+		NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(1);
 
 		if (autonomousCommand != null)
 			autonomousCommand.cancel();
