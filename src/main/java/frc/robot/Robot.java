@@ -205,7 +205,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
-		NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(1);
+		NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
 
 		if (autonomousCommand != null)
 			autonomousCommand.cancel();

@@ -650,7 +650,6 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
-
 			}
 		};
 
@@ -917,6 +916,7 @@ public class DriveTrain extends SubsystemModule {
 
 
 		new SubsystemCommand(this.registeredCommands, "auton_vision_align"){
+			boolean isAboveMax = false;
 			double maxBlobArea = 6.1;
 			double currentBlobArea;
 
@@ -924,6 +924,7 @@ public class DriveTrain extends SubsystemModule {
 			public void initialize() {
 				limelightTable.getEntry("ledMode").setNumber(3);
 				limelightTable.getEntry("camMode").setNumber(0);
+				isAboveMax = false;
 			}
 
 
@@ -956,21 +957,21 @@ public class DriveTrain extends SubsystemModule {
 					closedLoopArcade(power * maxVelocity, -pivot);
 				}
 
-
+				isAboveMax = currentBlobArea > maxBlobArea;
 			}
 
 			@Override
 			public boolean isFinished() {
 				System.out.println("Boolean : " + (currentBlobArea > maxBlobArea));
-				return (currentBlobArea > maxBlobArea);
+				return isAboveMax;
 			}
 
 			@Override
 			public void end() {
-				limelightTable.getEntry("camMode").setNumber(1);
+				limelightTable.getEntry("camMode").setNumber(0);
 				closedLoopArcade(0, 0);
 				limelightTable.getEntry("ledMode").setNumber(1);
-				drivingController.clearControlPath();
+				System.out.println("x: " + odometer.getCurrentX() + "y: " + odometer.getCurrentY() + "thetaF: " + odometer.getHeadingAngle());
 			}
 		};
 		
