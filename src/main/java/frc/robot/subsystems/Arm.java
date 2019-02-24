@@ -30,27 +30,8 @@ public class Arm extends SubsystemModule {
 	private CANEncoder wristEncoder = wristMotor.getEncoder();
 
 	// Shoulder linearization
-	private final double shoulderLoadPosition = 47.0; // In degrees
-	private final double shoulderFeedforward = 0.045; // In degrees per second
-
-	// PID coefficients for the shoulder
-	private final double sMinOutput = -1;
-	private final double sMaxOutput = 1;
-	private final double sRate = 0.025;
-	private final double sP = 0.00525;
-	private final double sI = 0.000005;
-	private final double sD = 0.0005;
-	
-	// PID coefficients for the wrist
-	private final double wMinOutput = -1;
-	private final double wMaxOutput = 1;
-	private final double wP = 0.00525;
-	private final double wI = 0.0;
-	private final double wD = 0.0;
-
-	// PID controllers
-	private PID shoulderPID = new PID(sP, sI, sD);
-	private CANPIDController wristPID =  wristMotor.getPIDController();
+	private final double shoulderLoadPosition = 45.0; // In degrees
+	private final double shoulderFeedforward = 0.0425; // In power
 
 	// Arm characteristics
 	private final double wristRatio = 140;
@@ -62,6 +43,18 @@ public class Arm extends SubsystemModule {
 	// Desired arm angles in degrees
 	private double desiredShoulderAngle;
 	private double desiredWristAngle;
+
+	// Start arm anngles
+	private double startShoulderAngle;
+	private double startWristAngle;
+
+	// Movement direction
+	private int shoulderDirection;
+	private int wristDirection;
+
+	// Variables to enable PID
+	private boolean enableShoulderPID;
+	private boolean enableWristPID;
 
 	// Test variables
 	private ArrayList<Double> shoulderMovement;
@@ -89,17 +82,6 @@ public class Arm extends SubsystemModule {
 		// Set encoder conversion factors
 		shoulderEncoder.setDistancePerPulse(45.0 / 512);
 		wristEncoder.setPositionConversionFactor(360.0 / wristRatio);
-		
-		// Set PID coefficients
-		shoulderPID.setOutputLimits(sMinOutput, sMaxOutput);
-		shoulderPID.setOutputRampRate(sRate);
-		shoulderPID.setP(sP);
-		shoulderPID.setI(sI);
-		shoulderPID.setD(sD);
-		wristPID.setOutputRange(wMinOutput, wMaxOutput);
-		wristPID.setP(wP);
-		wristPID.setI(wI);
-		wristPID.setD(wD);
 
 		// Initialize ArrayLists
 		shoulderMovement = new ArrayList<Double>(0);
@@ -125,20 +107,45 @@ public class Arm extends SubsystemModule {
 	}
 
 	/**
-	 * Uses the shoulder PID and feedforward value to set shoulder motor power
+	 * Uses costrol and feedforward value to set shoulder motor power
 	 */
 	public void setShoulderPower() {
-		double motorPower = shoulderPID.getOutput(currentShoulderAngle, desiredShoulderAngle);
-		motorPower += getShoulderFeedforward();
+		double motorPower = 0;
+
+		if(!enableShoulderPID && shoulderDirection * (desiredShoulderAngle - currentShoulderAngle) > 0) {
+			motorPower = Math.PI * (currentShoulderAngle + startShoulderAngle);
+			motorPower /= Math.abs(startShoulderAngle - desiredShoulderAngle);
+			motorPower = 1 + Math.cos(Math.toRadians(motorPower));
+			motorPower /= 2;
+
+			motorPower *= 0.3;
+		} else {
+			motorPower = ;
+			enableShoulderPID = true;
+		}
 
 		shoulderMotor.set(motorPower);
 	}
 
 	/**
-	 * Plugs in desired wrist angle to the wrist PID
+	 * Plugs in desired wrist angle to the wrist costrol
 	 */
 	public void setWristPower() {
-		wristPID.setReference(desiredWristAngle, ControlType.kPosition);
+		double motorPower = 0;
+
+		if(!enableWristPID && wristDirection * (desiredWristAngle - currentWristAngle) > 0) {
+			motorPower = Math.PI * (currentWristAngle + startWristAngle);
+			motorPower /= Math.abs(startWristAngle - desiredWristAngle);
+			motorPower = 1 + Math.cos(Math.toRadians(motorPower));
+			motorPower /= 2;
+
+			motorPower *= 0.3;
+
+			wristMotor.set(motorPower);
+		} else {
+			motorPower = ;
+			enableWristPID = true;
+		}
 	}
 
 	/**
@@ -149,6 +156,17 @@ public class Arm extends SubsystemModule {
 	public void goToPosition(double shoulderAngle, double wristAngle) {
 		desiredShoulderAngle = shoulderAngle;
 		desiredWristAngle = wristAngle;
+
+		shoulderDirection = (int)(desiredShoulderAngle - startShoulderAngle);
+		shoulderDirection /= Math.abs(shoulderDirection);
+		wristDirection = (int)(desiredWristAngle - startWristAngle);
+		wristDirection /= Math.abs(wristDirection);
+
+		enableShoulderPID = false;
+		enableShoulderPID = false;
+
+		startShoulderAngle = currentShoulderAngle;
+		startWristAngle = currentWristAngle;
 	}
 
 	/**
@@ -236,10 +254,14 @@ public class Arm extends SubsystemModule {
 		
 		wristEncoder.setPosition(0);
 
-		shoulderPID.reset();
-
 		desiredShoulderAngle = 0;
 		desiredWristAngle = 0;
+
+		startShoulderAngle = 0;
+		startWristAngle = 0;
+
+		enableShoulderPID = false;
+		enableWristPID = false;
 
 		shoulderMovement = new ArrayList<Double>(0);
 		wristMovement = new ArrayList<Double>(0);
