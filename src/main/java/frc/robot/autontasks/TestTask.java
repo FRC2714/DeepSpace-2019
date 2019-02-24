@@ -16,7 +16,11 @@ public class TestTask extends AutonTask {
 ////		queueTask("add_backwards_spline_dynamic -s 2,5,10,270,2,5,5,0,0");
 //		queueTask("start_path -s");
 
-		queueTask("set_current_position -s 7.2,16.5");
+//		queueTask("set_current_position -s 7.2,16.5");
+
+
+		queueTask("add_forwards_spline -s 0,0,90,1,5,6,320,3,5,5,0,0");
+		queueTask("start_path -s");
 
 
 	}

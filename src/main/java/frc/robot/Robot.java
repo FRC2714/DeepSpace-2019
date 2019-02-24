@@ -118,7 +118,7 @@ public class Robot extends TimedRobot {
 				append("driver_control -p", this.rightStick);
 				append("get_arm_position -s", this.rb);
 				append("vision_align -s", this.a);
-				append("auton_vision_align -s", this.y);
+				append("auton_vision_align -s 6.4", this.y);
 
 
 				// append("go_to_position -p 126,58", this.a);
@@ -189,7 +189,7 @@ public class Robot extends TimedRobot {
 		AutonTask pickupHatch = new PickupAutonHatch(controlsProcessor);
 		AutonTask testS = new TestTask(controlsProcessor);
 
-		rightRocketHabLevelTwo.run();
+		rightRocket.run();
 	}
 
 	/**

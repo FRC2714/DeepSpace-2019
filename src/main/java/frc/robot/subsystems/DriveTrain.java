@@ -918,11 +918,12 @@ public class DriveTrain extends SubsystemModule {
 
 		new SubsystemCommand(this.registeredCommands, "auton_vision_align"){
 			boolean isAboveMax = false;
-			double maxBlobArea = 6.1;
+			double maxBlobArea = 8;
 			double currentBlobArea;
 
 			@Override
 			public void initialize() {
+				System.out.println("INITIALIZED VISION ALIGN");
 				limelightTable.getEntry("ledMode").setNumber(3);
 				limelightTable.getEntry("camMode").setNumber(0);
 				isAboveMax = false;
@@ -931,12 +932,15 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void execute() {
-				System.out.println("Running");
+//				System.out.println("Running");
 				double tx = limelightTable.getEntry("tx").getDouble(0);
 				currentBlobArea = limelightTable.getEntry("ta").getDouble(0);
 
 				double kAngleP = 0.05;
-				double kDistanceDivisor = 0.55; // Untested value. Direct proportionality.
+				double kDistanceDivisor = 0.6; // Untested value. Direct proportionality.
+
+				if (this.args[0] != null)
+					maxBlobArea = Double.parseDouble(this.args[0]);
 
 				double power = 0;
 				if (currentBlobArea < maxBlobArea && currentBlobArea != 0)
@@ -946,24 +950,26 @@ public class DriveTrain extends SubsystemModule {
 
 				double pivot = tx * kAngleP;
 
-				System.out.println("kDistanceDivisor: " + kDistanceDivisor + "| blobArea : " + currentBlobArea);
+//				System.out.println("kDistanceDivisor: " + kDistanceDivisor + "| blobArea : " + currentBlobArea);
 
 
-				if (power > 0.4)
-					power = 0.4;
+				if (power > 0.8)
+					power = 0.8;
 
-				System.out.println("power: " + power);
+//				System.out.println("power: " + power);
 
 				if (currentBlobArea <= maxBlobArea) {
 					closedLoopArcade(power * maxVelocity, -pivot);
 				}
 
 				isAboveMax = currentBlobArea > maxBlobArea;
+				System.out.println("RUNNING VISION ALIGN POWER : " + power + " IS ABOVE MAX? : " + isAboveMax);
+
 			}
 
 			@Override
 			public boolean isFinished() {
-				System.out.println("Boolean : " + (currentBlobArea > maxBlobArea));
+//				System.out.println("Boolean : " + (currentBlobArea > maxBlobArea));
 				return isAboveMax;
 			}
 
@@ -980,7 +986,7 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 				odometer.setCurrentPosition(Double.parseDouble(this.args[0]), Double.parseDouble(this.args[1]));
-				System.out.println("SET POSITIONS: " + " X = " + odometer.getCurrentX() + " Y = " + odometer.getCurrentY());
+//				System.out.println("SET POSITIONS: " + " X = " + odometer.getCurrentX() + " Y = " + odometer.getCurrentY());
 			}
 
 			@Override
