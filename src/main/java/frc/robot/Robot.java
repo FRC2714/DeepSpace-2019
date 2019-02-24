@@ -181,14 +181,6 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousInit() {
 		generalInit();
-
-		AutonTask leftRocket = new LeftRocketHatchAuton(controlsProcessor);
-		AutonTask leftCargo = new LeftCargoHatchAuton(controlsProcessor);
-		AutonTask rightRocket = new RightRocketHatchAuton(controlsProcessor);
-		AutonTask rightCargo = new RightCargoHatchAuton(controlsProcessor);
-		AutonTask pickupHatch = new PickupAutonHatch(controlsProcessor);
-
-		rightRocket.run();
 	}
 
 	/**

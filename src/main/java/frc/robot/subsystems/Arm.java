@@ -31,7 +31,7 @@ public class Arm extends SubsystemModule {
 
 	// Shoulder linearization
 	private final double shoulderLoadPosition = 45.0; // In degrees
-	private final double shoulderFeedforward = 0.0425; // In power
+	private final double shoulderFeedforward = 0.04; // In power
 
 	// Arm characteristics
 	private final double wristRatio = 140;
@@ -49,12 +49,18 @@ public class Arm extends SubsystemModule {
 	private double startWristAngle;
 
 	// Movement direction
+	private double shoulderCoefficient;
+	private double wristCoefficient;
+
+	// Arm start powers
+	private double shoulderPowerFactor;
+	private double wristPowerFactor;
+	private final double shoulderDampingFactor = 0.75;
+	private final double wristDampingFactor = 1.0;
+
+	// 
 	private int shoulderDirection;
 	private int wristDirection;
-
-	// Variables to enable PID
-	private boolean enableShoulderPID;
-	private boolean enableWristPID;
 
 	// Test variables
 	private ArrayList<Double> shoulderMovement;
@@ -112,20 +118,25 @@ public class Arm extends SubsystemModule {
 	public void setShoulderPower() {
 		double motorPower = 0;
 
-		if(!enableShoulderPID && shoulderDirection * (desiredShoulderAngle - currentShoulderAngle) > 0) {
-			motorPower = Math.PI * (currentShoulderAngle + startShoulderAngle);
-			motorPower /= Math.abs(startShoulderAngle - desiredShoulderAngle);
-			motorPower = 1 + Math.cos(Math.toRadians(motorPower));
-			motorPower /= 2;
+		if(shoulderDirection * (currentShoulderAngle - desiredShoulderAngle) < 0) {
+			shoulderPowerFactor *= shoulderDampingFactor;
+			shoulderDirection *= -1;
+			System.out.println("Shoulder damp");
+		}
 
-			motorPower *= 0.3;
+		if(currentShoulderAngle - desiredShoulderAngle != 0) {
+			motorPower += Math.pow(currentShoulderAngle - desiredShoulderAngle, 2);
+			motorPower *= shoulderCoefficient;
+			motorPower = Math.sin(motorPower);
+			motorPower *= (int)((desiredShoulderAngle - currentShoulderAngle) / Math.abs(desiredShoulderAngle - currentShoulderAngle));
+			motorPower *= shoulderPowerFactor;
 		}
 		// } else {
 		// 	motorPower = ;
 		// 	enableShoulderPID = true;
 		// }
 
-		shoulderMotor.set(motorPower);
+		shoulderMotor.set(motorPower + getShoulderFeedforward());
 	}
 
 	/**
@@ -134,20 +145,21 @@ public class Arm extends SubsystemModule {
 	public void setWristPower() {
 		double motorPower = 0;
 
-		if(!enableWristPID && wristDirection * (desiredWristAngle - currentWristAngle) > 0) {
-			motorPower = Math.PI * (currentWristAngle + startWristAngle);
-			motorPower /= Math.abs(startWristAngle - desiredWristAngle);
-			motorPower = 1 + Math.cos(Math.toRadians(motorPower));
-			motorPower /= 2;
-
-			motorPower *= 0.3;
-
-			wristMotor.set(motorPower);
+		if(wristDirection * (currentWristAngle - desiredWristAngle) < 0) {
+			wristPowerFactor *= wristDampingFactor;
+			wristDirection *= -1;
+			System.out.println("Wrist damp");
 		}
-		// } else {
-		// 	motorPower = ;
-		// 	enableWristPID = true;
-		// }
+
+		if(currentWristAngle - desiredWristAngle != 0) {
+			motorPower += Math.pow(currentWristAngle - desiredWristAngle, 2);
+			motorPower *= wristCoefficient;
+			motorPower = Math.sin(motorPower);
+			motorPower *= (int)((desiredWristAngle - currentWristAngle) / Math.abs(desiredWristAngle - currentWristAngle));
+			motorPower *= wristPowerFactor;
+		}
+
+		wristMotor.set(motorPower);
 	}
 
 	/**
@@ -159,16 +171,34 @@ public class Arm extends SubsystemModule {
 		desiredShoulderAngle = shoulderAngle;
 		desiredWristAngle = wristAngle;
 
-		shoulderDirection = (int)(desiredShoulderAngle - startShoulderAngle);
-		shoulderDirection /= Math.abs(shoulderDirection);
-		wristDirection = (int)(desiredWristAngle - startWristAngle);
-		wristDirection /= Math.abs(wristDirection);
+		double motorPower = 0.3;
 
-		enableShoulderPID = false;
-		enableShoulderPID = false;
+		shoulderPowerFactor = (Math.abs(startShoulderAngle - desiredShoulderAngle) / 40) * motorPower;
+		if(shoulderPowerFactor > motorPower) { shoulderPowerFactor = motorPower; }
+
+		wristPowerFactor = (Math.abs(startWristAngle - desiredWristAngle) / 40) * motorPower;
+		if(wristPowerFactor > motorPower) { wristPowerFactor = motorPower; }
 
 		startShoulderAngle = currentShoulderAngle;
 		startWristAngle = currentWristAngle;
+
+		if(startShoulderAngle - desiredShoulderAngle != 0) {
+			shoulderCoefficient = Math.PI / (2 * Math.pow(startShoulderAngle - desiredShoulderAngle, 2));
+			shoulderDirection = (int)(Math.abs(startShoulderAngle - desiredShoulderAngle) / (startShoulderAngle - desiredShoulderAngle));
+		}
+		else {
+			shoulderCoefficient = 0;
+			shoulderDirection = 0;
+		}
+		
+		if(startWristAngle - desiredWristAngle != 0) {
+			wristCoefficient = Math.PI / (2 * Math.pow(startWristAngle - desiredShoulderAngle, 2));
+			wristDirection = (int)(Math.abs(startWristAngle - desiredWristAngle) / (startWristAngle - desiredWristAngle));
+		}
+		else {
+			wristCoefficient = 0;
+			wristDirection = 0;
+		}
 	}
 
 	/**
@@ -261,9 +291,6 @@ public class Arm extends SubsystemModule {
 
 		startShoulderAngle = 0;
 		startWristAngle = 0;
-
-		enableShoulderPID = false;
-		enableWristPID = false;
 
 		shoulderMovement = new ArrayList<Double>(0);
 		wristMovement = new ArrayList<Double>(0);
