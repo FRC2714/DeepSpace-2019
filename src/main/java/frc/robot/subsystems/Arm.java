@@ -119,10 +119,11 @@ public class Arm extends SubsystemModule {
 			motorPower /= 2;
 
 			motorPower *= 0.3;
-		} else {
-			motorPower = ;
-			enableShoulderPID = true;
 		}
+		// } else {
+		// 	motorPower = ;
+		// 	enableShoulderPID = true;
+		// }
 
 		shoulderMotor.set(motorPower);
 	}
@@ -142,10 +143,11 @@ public class Arm extends SubsystemModule {
 			motorPower *= 0.3;
 
 			wristMotor.set(motorPower);
-		} else {
-			motorPower = ;
-			enableWristPID = true;
 		}
+		// } else {
+		// 	motorPower = ;
+		// 	enableWristPID = true;
+		// }
 	}
 
 	/**
