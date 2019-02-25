@@ -90,7 +90,6 @@ public class Robot extends TimedRobot {
 				append("hatch_station_intake -s", this.launchpad.getButtonInstance(4, 5));
 
 				// Score positions
-
 				append("lower_score -p", this.launchpad.getButtonInstance(6, 8));
 				append("lower_score -p", this.launchpad.getButtonInstance(7, 8));
 				append("middle_score -p", this.launchpad.getButtonInstance(6, 6));
@@ -118,8 +117,9 @@ public class Robot extends TimedRobot {
 				append("driver_control -p", this.rightStick);
 				append("vision_align -s", this.leftStick);
 				append("vision_align -s", this.lb);
-				append("arm_to_position -p 50,50", this.a);
-				append("arm_to_position -p 90,90", this.b);
+				
+				append("arm_to_position -s 19,193", this.a);
+
 				// append("auton_vision_align -s", this.y);
 
 				// append("go_to_position -p 126,58", this.a);
