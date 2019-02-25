@@ -1,18 +1,13 @@
 package frc.robot.subsystems;
 
 import java.util.ArrayList;
+
 import com.revrobotics.CANEncoder;
-import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.CounterBase.EncodingType;
-import frc.robot.RobotMap;
 import frc.robot.util.ControlsProcessor;
-import frc.robot.util.PID;
 import frc.robot.util.SubsystemCommand;
 import frc.robot.util.SubsystemModule;
 
@@ -20,259 +15,189 @@ public class Arm extends SubsystemModule {
 
 	private Intake intake;
 
-	// Controls Processor
-	private ControlsProcessor controlsProcessor;
-
 	// Arm motors
-	private CANSparkMax shoulderMotor = new CANSparkMax(7, MotorType.kBrushless);
-	private CANSparkMax wristMotor = new CANSparkMax(8, MotorType.kBrushless);
-
-	// PID controllers
-
-	private CANPIDController wristPidController = wristMotor.getPIDController();
-
-	// MAX encoders
-	private CANEncoder wristMotorEncoder = wristMotor.getEncoder();
-
-	// Output encoders - Probably won't use these
-	private Encoder shoulderOutputEncoder = new Encoder(RobotMap.p_shoulderEncoderA, RobotMap.p_shoulderEncoderB, true, EncodingType.k4X);
-	// private Encoder wristOutputEncoder = new Encoder(RobotMap.p_wristEncoderA, RobotMap.p_wristEncoderB, true, EncodingType.k4X);
-
+	private final CANSparkMax shoulderMotor = new CANSparkMax(7, MotorType.kBrushless);
+	private final CANSparkMax wristMotor = new CANSparkMax(8, MotorType.kBrushless);
 	
-	// PID coefficients
-	private final double sMinOutput = -1;
-	private final double sMaxOutput = 1;
-	private final double sP = 0.012; // 0.018
-	private final double sI = 0.0; // 0.000038
-	private final double sD = 0.0; // 0.001
-	
-	private final double wMinOutput = -1;
-	private final double wMaxOutput = 1;
-	private final double wP = 0.05;
-	private final double wI = 0;
-	private final double wD = 0;
-
-	// Initialize PID
-	private final PID shoulderPID = new PID(sP, sI, sD);
-
-	// All angles are in degrees
-	private double wristOffset;
-	private double currentShoulderAngle;
-	private double currentWristAngle;
-	private double currentShoulderSetpoint;
-	private double currentWristSetpoint;
-	
-	// Shoulder linearization
-	private final double shoulderHoldPower = 0.045;
-	private final double parallelOffset = 47;
-	private double shoulderFF;
-
-	private final double maxDegreesPerSecond = 10;
+	// Initialize arm encoders
+	private CANEncoder shoulderMotorEncoder = shoulderMotor.getEncoder();
+	private CANEncoder wristEncoder = wristMotor.getEncoder();
 
 	// Arm characteristics
-	private final double wristRatio = -140;
+	private final double wristRatio = 360 / (140.0);
+	private final double shoulderRatio = 360 / (512.0 / 3);
 
-	// Arm movement constants
-	private final double armMaxVelocity = 220; // 120
-	private final double armAcceleration = 2714; // 250
-	private final double armJerk = 100; // 100
+	// Current arm angles in degrees
+	private double currentShoulderAngle;
+	private double currentWristAngle;
 
-	// Array Lists
-	private ArrayList<Double> shoulderPath;
-	private ArrayList<Double> wristPath;
+	// Desired arm angles in degrees
+	private double desiredShoulderAngle;
+	private double desiredWristAngle;
 
-	private boolean shoulderPathFinished;
-	private boolean wristPathFinished;
+	// Start arm anngles
+	private double startShoulderAngle;
+	private double startWristAngle;
 
-	private ArrayList<Double> currentShoulderPosition;
+	// Movement direction
+	private double shoulderCoefficient;
+	private double wristCoefficient;
 
-	// Makes the arm give up
-	private boolean giveUp;
-
-	// Sets true when at bumper position
-	private boolean bumperPosition;
+	// Arm start powers
+	private double shoulderPowerFactor;
+	private double wristPowerFactor;
 
 	// Arm initialization
     public Arm(ControlsProcessor controlsProcessor) {
 		intake = new Intake();
+		
 		controlsProcessor.registerController("Intake", intake);
-		
 		registerCommands();
-		
-		this.controlsProcessor = controlsProcessor;
 
-		shoulderMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 2);
+		// Enable voltage compensation for arm motors
+		shoulderMotor.enableVoltageCompensation(12.0);
+		wristMotor.enableVoltageCompensation(12.0);
 
+		// Set SparkMax CAN periods
+		shoulderMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
 		wristMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 10);
 		wristMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10);
-
-		// Setup up PID coefficients
-		wristPidController.setP(wP);
-		wristPidController.setI(wI);
-		wristPidController.setD(wD);
-		wristPidController.setOutputRange(wMinOutput, wMaxOutput);
-	}
-	
-	/**
-	 * Goes to the desired angle from the current angle on the shoulder
-	 * @param desiredTheta Desired angle for the shoulder in degrees
-	 */
-	public void setShoulderAngle(double desiredTheta) {
-		currentShoulderSetpoint = desiredTheta;
-		// System.out.println("Shoulder Desired Theta: " + desiredTheta);
-	}
-
-	/**
-	 * Goes to the desired angle from the current angle on the wrist
-	 * @param desiredTheta Desired angle for the wrist in degrees
-	 */
-	public void setWristAngle(double desiredTheta) {
-		double desiredMotorRotations = ((wristOffset + desiredTheta) / 360) * wristRatio;
 		
-		// System.out.println("Wrist Desired Theta: " + desiredTheta + " Desired Motor Rotations: " + desiredMotorRotations);
-		wristPidController.setReference(desiredMotorRotations, ControlType.kPosition);
+		// Inverts wrist motor direction
+		wristMotor.setInverted(true);
 	}
 
 	/**
-	 * Calls generatePath with infinite max acceleration and infinite jerk for constant velocity
-	 * @param startPosition in degrees
-	 * @param endPosition in degrees
-	 * @param velocity in degrees per second
-	 * @return ArrayList of type double with every controlled point in the path
+	 * Sets currentShoulderAngle and currentWristAngle to the encoder values
 	 */
-	public ArrayList<Double> generatePath(double startPosition, double endPosition, double velocity) {
-		return generatePath(startPosition, endPosition, velocity, Double.MAX_VALUE, Double.MAX_VALUE);
+	public void updateCurrentAngles() {
+		currentShoulderAngle = shoulderMotorEncoder.getPosition() * shoulderRatio;
+		currentWristAngle = wristEncoder.getPosition() * wristRatio;
 	}
 
 	/**
-	 * Calls generatePath with infinite jerk for constant velocity
-	 * @param startPosition in degrees
-	 * @param endPosition in degrees
-	 * @param maxVelocity in degrees per second
-	 * @param acceleration in degrees per second per second
-	 * @return ArrayList of type double with every controlled point in the path
+	 * Uses costrol and feedforward value to set shoulder motor power
 	 */
-	public ArrayList<Double> generatePath(double startPosition, double endPosition, double maxVelocity, double acceleration) {
-		return generatePath(startPosition, endPosition, maxVelocity, acceleration, Double.MAX_VALUE);
-	}
+	public void setShoulderPower() {
+		double motorPower = 0;
 
-	/**
-	 * Generates a path for the arm to follow while limiting jerk
-	 * @param initialAngle in degrees
-	 * @param desiredAngle in degrees
-	 * @param maxVelocity in degrees per second
-	 * @param maxAcceleration in degrees per second per second
-	 * @param jerkConstant in degrees per second per second per second
-	 * @return ArrayList of type double with every controlled point in the path
-	 */
-	public ArrayList<Double> generatePath(double initialAngle, double desiredAngle, double maxVelocity, double maxAcceleration, double jerkConstant) {
-		int direction;
-		
-		if(desiredAngle - initialAngle < 0) { direction = -1; }
-		else if(desiredAngle - initialAngle > 0) { direction = 1; }
-		else { return new ArrayList<Double>(0); }
-
-		double currentAcceleration = 0;
-		double currentVelocity = 0;
-		double angularDisplacement = 0;
-
-		double period = controlsProcessor.getCommandPeriod();
-
-		jerkConstant *= Math.pow(period, 3);
-		maxAcceleration *= Math.pow(period, 2);
-		maxVelocity *= period;
-
-		ArrayList<Double> points = new ArrayList<Double>(0);
-		points.add(initialAngle);
-		points.add(desiredAngle);
-		
-		for(int i = 0; direction * (points.get(i + 1) - points.get(i)) >=  3 * direction * angularDisplacement; i++) {
-			points.add(i + 1, points.get(i + 1) - angularDisplacement);
-			points.add(i + 1, points.get(i) + angularDisplacement);
-
-			currentAcceleration += jerkConstant;
-
-			if(currentAcceleration > maxAcceleration)
-				currentAcceleration = maxAcceleration;
-			
-			currentVelocity += currentAcceleration;
-
-			if(currentVelocity > maxVelocity)
-				currentVelocity = maxVelocity;
-			
-			angularDisplacement = direction * currentVelocity;
+		if(Math.abs(desiredShoulderAngle - currentShoulderAngle) < 0.5) {}
+		else if(desiredShoulderAngle - currentShoulderAngle != 0) {
+			motorPower += Math.pow(desiredShoulderAngle - currentShoulderAngle, 2);
+			motorPower *= shoulderCoefficient;
+			motorPower = Math.sin(motorPower);
+			motorPower += 0.1;
+			motorPower *= (int)((desiredShoulderAngle - currentShoulderAngle) / Math.abs(desiredShoulderAngle - currentShoulderAngle));
+			motorPower *= shoulderPowerFactor;
 		}
 
-		points.remove(0);
-		points.remove(points.size() - 1);
-
-		int midpoint = (points.size() / 2) - 1;
-		points.add(midpoint + 1, (points.get(midpoint) + points.get(midpoint + 1)) / 2);
-
-		// System.out.println("End Velocity: " + currentVelocity + "  Max Velocity: " + maxVelocity);
-		// System.out.println("End Acceleration: " + currentAcceleration + "  Max Acceleration: " + maxAcceleration);
-		// System.out.println("Total Time: " + (points.size() - 1) * period);
-
-		return points;
+		shoulderMotor.set(motorPower);
 	}
 
-	/** 
-	 * Locks the arm into a four bar configuration going up
+	/**
+	 * Plugs in desired wrist angle to the wrist costrol
 	 */
-	public void jogUp() {
-		double currentDegreesPerPeriod = maxDegreesPerSecond * controlsProcessor.getCommandPeriod();
-		currentShoulderSetpoint += currentDegreesPerPeriod;
-		currentWristSetpoint += currentDegreesPerPeriod;
+	public void setWristPower() {
+		double motorPower = 0;
 
-		setWristAngle(currentWristSetpoint);
+		if(Math.abs(desiredWristAngle - currentWristAngle) < 0.5) {}
+		else if(desiredWristAngle - currentWristAngle != 0) {
+			motorPower += Math.pow(desiredWristAngle - currentWristAngle, 2);
+			motorPower *= wristCoefficient;
+			motorPower = Math.sin(motorPower);
+			motorPower += 0.05;
+			motorPower *= (int)((desiredWristAngle - currentWristAngle) / Math.abs(desiredWristAngle - currentWristAngle));
+			motorPower *= wristPowerFactor;
+		}
 
-		// System.out.println("Delta S: " + shoulderDelta + "\tW: " + wristDelta);
-		// System.out.println("Up S:" + currentShoulderAngle + "\tW: " + currentWristAngle);
+		wristMotor.set(motorPower);
 	}
 
-	/** 
-	 * Locks the arm into a four bar configuration going down
+	/**
+	 * 
+	 * @param shoulderPower
+	 * @param wristPower
 	 */
-	public void jogDown() {
-		double currentDegreesPerPeriod = maxDegreesPerSecond * controlsProcessor.getCommandPeriod();
-		currentShoulderSetpoint -= currentDegreesPerPeriod;
-		currentWristSetpoint -= currentDegreesPerPeriod;
+	public void setPowerFactors(double shoulderPower, double wristPower) {
+		shoulderPowerFactor = (Math.abs(desiredShoulderAngle - startShoulderAngle) / 40) * shoulderPower;
+		if(shoulderPowerFactor > shoulderPower) { shoulderPowerFactor = shoulderPower; }
 
-		setWristAngle(currentWristSetpoint);
-
-		// System.out.println("Delta S: " + shoulderDelta + "\tW: " + wristDelta);
-		// System.out.println("Down S: " + currentShoulderAngle + "\tW: " + currentWristAngle);
+		wristPowerFactor = (Math.abs(desiredWristAngle - startWristAngle) / 40) * wristPower;
+		if(wristPowerFactor > wristPower) { wristPowerFactor = wristPower; }
 	}
 
+	/**
+	 * 
+	 */
+	public void setArmValues() {
+		if(desiredShoulderAngle - startShoulderAngle != 0) {
+			shoulderCoefficient = Math.PI / (2 * Math.pow(desiredShoulderAngle - startShoulderAngle, 2));
+		}
+		else {
+			shoulderCoefficient = 0;
+		}
+		
+		if(desiredWristAngle - startWristAngle != 0) {
+			wristCoefficient = Math.PI / (2 * Math.pow(desiredWristAngle - startWristAngle, 2));
+		}
+		else {
+			wristCoefficient = 0;
+		}
+	}
+
+	/**
+	 * Sets the arm to the desired overall position
+	 * @param shoulderAngle the desired shoulder angle in degrees
+	 * @param wristAngle the desired wrist angle in degrees
+	 */
+	public void goToPosition(double shoulderAngle, double wristAngle) {		
+		desiredShoulderAngle = shoulderAngle;
+		desiredWristAngle = wristAngle;
+
+		startShoulderAngle = currentShoulderAngle;
+		startWristAngle = currentWristAngle;
+
+		setPowerFactors(0.75, 1.0);
+		setArmValues();
+	}
+
+	/**
+	 * 
+	 * @param shoulderAngle
+	 * @param wristAngle
+	 * @return
+	 */
+	public boolean atPosition(double shoulderAngle, double wristAngle) {
+		boolean atShoulderAngle = false;
+		boolean atWristAngle = false;
+
+		double shoulderAngleDelta = Math.abs(currentShoulderAngle - shoulderAngle);
+		double wristAngleDelta = Math.abs(currentWristAngle - wristAngle);
+
+		if(shoulderAngleDelta < 2.0) { atShoulderAngle = true; }
+		if(wristAngleDelta < 2.0) { atWristAngle = true; }
+
+		return atShoulderAngle && atWristAngle;
+	}
 
 	@Override
 	public void run() {
-		currentShoulderAngle = shoulderOutputEncoder.getDistance();
-		currentWristAngle = ((wristMotorEncoder.getPosition() / wristRatio) * 360) - wristOffset;
+		updateCurrentAngles();
 
-		if(giveUp) { currentShoulderSetpoint = shoulderOutputEncoder.getDistance(); }
-		
-		shoulderFF = shoulderHoldPower * Math.cos(Math.abs(currentShoulderSetpoint - parallelOffset) * (Math.PI / 180));
-		shoulderMotor.set(shoulderPID.getOutput(currentShoulderAngle, currentShoulderSetpoint) + shoulderFF);
-
-		// System.out.println("Shoulder encoder: " + shoulderOutputEncoder.getDistance());
-		// System.out.println("PID Output: " + shoulderPID.getOutput(currentShoulderAngle, currentShoulderSetpoint) + "\tEncoder Distance: " + shoulderOutputEncoder.getDistance());
+		setShoulderPower();
+		setWristPower();
 	}
 
 	@Override
 	public void registerCommands() {
-
-		new SubsystemCommand(this.registeredCommands, "get_arm_position") {
-			
+		new SubsystemCommand(this.registeredCommands, "jog_up") {
 			@Override
-			public void initialize() {
-				System.out.println("WARNING: Is the PID off?");
-				wristMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
-				shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
+			public void initialize() {}
+
+			@Override
+			public void execute() {
+				goToPosition(currentShoulderAngle + 3, currentWristAngle + 1.5);
 			}
-
-			@Override
-			public void execute() { }
 
 			@Override
 			public boolean isFinished() {
@@ -280,524 +205,257 @@ public class Arm extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-				wristMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
-				shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
-				System.out.println("Shoulder Angle: " + currentShoulderAngle + "\tWrist Angle: " + currentWristAngle);
-			}
+			public void end() {}
 		};
 
-		new SubsystemCommand(this.registeredCommands, "start_position") {
-			int iterator;
-
+		new SubsystemCommand(this.registeredCommands, "jog_down") {
 			@Override
-			public void initialize() {
-				giveUp = false;
-				bumperPosition = false;
-
-				if (!intake.getHatchState()) {
-					shoulderPathFinished = false;
-					wristPathFinished = false;
-
-					shoulderPath = generatePath(currentShoulderAngle, 0,
-							armMaxVelocity, armAcceleration, armJerk);
-
-					wristPath = generatePath(currentWristAngle, 0,
-							armMaxVelocity, armAcceleration, armJerk);
-
-					iterator = 0;
-				}
-			}
+			public void initialize() {}
 
 			@Override
 			public void execute() {
-				iterator++;
-
-				if (iterator < shoulderPath.size())
-					setShoulderAngle(shoulderPath.get(iterator));
-				else
-					shoulderPathFinished = true;
-				
-				if (iterator < wristPath.size())
-					setWristAngle(wristPath.get(iterator));
-				else
-					wristPathFinished = true;
+				goToPosition(currentShoulderAngle - 3, currentWristAngle - 3);
 			}
 
 			@Override
 			public boolean isFinished() {
-				return shoulderPathFinished && wristPathFinished;
+				return false;
 			}
 
 			@Override
-			public void end() {
-				shoulderPath = new ArrayList<Double>(0);
-				wristPath = new ArrayList<Double>(0);
-			}
+			public void end() {}
 		};
 
-
-		new SubsystemCommand(this.registeredCommands, "floor_cargo_position") {
-			int iterator;
+		new SubsystemCommand(this.registeredCommands, "arm_to_position") {
+			double shoulderAngle;
+			double wristAngle;
 
 			@Override
 			public void initialize() {
-				giveUp = false;
-				bumperPosition = false;
+				shoulderAngle = Double.parseDouble(this.args[0]);
+				wristAngle = Double.parseDouble(this.args[1]);
 
-				intake.setAtPosition(false);
-
-				if (!intake.getHatchState() && !intake.getCargoState()) {
-					shoulderPathFinished = false;
-					wristPathFinished = false;
-
-					shoulderPath = generatePath(currentShoulderAngle, 21,
-							armMaxVelocity, armAcceleration, armJerk);
-
-					wristPath = generatePath(currentWristAngle, 222,
-							armMaxVelocity, armAcceleration, armJerk);
-
-					iterator = 0;
-				}
+				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void execute() {
-				iterator++;
-
-				if (iterator < shoulderPath.size())
-					setShoulderAngle(shoulderPath.get(iterator));
-				else
-					shoulderPathFinished = true;
-				
-				if (iterator < wristPath.size())
-					setWristAngle(wristPath.get(iterator));
-				else
-					wristPathFinished = true;
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
-				return shoulderPathFinished && wristPathFinished;
+				return atPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void end() {
-				shoulderPath = new ArrayList<Double>(0);
-				wristPath = new ArrayList<Double>(0);
-				
-				intake.setAtPosition(true);
-			}
+			public void end() {}
 		};
 
-
-		new SubsystemCommand(this.registeredCommands, "floor_hatch_position") {
-			int iterator;
+		new SubsystemCommand(this.registeredCommands, "floor_cargo_postion") {
+			double shoulderAngle;
+			double wristAngle;
 
 			@Override
 			public void initialize() {
-				giveUp = false;
-				bumperPosition = false;
-
-				intake.setAtPosition(false);
-
-				if (!intake.getHatchState() && !intake.getCargoState()) {
-					shoulderPathFinished = false;
-					wristPathFinished = false;
-
-					shoulderPath = generatePath(currentShoulderAngle, 13,
-							armMaxVelocity, armAcceleration, armJerk);
-
-					wristPath = generatePath(currentWristAngle, 182,
-							armMaxVelocity, armAcceleration, armJerk);
-
-					iterator = 0;
-				}
+				shoulderAngle = 27;
+				wristAngle = 240;
+				
+				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void execute() {
-				iterator++;
-
-				if (iterator < shoulderPath.size())
-					setShoulderAngle(shoulderPath.get(iterator));
-				else
-					shoulderPathFinished = true;
-				
-				if (iterator < wristPath.size())
-					setWristAngle(wristPath.get(iterator));
-				else
-					wristPathFinished = true;
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
-				return shoulderPathFinished && wristPathFinished;
+				return atPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void end() {
-				shoulderPath = new ArrayList<Double>(0);
-				wristPath = new ArrayList<Double>(0);
-				
-				intake.setAtPosition(true);
-			}
+			public void end() {}
 		};
 
-
-		new SubsystemCommand(this.registeredCommands, "station_position") {
-			int iterator;
+		new SubsystemCommand(this.registeredCommands, "floor_hatch_postion") {
+			double shoulderAngle;
+			double wristAngle;
 
 			@Override
 			public void initialize() {
-				giveUp = false;
-				bumperPosition = false;
-
-				shoulderPathFinished = false;
-				wristPathFinished = false;
-
-				shoulderPath = generatePath(currentShoulderAngle, 4,
-						armMaxVelocity, armAcceleration, armJerk);
-
-				wristPath = generatePath(currentWristAngle, 76,
-						armMaxVelocity, armAcceleration, armJerk);
-				// 86
-				iterator = 0;
+				shoulderAngle = 19;
+				wristAngle = 193;
+				
+				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void execute() {
-				iterator++;
-
-				if (iterator < shoulderPath.size())
-					setShoulderAngle(shoulderPath.get(iterator));
-				else
-					shoulderPathFinished = true;
-				
-				if (iterator < wristPath.size())
-					setWristAngle(wristPath.get(iterator));
-				else
-					wristPathFinished = true;
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
-				return shoulderPathFinished && wristPathFinished;
+				return atPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void end() {
-				shoulderPath = new ArrayList<Double>(0);
-				wristPath = new ArrayList<Double>(0);
-
-				bumperPosition = true;
-				intake.setAtPosition(true);
-				System.out.println("station position end");
-			}
+			public void end() {}
 		};
 
+		new SubsystemCommand(this.registeredCommands, "station_postion") {
+			double shoulderAngle;
+			double wristAngle;
+
+			@Override
+			public void initialize() {
+				shoulderAngle = 4;
+				wristAngle = 80;
+				
+				goToPosition(shoulderAngle, wristAngle);
+			}
+
+			@Override
+			public void execute() {}
+
+			@Override
+			public boolean isFinished() {
+				return atPosition(shoulderAngle, wristAngle);
+			}
+
+			@Override
+			public void end() {}
+		};
 
 		new SubsystemCommand(this.registeredCommands, "lower_score") {
-			int iterator;
+			double shoulderAngle;
+			double wristAngle;
 
 			@Override
 			public void initialize() {
-				giveUp = false;
-				bumperPosition = false;
-
-				if (!intake.getHatchState() && intake.getCargoState()) {
-					shoulderPathFinished = false;
-					wristPathFinished = false;
-					
-					shoulderPath = generatePath(currentShoulderAngle, 50,
-							armMaxVelocity, armAcceleration, armJerk);
-					// 38
-					wristPath = generatePath(currentWristAngle, 195,
-							armMaxVelocity, armAcceleration, armJerk);
-
-					iterator = 0;
-				} else if (intake.getHatchState() && !intake.getCargoState()) {
-					shoulderPathFinished = false;
-					wristPathFinished = false;
-
-					shoulderPath = generatePath(currentShoulderAngle, 4,
-							armMaxVelocity, armAcceleration, armJerk);
-
-					wristPath = generatePath(currentWristAngle, 76,
-							armMaxVelocity, armAcceleration, armJerk);
-					// 86
-					iterator = 0;
+				if(intake.getCargoState()) {
+					shoulderAngle = 28;
+					wristAngle = 75;
+				} else if(intake.getHatchState()) {
+					shoulderAngle = 4;
+					wristAngle = 80;
+				} else {
+					shoulderAngle = currentShoulderAngle;
+					wristAngle = currentWristAngle;
 				}
+
+				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void execute() {
-				iterator++;
-
-				if (iterator < shoulderPath.size())
-					setShoulderAngle(shoulderPath.get(iterator));
-				else
-					shoulderPathFinished = true;
-				
-				if (iterator < wristPath.size())
-					setWristAngle(wristPath.get(iterator));
-				else
-					wristPathFinished = true;
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
-				return shoulderPathFinished && wristPathFinished;
+				return atPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void end() {
-				shoulderPath = new ArrayList<Double>(0);
-				wristPath = new ArrayList<Double>(0);
-			}
+			public void end() {}
 		};
-
 
 		new SubsystemCommand(this.registeredCommands, "middle_score") {
-			int iterator;
+			double shoulderAngle;
+			double wristAngle;
 
 			@Override
 			public void initialize() {
-				giveUp = false;
-				bumperPosition = false;
-
-				if (!intake.getHatchState() && intake.getCargoState()) {
-					shoulderPathFinished = false;
-					wristPathFinished = false;
-					
-					shoulderPath = generatePath(currentShoulderAngle, 83,
-							armMaxVelocity, armAcceleration, armJerk);
-					// 77
-					wristPath = generatePath(currentWristAngle, 200,
-							armMaxVelocity, armAcceleration, armJerk);
-					// 227
-
-					iterator = 0;
-				} else if (intake.getHatchState() && !intake.getCargoState()) {
-					shoulderPathFinished = false;
-					wristPathFinished = false;
-					
-					shoulderPath = generatePath(currentShoulderAngle, 62,
-							armMaxVelocity, armAcceleration, armJerk);
-					// 50
-					wristPath = generatePath(currentWristAngle, 122,
-							armMaxVelocity, armAcceleration, armJerk);
-					// 143
-					iterator = 0;
+				if(intake.getCargoState()) {
+					shoulderAngle = 87;
+					wristAngle = 200;
+				} else if(intake.getHatchState()) {
+					shoulderAngle = 62;
+					wristAngle = 126;
+				} else {
+					shoulderAngle = currentShoulderAngle;
+					wristAngle = currentWristAngle;
 				}
+
+				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void execute() {
-				iterator++;
-
-				if (iterator < shoulderPath.size())
-					setShoulderAngle(shoulderPath.get(iterator));
-				else
-					shoulderPathFinished = true;
-				
-				if (iterator < wristPath.size())
-					setWristAngle(wristPath.get(iterator));
-				else
-					wristPathFinished = true;
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
-				return shoulderPathFinished && wristPathFinished;
+				return atPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void end() {
-				shoulderPath = new ArrayList<Double>(0);
-				wristPath = new ArrayList<Double>(0);
-			}
+			public void end() {}
 		};
-
 
 		new SubsystemCommand(this.registeredCommands, "upper_score") {
-			int iterator;
+			double shoulderAngle;
+			double wristAngle;
 
 			@Override
 			public void initialize() {
-				giveUp = false;
-				bumperPosition = false;
-
-				if (!intake.getHatchState() && intake.getCargoState()) {
-					shoulderPathFinished = false;
-					wristPathFinished = false;
-					
-					shoulderPath = generatePath(currentShoulderAngle, 120,
-							armMaxVelocity, armAcceleration, armJerk);
-					// 122
-					wristPath = generatePath(currentWristAngle, 221,
-							armMaxVelocity, armAcceleration, armJerk);
-					// 233
-					iterator = 0;
-				} else if (intake.getHatchState() && !intake.getCargoState()) {
-					shoulderPathFinished = false;
-					wristPathFinished = false;
-					
-					shoulderPath = generatePath(currentShoulderAngle, 117,
-							armMaxVelocity, armAcceleration, armJerk);
-					// 91
-					wristPath = generatePath(currentWristAngle, 204,
-							armMaxVelocity, armAcceleration, armJerk);
-					// 178
-					iterator = 0;
+				if(intake.getCargoState()) {
+					shoulderAngle = 120;
+					wristAngle = 220;
+				} else if(intake.getHatchState()) {
+					shoulderAngle = 110;
+					wristAngle = 188;
+				} else {
+					shoulderAngle = currentShoulderAngle;
+					wristAngle = currentWristAngle;
 				}
+
+				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void execute() {
-				iterator++;
-
-				currentShoulderPosition.add(shoulderOutputEncoder.getDistance());
-
-				if (iterator < shoulderPath.size())
-					setShoulderAngle(shoulderPath.get(iterator));
-				else
-					shoulderPathFinished = true;
-				
-				if (iterator < wristPath.size())
-					setWristAngle(wristPath.get(iterator));
-				else
-					wristPathFinished = true;
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
-				return shoulderPathFinished && wristPathFinished;
+				return atPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void end() {
-				shoulderPath = new ArrayList<Double>(0);
-				wristPath = new ArrayList<Double>(0);
-			}
+			public void end() {}
 		};
-
 
 		new SubsystemCommand(this.registeredCommands, "back_score") {
-			int iterator;
+			double shoulderAngle;
+			double wristAngle;
 
 			@Override
 			public void initialize() {
-				giveUp = false;
-				bumperPosition = false;
-
-				if (intake.getHatchState() && !intake.getCargoState()) {
-					shoulderPathFinished = false;
-					wristPathFinished = false;
-					
-					shoulderPath = generatePath(currentShoulderAngle, 130,
-							armMaxVelocity, armAcceleration, armJerk);
-
-					wristPath = generatePath(currentWristAngle, 58,
-							armMaxVelocity, armAcceleration, armJerk);
-
-					iterator = 0;
+				if(intake.getHatchState()) {
+					shoulderAngle = 130;
+					wristAngle = 58;
+				} else {
+					shoulderAngle = currentShoulderAngle;
+					wristAngle = currentWristAngle;
 				}
+
+				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void execute() {
-				iterator++;
-
-				if (iterator < shoulderPath.size())
-					setShoulderAngle(shoulderPath.get(iterator));
-				else
-					shoulderPathFinished = true;
-				
-				if (iterator < wristPath.size())
-					setWristAngle(wristPath.get(iterator));
-				else
-					wristPathFinished = true;
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
-				return shoulderPathFinished && wristPathFinished;
+				return atPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void end() {
-				shoulderPath = new ArrayList<Double>(0);
-				wristPath = new ArrayList<Double>(0);
-			}
+			public void end() {}
 		};
-
-
-		new SubsystemCommand(this.registeredCommands, "go_to_position") {
-			int iterator;
-
-			@Override
-			public void initialize() {
-				giveUp = false;
-				bumperPosition = false;
-
-				shoulderPathFinished = false;
-				wristPathFinished = false;
-
-				shoulderPath = generatePath(currentShoulderAngle, Double.parseDouble(this.args[0]),
-						armMaxVelocity, armAcceleration, armJerk);
-
-				wristPath = generatePath(currentWristAngle, Double.parseDouble(this.args[1]),
-						armMaxVelocity, armAcceleration, armJerk);
-
-				iterator = 0;
-			}
-
-			@Override
-			public void execute() {
-				iterator++;
-
-				if (iterator < shoulderPath.size())
-					setShoulderAngle(shoulderPath.get(iterator));
-				else
-					shoulderPathFinished = true;
-				
-				if (iterator < wristPath.size())
-					setWristAngle(wristPath.get(iterator));
-				else
-					wristPathFinished = true;
-			}
-
-			@Override
-			public boolean isFinished() {
-				return shoulderPathFinished && wristPathFinished;
-			}
-
-			@Override
-			public void end() {
-				giveUp = true;
-				shoulderPath = new ArrayList<Double>(0);
-				wristPath = new ArrayList<Double>(0);
-			}
-		};
-
 
 		new SubsystemCommand(this.registeredCommands, "extake") {
 
 			@Override
 			public void initialize() {
-				if(intake.getHatchState()) { intake.pumpMotor.set(0); }
-
-				if(bumperPosition && intake.checkCargoState()) {
+				if(intake.getHatchState()) {
+					intake.pumpMotor.set(0);
+				} else {
 					intake.cargoMotor.set(-1);
 				}
-				else if (!intake.checkPumpState()) {
-					intake.cargoMotor.set(-1);
-				}
-
-				if(intake.getHatchState() || intake.getCargoState()) { giveUp = true; }
-
-				bumperPosition = false;
 			}
 			
 			@Override
@@ -816,104 +474,35 @@ public class Arm extends SubsystemModule {
 				intake.clearStates();
 			}
 		};
-
-
-		new SubsystemCommand(this.registeredCommands, "jog_up") {
-
-			@Override
-			public void initialize() {
-				giveUp = false;
-				currentWristSetpoint = currentWristAngle;
-			}
-
-			@Override
-			public void execute() {
-				jogUp();
-			}
-
-			@Override
-			public boolean isFinished() {
-				return false;
-			}
-
-			@Override
-			public void end() {
-				System.out.println("Current Position: " + currentShoulderAngle);
-			}
-		};
-
-
-		new SubsystemCommand(this.registeredCommands, "jog_down") {
-
-			@Override
-			public void initialize() {
-				giveUp = false;
-				currentShoulderSetpoint = currentShoulderAngle;
-				currentWristSetpoint = currentWristAngle;
-			}
-
-			@Override
-			public void execute() {
-				jogDown();
-			}
-
-			@Override
-			public boolean isFinished() {
-				return false;
-			}
-
-			@Override
-			public void end() { }
-		};
     }
 
 	@Override
 	public void init() {
 		intake.init();
 
-		shoulderOutputEncoder.reset();
-		// wristOutputEncoder.reset();
-
-		shoulderOutputEncoder.setDistancePerPulse(45.0 / 512);
-		// wristOutputEncoder.setDistancePerPulse(wristScaler);
-
-		shoulderPID.setOutputLimits(sMinOutput, sMaxOutput);
-
-		currentShoulderAngle = 0;
-		currentWristAngle = 0;
-		currentShoulderSetpoint = 0;
-
-		shoulderFF = 0;
-
-		shoulderPath = new ArrayList<Double>(0);
-		wristPath = new ArrayList<Double>(0);
-
-		wristOffset = (wristMotorEncoder.getPosition() / wristRatio) * 360;
-
-		currentShoulderPosition = new ArrayList<Double>(0);
-
-		shoulderPathFinished = false;
-		wristPathFinished = false;
-
-		giveUp = false;
-		bumperPosition = false;
-
 		shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		wristMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+		
+		shoulderMotorEncoder.setPosition(0);
+		wristEncoder.setPosition(0);
+
+		desiredShoulderAngle = 0;
+		desiredWristAngle = 0;
+
+		startShoulderAngle = 0;
+		startWristAngle = 0;
 	}
 
 	@Override
 	public void destruct() {
-		System.out.println("ARM DESTRUCT");
+		intake.destruct();
 
 		shoulderMotor.set(0);
 		wristMotor.set(0);
-
-		System.out.println(currentShoulderPosition);
-
-		shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
-		wristMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
 		
-		intake.destruct();
+		shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
+		wristMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
+
+		System.out.println("Current Shoulder Angle: " + currentShoulderAngle + "\tCurrent Wrist Angle: " + currentWristAngle);
 	}
 }
