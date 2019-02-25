@@ -679,7 +679,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-//				System.out.println("driving controller finished? " + ":" + drivingController.isFinished());
+				System.out.println("driving controller finished? " + ":" + drivingController.isFinished());
 				return drivingController.isFinished();
 			}
 
@@ -937,7 +937,7 @@ public class DriveTrain extends SubsystemModule {
 				currentBlobArea = limelightTable.getEntry("ta").getDouble(0);
 
 				double kAngleP = 0.05;
-				double kDistanceDivisor = 0.6; // Untested value. Direct proportionality.
+				double kDistanceDivisor = 0.3; // Untested value. Direct proportionality.
 
 				if (this.args[0] != null)
 					maxBlobArea = Double.parseDouble(this.args[0]);
@@ -953,8 +953,8 @@ public class DriveTrain extends SubsystemModule {
 //				System.out.println("kDistanceDivisor: " + kDistanceDivisor + "| blobArea : " + currentBlobArea);
 
 
-				if (power > 0.8)
-					power = 0.8;
+				if (power > 0.2)
+					power = 0.2;
 
 //				System.out.println("power: " + power);
 

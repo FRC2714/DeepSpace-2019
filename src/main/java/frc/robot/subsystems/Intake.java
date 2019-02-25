@@ -18,7 +18,7 @@ public class Intake extends SubsystemModule {
 	protected CANSparkMax pumpMotor = new CANSparkMax(10, MotorType.kBrushless);
 
 	// Blinkin
-	private Spark blinkin = new Spark(0);
+	private Spark blinkin = new Spark(3);
 
 	// Hatchplate Servo
 	private Servo valveServo = new Servo(1);
