@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -211,19 +212,13 @@ public class Robot extends TimedRobot {
 		Scheduler.getInstance().run();
 	}
 
-	private SendableChooser<Command> chooseButton;
+
 	/**
 	 * Unused
 	 */
 	@Override
 	public void testInit(){
-		chooseButton = new SendableChooser<Command>();
-		SmartDashboard.putData("chooseButton",chooseButton);
-
-		//SmartDashboard Test
-		SmartDashboard.putBoolean("hi", false);
-		
-		// append("jog_up", SmartDashboard.putData(jog_up)); //chooseButton.addObject("jog_up", new jog_up()));
+		NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
 			}
 
 

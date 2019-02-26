@@ -918,7 +918,7 @@ public class DriveTrain extends SubsystemModule {
 
 		new SubsystemCommand(this.registeredCommands, "auton_vision_align"){
 			boolean isAboveMax = false;
-			double maxBlobArea = 8;
+			double maxBlobArea = 6;
 			double currentBlobArea;
 
 			@Override
@@ -953,8 +953,8 @@ public class DriveTrain extends SubsystemModule {
 //				System.out.println("kDistanceDivisor: " + kDistanceDivisor + "| blobArea : " + currentBlobArea);
 
 
-				if (power > 0.2)
-					power = 0.2;
+				if (power > 0.3)
+					power = 0.3;
 
 //				System.out.println("power: " + power);
 
