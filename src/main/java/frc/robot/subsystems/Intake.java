@@ -252,7 +252,8 @@ public class Intake extends SubsystemModule {
 			@Override
 			public void end() {}
 		};
-		
+
+
 		new SubsystemCommand(this.registeredCommands, "intake_stop") {
 
 			@Override
@@ -360,6 +361,35 @@ public class Intake extends SubsystemModule {
 				pumpHatch();
 
 				if(!intaking && atPosition) {
+					pumpMotor.set(1);
+					intaking = true;
+				}
+			}
+
+			@Override
+			public boolean isFinished() {
+				return cargoState || hatchState || pumpState;
+			}
+
+			@Override
+			public void end() {
+				cargoMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "hatch_intake") {
+			boolean intaking;
+
+			@Override
+			public void initialize() {
+				intaking = false;
+			}
+
+			@Override
+			public void execute() {
+				pumpHatch();
+
+				if(!intaking) {
 					pumpMotor.set(1);
 					intaking = true;
 				}

@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import java.util.ArrayList;
 
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
@@ -86,7 +85,7 @@ public class Arm extends SubsystemModule {
 			motorPower += Math.pow(desiredShoulderAngle - currentShoulderAngle, 2);
 			motorPower *= shoulderCoefficient;
 			motorPower = Math.sin(motorPower);
-			motorPower += 0.1;
+			motorPower += 0.2;
 			motorPower *= (int)((desiredShoulderAngle - currentShoulderAngle) / Math.abs(desiredShoulderAngle - currentShoulderAngle));
 			motorPower *= shoulderPowerFactor;
 		}
@@ -298,7 +297,7 @@ public class Arm extends SubsystemModule {
 			public void end() {}
 		};
 
-		new SubsystemCommand(this.registeredCommands, "station_postion") {
+		new SubsystemCommand(this.registeredCommands, "station_position") {
 			double shoulderAngle;
 			double wristAngle;
 
@@ -396,8 +395,8 @@ public class Arm extends SubsystemModule {
 					shoulderAngle = 120;
 					wristAngle = 220;
 				} else if(intake.getHatchState()) {
-					shoulderAngle = 110;
-					wristAngle = 188;
+					shoulderAngle = 120;
+					wristAngle = 183;
 				} else {
 					shoulderAngle = currentShoulderAngle;
 					wristAngle = currentWristAngle;
@@ -449,6 +448,8 @@ public class Arm extends SubsystemModule {
 
 		new SubsystemCommand(this.registeredCommands, "extake") {
 
+			int timer = 0;
+
 			@Override
 			public void initialize() {
 				if(intake.getHatchState()) {
@@ -456,22 +457,23 @@ public class Arm extends SubsystemModule {
 				} else {
 					intake.cargoMotor.set(-1);
 				}
+				intake.clearStates();
 			}
 			
 			@Override
 			public void execute() {
 				intake.pumpRelease();
+				timer += 20;
 			}
 
 			@Override
 			public boolean isFinished() {
-				return false;
+				return timer >= 500;
 			}
 
 			@Override
 			public void end() {
 				intake.cargoMotor.set(0);
-				intake.clearStates();
 			}
 		};
     }

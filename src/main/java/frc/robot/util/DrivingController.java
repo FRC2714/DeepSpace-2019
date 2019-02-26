@@ -163,4 +163,8 @@ public abstract class DrivingController {
 	public boolean isFinished() {
 		return pathFinished;
 	}
+
+	public void setIsFinished(boolean isFinished) {
+		pathFinished = isFinished;
+	}
 }

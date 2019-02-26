@@ -339,6 +339,7 @@ public class DriveTrain extends SubsystemModule {
 		closedLoopArcade(velocitySetpoint, pivot);
 
 		lastVelocity = velocitySetpoint;
+		System.out.println("velocity setpoint: " + velocitySetpoint);
 	}
 
 	// Output encoder values
@@ -601,7 +602,6 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
-
 			}
 		};
 
@@ -609,6 +609,9 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void initialize() {
+
+				System.out.println("Current X : " + odometer.getCurrentX() + " || Current Y : " + odometer.getCurrentY());
+				System.out.println("DYNAMIC HEADING ANGLE:- " + odometer.getHeadingAngle());
 
 				double xInitial = odometer.getCurrentX();
 				double xFinal = Double.parseDouble(this.args[1]);
@@ -618,6 +621,7 @@ public class DriveTrain extends SubsystemModule {
 
 				double thetaInitial = odometer.getHeadingAngle();
 				double thetaFinal = Double.parseDouble(this.args[3]);
+				System.out.println("Theta Final:- " + this.args[3]);
 
 				double lInitial = Double.parseDouble(this.args[0]);
 				double lFinal = Double.parseDouble(this.args[4]);
@@ -647,7 +651,6 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
-
 			}
 		};
 
@@ -657,6 +660,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void initialize() {
+				drivingController.setIsFinished(false);
 				enable();
 				System.out.println("starting path");
 			}
@@ -666,7 +670,9 @@ public class DriveTrain extends SubsystemModule {
 				if(counter < 5){
 					startTime = System.nanoTime();
 				}
-				double averageTime = (System.nanoTime() - startTime)/counter;
+//				System.out.println("CURRENT HEADING ANGLE: " + odometer.getHeadingAngle());
+//				double averageTime = (System.nanoTime() - startTime)/counter;
+
 				//System.out.println("average time " + averageTime);
 				counter++;
 			}
@@ -681,7 +687,7 @@ public class DriveTrain extends SubsystemModule {
 			public void end() {
 				closedLoopArcade(0, 0);
 				disable();
-				System.out.println(odometer.getCurrentX() + " : " + odometer.getCurrentY());
+				System.out.println(odometer.getCurrentX() + " : " + odometer.getCurrentY() + "Final Heading : " + odometer.getHeadingAngle());
 			}
 		};
 
@@ -903,6 +909,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
+				limelightTable.getEntry("camMode").setNumber(1);
 				limelightTable.getEntry("ledMode").setNumber(1);
 				closedLoopArcade(0, 0);
 			}
@@ -910,24 +917,30 @@ public class DriveTrain extends SubsystemModule {
 
 
 		new SubsystemCommand(this.registeredCommands, "auton_vision_align"){
-			double maxBlobArea = 6.1;
+			boolean isAboveMax = false;
+			double maxBlobArea = 6;
 			double currentBlobArea;
 
 			@Override
 			public void initialize() {
+				System.out.println("INITIALIZED VISION ALIGN");
 				limelightTable.getEntry("ledMode").setNumber(3);
 				limelightTable.getEntry("camMode").setNumber(0);
+				isAboveMax = false;
 			}
 
 
 			@Override
 			public void execute() {
-				System.out.println("Running");
+//				System.out.println("Running");
 				double tx = limelightTable.getEntry("tx").getDouble(0);
 				currentBlobArea = limelightTable.getEntry("ta").getDouble(0);
 
 				double kAngleP = 0.05;
-				double kDistanceDivisor = 0.4; // Untested value. Direct proportionality.
+				double kDistanceDivisor = 0.3; // Untested value. Direct proportionality.
+
+				if (this.args[0] != null)
+					maxBlobArea = Double.parseDouble(this.args[0]);
 
 				double power = 0;
 				if (currentBlobArea < maxBlobArea && currentBlobArea != 0)
@@ -937,31 +950,48 @@ public class DriveTrain extends SubsystemModule {
 
 				double pivot = tx * kAngleP;
 
-				System.out.println("kDistanceDivisor: " + kDistanceDivisor + "| blobArea : " + currentBlobArea);
+//				System.out.println("kDistanceDivisor: " + kDistanceDivisor + "| blobArea : " + currentBlobArea);
 
 
-				if (power > 0.4)
-					power = 0.4;
+				if (power > 0.3)
+					power = 0.3;
 
-				System.out.println("power: " + power);
+//				System.out.println("power: " + power);
 
 				if (currentBlobArea <= maxBlobArea) {
 					closedLoopArcade(power * maxVelocity, -pivot);
 				}
 
+				isAboveMax = currentBlobArea > maxBlobArea;
+				System.out.println("RUNNING VISION ALIGN POWER : " + power + " IS ABOVE MAX? : " + isAboveMax);
 
 			}
 
 			@Override
 			public boolean isFinished() {
-				System.out.println("Boolean : " + (currentBlobArea > maxBlobArea));
-				return (currentBlobArea > maxBlobArea);
+//				System.out.println("Boolean : " + (currentBlobArea > maxBlobArea));
+				return isAboveMax;
 			}
 
 			@Override
 			public void end() {
+				limelightTable.getEntry("camMode").setNumber(0);
 				closedLoopArcade(0, 0);
 				limelightTable.getEntry("ledMode").setNumber(1);
+				System.out.println("x: " + odometer.getCurrentX() + "y: " + odometer.getCurrentY() + "thetaF: " + odometer.getHeadingAngle());
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "set_current_position"){
+			@Override
+			public void initialize() {
+				odometer.setCurrentPosition(Double.parseDouble(this.args[0]), Double.parseDouble(this.args[1]));
+//				System.out.println("SET POSITIONS: " + " X = " + odometer.getCurrentX() + " Y = " + odometer.getCurrentY());
+			}
+
+			@Override
+			public boolean isFinished() {
+				return true;
 			}
 
 			

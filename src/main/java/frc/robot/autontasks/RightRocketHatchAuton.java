@@ -9,30 +9,29 @@ public class RightRocketHatchAuton extends AutonTask {
 		super(controlsProcessor);
 
 
+
 		queueTask("set_angular_offset -s -180");
 
-		// queueTask("add_backwards_spline -s 0,0,270,6,-10,15,270,4,8,10,0,0");
-		// queueTask("add_forwards_spline -s -10,15,270,4,0,0,270,6,8,10,0,0");
-
-		// queueTask("add_backwards_spline -s 0,0,270,6,-10,15,270,4,8,10,0,0");
-		// queueTask("add_forwards_spline -s -10,15,270,4,0,0,270,6,8,10,0,0");
-
-		// queueTask("add_backwards_spline -s 0,0,270,6,-10,15,270,4,8,10,0,0");
-		// queueTask("add_forwards_spline -s -10,15,270,4,0,0,270,6,8,10,0,0");
-
-		// queueTask("add_backwards_spline -s 0,0,270,6,-10,15,270,4,8,10,0,0");
-		// queueTask("add_forwards_spline -s -10,15,270,4,0,0,270,6,8,10,0,0");
-
-		// queueTask("add_backwards_spline -s 0,0,270,6,-10,15,270,4,8,10,0,0");
-		// queueTask("add_forwards_spline -s -10,15,270,4,0,0,270,6,8,10,0,0");
-
-		queueTask("add_backwards_spline -s 0,0,270,4,3,21,310,9,12,10,0,0");
+		queueTask("hatch_intake -p");
+		queueTask("hatch_true -p");
+		queueTask("add_backwards_spline -p 0,0,270,4,3.75,14.25,270,6,12,10,0,8");
+		queueTask("add_backwards_spline -p 3.75,14.25,270,1,3.5,20.5,304,2,8,8,8,0");
 		queueTask("start_path -s");
-		queueTask("auton_vision_align -s");
-//		queueTask("add_backwards_spline_dynamic 1,6,21, ");
-//		queueTask("add_backwards_spline -s 3,21,310,4,,9.4,294,4,5,3,0,0");
-//		queueTask("add_forwards_spline -s 6.6,9.4,294,2,7.6,-2,270,6,12,12,0,0");
-//		queueTask("add_backwards_spline -s 7.6,-2.5,270,2,4,22,270,8,12,12,0,0");
-//		queueTask("add_forwards_spline -s 4,22,270,1,-7.2,17,240,2,13,5,0,0");
+		queueTask("upper_score -s");
+		queueTask("auton_vision_align -s 4.55");
+		queueTask("extake -s");
+		queueTask("add_backwards_spline -s 6.2,16.5,298,1,3.5,19.5,270,1,5,5,0,0");
+		queueTask("start_path -s");
+		queueTask("station_position -s");
+		queueTask("add_forwards_spline -s 3.5,19.7,270,2,7.3,-3,268,4,10,8,0,0");
+		queueTask("start_path -s");
+		queueTask("auton_vision_align -s 4.7");
+		queueTask("hatch_station_intake -s");
+//		queueTask("add_backwards_spline -s 7,-4.5,268,2,8.3,10.5,240,3,10,8,0,0");
+//		queueTask("start_path -s");
+//		queueTask("back_score -s");
+//		queueTast("extake -s");
+
+
 	}
 }

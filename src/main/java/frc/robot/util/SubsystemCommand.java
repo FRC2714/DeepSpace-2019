@@ -119,6 +119,7 @@ public abstract class SubsystemCommand {
      * Called once at the end of the command
      */
     public void end() {
+        this.running = false;
 
     }
 }

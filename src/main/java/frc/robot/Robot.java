@@ -6,11 +6,15 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.autontasks.*;
 import frc.robot.subsystems.Arm;
+import frc.robot.autontasks.DelayAutonTesterTask;
+import frc.robot.autontasks.LeftCargoHatchAuton;
+import frc.robot.autontasks.LeftRocketHatchAuton;
+import frc.robot.autontasks.RightRocketHatchAuton;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.util.AutonTask;
 import frc.robot.util.ControlsProcessor;
+import frc.robot.util.SubsystemCommand;
 
 /*
   The VM is configured to automatically run this class, and to call the
@@ -22,8 +26,8 @@ import frc.robot.util.ControlsProcessor;
 public class Robot extends TimedRobot {
 
 	// Initialize subsystems
-	private Arm arm;
 	private DriveTrain drivetrain;
+	private Arm arm;
 
 	// Initialize auton mode selector
 	private Command autonomousCommand;
@@ -118,26 +122,22 @@ public class Robot extends TimedRobot {
 				append("vision_align -s", this.leftStick);
 				append("vision_align -s", this.lb);
 				
-				append("arm_to_position -s 19,193", this.a);
 
 				// append("auton_vision_align -s", this.y);
 
 				// append("go_to_position -p 126,58", this.a);
 				// append("debug_print -p", this.lb);
 
-				append("intake_stop -s", this.launchpad.getButtonInstance(0, 0));
+				//append("debug_print -s", this.rb);
 				// append("servo2 -p 0", this.b);
 				// append("servo1 -p 0", this.x);
 				// append("servo2 -p 0", this.y);
 
-				// append("drive_to_target -s 3", this.leftStick);
-				// append("debug_print -p", this.rb);
-
 				// // Toggle end game
-				// append("endgame_toggle -p", this.launchpad.getButtonInstance(0, 4))
-				// append("endgame_toggle -p", this.launchpad.getButtonInstance(0, 5))
-				// append("endgame_toggle -p", this.launchpad.getButtonInstance(0, 6))
-				// append("endgame_toggle -p", this.launchpad.getButtonInstance(0, 7))
+				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 1))
+				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 2))
+				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 3))
+				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 4))
 			}
 		};
 
@@ -148,7 +148,7 @@ public class Robot extends TimedRobot {
 		controlsProcessor.registerController("DriveTrain", drivetrain);
 		controlsProcessor.registerController("Arm", arm);
 		controlsProcessor.start();
-
+		
 	}
 
 	/**
@@ -157,14 +157,15 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void disabledInit() {
+		drivetrain.destruct();
+		arm.destruct();
+		Scheduler.getInstance().removeAll();
+
 		if (controlsProcessor != null) {
 			controlsProcessor.cancelAll();
 			controlsProcessor.disable();
 		}
 
-		drivetrain.destruct();
-		arm.destruct();
-		Scheduler.getInstance().removeAll();
 	}
 
 	/**
@@ -181,23 +182,25 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousInit() {
 		generalInit();
+		
+		AutonTask leftRocket = new LeftRocketHatchAuton(controlsProcessor);
+		AutonTask leftCargo = new LeftCargoHatchAuton(controlsProcessor);
+		AutonTask rightRocket = new RightRocketHatchAuton(controlsProcessor);
+
+		rightRocket.run();
 	}
 
 	/**
 	 * Runs periodically during auton
 	 */
 	@Override
-	public void autonomousPeriodic() {
-		Scheduler.getInstance().run();
-	}
+	public void autonomousPeriodic() { Scheduler.getInstance().run(); }
 
 	/**
 	 * Runs at the start of teleop mode
 	 */
 	@Override
 	public void teleopInit() {
-		NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
-
 		if (autonomousCommand != null)
 			autonomousCommand.cancel();
 
@@ -210,24 +213,23 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
-		SmartDashboard.putNumber("Heading Angle", drivetrain.odometer.getHeadingAngle());
-		SmartDashboard.putNumber("X Value", drivetrain.odometer.getCurrentX());
-		SmartDashboard.putNumber("Y Value", drivetrain.odometer.getCurrentY());
 	}
+
 
 	/**
 	 * Unused
 	 */
 	@Override
-	public void testInit() {
+	public void testInit(){
 		NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
-	}
+			}
+
 
 	/**
 	 * Unused
 	 */
 	@Override
-	public void testPeriodic() {
+	public void testPeriodic() { 
 	}
 
 	/**
@@ -240,7 +242,5 @@ public class Robot extends TimedRobot {
 
 		drivetrain.init();
 		arm.init();
-
-
 	}
 }
