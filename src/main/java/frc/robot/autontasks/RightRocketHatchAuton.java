@@ -19,7 +19,6 @@ public class RightRocketHatchAuton extends AutonTask {
 		queueTask("add_backwards_spline -p 4.75,14.25,270,1,4.5,20.5,304,2,10,8,8,0");
 		queueTask("start_path -s");
 		queueTask("upper_score -s");
-		queueTask("wait -p 1");
 		queueTask("auton_vision_align -p 6.3");
 		queueTask("extake -s");
 //		queueTask("hatch_station_position -p");
