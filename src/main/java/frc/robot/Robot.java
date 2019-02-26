@@ -53,43 +53,44 @@ public class Robot extends TimedRobot {
 				append("start_position -p", this.launchpad.getButtonInstance(4, 2));
 
 				// Intake cargo from ground
-				append("floor_position -p", this.launchpad.getButtonInstance(0, 7));
+				append("floor_cargo_position -p", this.launchpad.getButtonInstance(0, 7));
 				append("cargo_intake -s", this.launchpad.getButtonInstance(0, 7));
-				append("floor_position -p", this.launchpad.getButtonInstance(0, 8));
+				append("floor_cargo_position -p", this.launchpad.getButtonInstance(0, 8));
 				append("cargo_intake -s", this.launchpad.getButtonInstance(0, 8));
-				append("floor_position -p", this.launchpad.getButtonInstance(1, 7));
+				append("floor_cargo_position -p", this.launchpad.getButtonInstance(1, 7));
 				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 7));
-				append("floor_position -p", this.launchpad.getButtonInstance(1, 8));
+				append("floor_cargo_position -p", this.launchpad.getButtonInstance(1, 8));
 				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 8));
 
 				// Intake hatch from ground
-				append("floor_position -p", this.launchpad.getButtonInstance(3, 7));
-				append("hatch_floor_intake -s", this.launchpad.getButtonInstance(3, 7));
-				append("floor_position -p", this.launchpad.getButtonInstance(3, 8));
-				append("hatch_floor_intake -s", this.launchpad.getButtonInstance(3, 8));
-				append("floor_position -p", this.launchpad.getButtonInstance(4, 7));
-				append("hatch_floor_intake -s", this.launchpad.getButtonInstance(4, 7));
-				append("floor_position -p", this.launchpad.getButtonInstance(4, 8));
-				append("hatch_floor_intake -s", this.launchpad.getButtonInstance(4, 8));
+				append("floor_hatch_position -p", this.launchpad.getButtonInstance(3, 7));
+				append("hatch_station_intake -s", this.launchpad.getButtonInstance(3, 7));
+				append("floor_hatch_position -p", this.launchpad.getButtonInstance(3, 8));
+				append("hatch_station_intake -s", this.launchpad.getButtonInstance(3, 8));
+				append("floor_hatch_position -p", this.launchpad.getButtonInstance(4, 7));
+				append("hatch_station_intake -s", this.launchpad.getButtonInstance(4, 7));
+				append("floor_hatch_position -p", this.launchpad.getButtonInstance(4, 8));
+				append("hatch_station_intake -s", this.launchpad.getButtonInstance(4, 8));
 
 				// Intake cargo from station
-				append("cargo_station_position -p", this.launchpad.getButtonInstance(0, 4));
+				append("station_position -p", this.launchpad.getButtonInstance(0, 4));
 				append("cargo_intake -s", this.launchpad.getButtonInstance(0, 4));
-				append("cargo_station_position -p", this.launchpad.getButtonInstance(0, 5));
+				append("station_position -p", this.launchpad.getButtonInstance(0, 5));
 				append("cargo_intake -s", this.launchpad.getButtonInstance(0, 5));
-				append("cargo_station_position -p", this.launchpad.getButtonInstance(1, 4));
+				append("station_position -p", this.launchpad.getButtonInstance(1, 4));
 				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 4));
-				append("cargo_station_position -p", this.launchpad.getButtonInstance(1, 5));
+				append("station_position -p", this.launchpad.getButtonInstance(1, 5));
+//				append("station_position -p", this.a);
 				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 5));
 
 				// Intake hatch from station
-				append("hatch_station_position -p", this.launchpad.getButtonInstance(3, 4));
+				append("station_position -p", this.launchpad.getButtonInstance(3, 4));
 				append("hatch_station_intake -s", this.launchpad.getButtonInstance(3, 4));
-				append("hatch_station_position -p", this.launchpad.getButtonInstance(3, 5));
+				append("station_position -p", this.launchpad.getButtonInstance(3, 5));
 				append("hatch_station_intake -s", this.launchpad.getButtonInstance(3, 5));
-				append("hatch_station_position -p", this.launchpad.getButtonInstance(4, 4));
+				append("station_position -p", this.launchpad.getButtonInstance(4, 4));
 				append("hatch_station_intake -s", this.launchpad.getButtonInstance(4, 4));
-				append("hatch_station_position -p", this.launchpad.getButtonInstance(4, 5));
+				append("station_position -p", this.launchpad.getButtonInstance(4, 5));
 				append("hatch_station_intake -s", this.launchpad.getButtonInstance(4, 5));
 
 				// Score positions
@@ -109,10 +110,12 @@ public class Robot extends TimedRobot {
 				append("extake -s", this.launchpad.getButtonInstance(1, 2));
 
 				// Jog
-				append("jog_up -s", this.launchpad.getButtonInstance(0, 0));
-				append("jog_up -s", this.launchpad.getButtonInstance(8, 7));
-				append("jog_down -s", this.launchpad.getButtonInstance(1, 0));
+				append("jog_up -s", this.launchpad.getButtonInstance(8, 6));
 				append("jog_down -s", this.launchpad.getButtonInstance(8, 8));
+
+				// Game Piece Override
+				append("cargo_true -p", this.launchpad.getButtonInstance(8, 1));
+				append("hatch_true -p", this.launchpad.getButtonInstance(8, 3));
 
 				// Toggle driver control
 				append("driver_control -p", this.rightStick);
