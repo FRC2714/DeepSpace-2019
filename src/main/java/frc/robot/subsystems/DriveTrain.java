@@ -128,6 +128,10 @@ public class DriveTrain extends SubsystemModule {
 		rPidController.setIZone(kIS);
 		rPidController.setFF(rKFF);
 		rPidController.setOutputRange(kMinOutput, kMaxOutput);
+
+		lMotor0.enableVoltageCompensation(12.0);
+		rMotor0.enableVoltageCompensation(12.0);
+
 	}
 
 	// Instantiate odometer and link in encoders and navX
@@ -178,6 +182,8 @@ public class DriveTrain extends SubsystemModule {
 	 */
 	@Override
 	public void init() {
+
+
 		System.out.println("resetting");
 		leftEncoderOffset = lEncoder.getPosition();
 		rightEncoderOffset = -rEncoder.getPosition();

@@ -6,11 +6,8 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.autontasks.*;
 import frc.robot.subsystems.Arm;
-import frc.robot.autontasks.DelayAutonTesterTask;
-import frc.robot.autontasks.LeftCargoHatchAuton;
-import frc.robot.autontasks.LeftRocketHatchAuton;
-import frc.robot.autontasks.RightRocketHatchAuton;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.util.AutonTask;
 import frc.robot.util.ControlsProcessor;
@@ -186,6 +183,7 @@ public class Robot extends TimedRobot {
 		AutonTask leftRocket = new LeftRocketHatchAuton(controlsProcessor);
 		AutonTask leftCargo = new LeftCargoHatchAuton(controlsProcessor);
 		AutonTask rightRocket = new RightRocketHatchAuton(controlsProcessor);
+		AutonTask testPath = new TestTask(controlsProcessor);
 
 		rightRocket.run();
 	}
