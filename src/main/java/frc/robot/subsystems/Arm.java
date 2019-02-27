@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -17,7 +16,7 @@ public class Arm extends SubsystemModule {
 	// Arm motors
 	private final CANSparkMax shoulderMotor = new CANSparkMax(7, MotorType.kBrushless);
 	private final CANSparkMax wristMotor = new CANSparkMax(8, MotorType.kBrushless);
-	
+
 	// Initialize arm encoders
 	private CANEncoder shoulderMotorEncoder = shoulderMotor.getEncoder();
 	private CANEncoder wristEncoder = wristMotor.getEncoder();
@@ -47,9 +46,9 @@ public class Arm extends SubsystemModule {
 	private double wristPowerFactor;
 
 	// Arm initialization
-    public Arm(ControlsProcessor controlsProcessor) {
+	public Arm(ControlsProcessor controlsProcessor) {
 		intake = new Intake();
-		
+
 		controlsProcessor.registerController("Intake", intake);
 		registerCommands();
 
@@ -59,9 +58,10 @@ public class Arm extends SubsystemModule {
 
 		// Set SparkMax CAN periods
 		shoulderMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
+		shoulderMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 5);
 		wristMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 10);
 		wristMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10);
-		
+
 		// Inverts wrist motor direction
 		wristMotor.setInverted(true);
 	}
@@ -113,7 +113,7 @@ public class Arm extends SubsystemModule {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param shoulderPower
 	 * @param wristPower
 	 */
@@ -126,7 +126,7 @@ public class Arm extends SubsystemModule {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void setArmValues() {
 		if(desiredShoulderAngle - startShoulderAngle != 0) {
@@ -135,7 +135,7 @@ public class Arm extends SubsystemModule {
 		else {
 			shoulderCoefficient = 0;
 		}
-		
+
 		if(desiredWristAngle - startWristAngle != 0) {
 			wristCoefficient = Math.PI / (2 * Math.pow(desiredWristAngle - startWristAngle, 2));
 		}
@@ -149,7 +149,7 @@ public class Arm extends SubsystemModule {
 	 * @param shoulderAngle the desired shoulder angle in degrees
 	 * @param wristAngle the desired wrist angle in degrees
 	 */
-	public void goToPosition(double shoulderAngle, double wristAngle) {		
+	public void goToPosition(double shoulderAngle, double wristAngle) {
 		desiredShoulderAngle = shoulderAngle;
 		desiredWristAngle = wristAngle;
 
@@ -161,7 +161,7 @@ public class Arm extends SubsystemModule {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param shoulderAngle
 	 * @param wristAngle
 	 * @return
@@ -185,6 +185,8 @@ public class Arm extends SubsystemModule {
 
 		setShoulderPower();
 		setWristPower();
+
+		if(atPosition(desiredShoulderAngle, desiredWristAngle)) { intake.setAtPosition(true); }
 	}
 
 	@Override
@@ -249,7 +251,7 @@ public class Arm extends SubsystemModule {
 			public void end() {}
 		};
 
-		new SubsystemCommand(this.registeredCommands, "floor_cargo_postion") {
+		new SubsystemCommand(this.registeredCommands, "floor_cargo_position") {
 			double shoulderAngle;
 			double wristAngle;
 
@@ -257,7 +259,7 @@ public class Arm extends SubsystemModule {
 			public void initialize() {
 				shoulderAngle = 27;
 				wristAngle = 240;
-				
+
 				goToPosition(shoulderAngle, wristAngle);
 			}
 
@@ -273,7 +275,7 @@ public class Arm extends SubsystemModule {
 			public void end() {}
 		};
 
-		new SubsystemCommand(this.registeredCommands, "floor_hatch_postion") {
+		new SubsystemCommand(this.registeredCommands, "floor_hatch_position") {
 			double shoulderAngle;
 			double wristAngle;
 
@@ -281,7 +283,7 @@ public class Arm extends SubsystemModule {
 			public void initialize() {
 				shoulderAngle = 19;
 				wristAngle = 193;
-				
+
 				goToPosition(shoulderAngle, wristAngle);
 			}
 
@@ -296,6 +298,8 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void end() {}
 		};
+
+
 
 		new SubsystemCommand(this.registeredCommands, "station_position") {
 			double shoulderAngle;
@@ -305,7 +309,7 @@ public class Arm extends SubsystemModule {
 			public void initialize() {
 				shoulderAngle = 4;
 				wristAngle = 80;
-				
+
 				goToPosition(shoulderAngle, wristAngle);
 			}
 
@@ -329,10 +333,10 @@ public class Arm extends SubsystemModule {
 			public void initialize() {
 				if(intake.getCargoState()) {
 					shoulderAngle = 28;
-					wristAngle = 75;
+					wristAngle = 95;
 				} else if(intake.getHatchState()) {
 					shoulderAngle = 4;
-					wristAngle = 80;
+					wristAngle = 82;
 				} else {
 					shoulderAngle = currentShoulderAngle;
 					wristAngle = currentWristAngle;
@@ -360,11 +364,11 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void initialize() {
 				if(intake.getCargoState()) {
-					shoulderAngle = 87;
+					shoulderAngle = 95;
 					wristAngle = 200;
 				} else if(intake.getHatchState()) {
-					shoulderAngle = 62;
-					wristAngle = 126;
+					shoulderAngle = 66;
+					wristAngle = 129;
 				} else {
 					shoulderAngle = currentShoulderAngle;
 					wristAngle = currentWristAngle;
@@ -392,11 +396,11 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void initialize() {
 				if(intake.getCargoState()) {
-					shoulderAngle = 120;
-					wristAngle = 220;
+					shoulderAngle = 122;
+					wristAngle = 217;
 				} else if(intake.getHatchState()) {
-					shoulderAngle = 120;
-					wristAngle = 183;
+					shoulderAngle = 116;
+					wristAngle = 185;
 				} else {
 					shoulderAngle = currentShoulderAngle;
 					wristAngle = currentWristAngle;
@@ -459,7 +463,7 @@ public class Arm extends SubsystemModule {
 				}
 				intake.clearStates();
 			}
-			
+
 			@Override
 			public void execute() {
 				intake.pumpRelease();
@@ -476,7 +480,7 @@ public class Arm extends SubsystemModule {
 				intake.cargoMotor.set(0);
 			}
 		};
-    }
+	}
 
 	@Override
 	public void init() {
@@ -484,7 +488,7 @@ public class Arm extends SubsystemModule {
 
 		shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		wristMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
-		
+
 		shoulderMotorEncoder.setPosition(0);
 		wristEncoder.setPosition(0);
 
@@ -501,7 +505,7 @@ public class Arm extends SubsystemModule {
 
 		shoulderMotor.set(0);
 		wristMotor.set(0);
-		
+
 		shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
 		wristMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
 

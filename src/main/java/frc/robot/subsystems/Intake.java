@@ -18,7 +18,7 @@ public class Intake extends SubsystemModule {
 	protected CANSparkMax pumpMotor = new CANSparkMax(10, MotorType.kBrushless);
 
 	// Blinkin
-	private Spark blinkin = new Spark(3);
+	private Spark blinkin = new Spark(0);
 
 	// Hatchplate Servo
 	private Servo valveServo = new Servo(1);
@@ -56,7 +56,7 @@ public class Intake extends SubsystemModule {
 	// Intake position
 	private boolean atPosition;
 
-    public Intake() { 
+	public Intake() {
 		registerCommands(); // Puts commands onto the hashmap
 
 		cargoMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
@@ -70,19 +70,19 @@ public class Intake extends SubsystemModule {
 	 * Puts pump servo into hatch intake mode
 	 */
 	public void pumpHatch() {
-		valveServo.set(1);
+		valveServo.set(0);
 	}
 
 	/**
 	 * Puts pump servo into release mode
 	 */
 	public void pumpRelease() {
-		valveServo.set(0);
+		valveServo.set(1);
 	}
 
 	/**
 	 * Uses the roller's current draw to determine if the robot has a cargo
-	 * @return Cargo = true or 
+	 * @return Cargo = true or
 	 */
 	public boolean checkCargoState() {
 		if(cargoMotor.get() > 0.5) {
@@ -202,7 +202,7 @@ public class Intake extends SubsystemModule {
 
 		// if(cargoCurrents.size() >= numberOfCargoCurrents || hatchCurrents.size() >= numberOfHatchCurrents || pumpCurrents.size() >= numberOfPumpCurrents)
 		// 	System.out.println("Cargo Current: " + cargoAverageCurrent + "\tHatch Current: " + hatchAverageCurrent + "\tPump Current: " + pumpAverageCurrent);
-    }
+	}
 
 	@Override
 	public void registerCommands() {
@@ -253,7 +253,6 @@ public class Intake extends SubsystemModule {
 			public void end() {}
 		};
 
-
 		new SubsystemCommand(this.registeredCommands, "intake_stop") {
 
 			@Override
@@ -281,7 +280,7 @@ public class Intake extends SubsystemModule {
 		};
 
 
-        new SubsystemCommand(this.registeredCommands, "cargo_intake") {
+		new SubsystemCommand(this.registeredCommands, "cargo_intake") {
 			boolean intaking;
 
 			@Override
@@ -315,7 +314,7 @@ public class Intake extends SubsystemModule {
 			}
 		};
 
-        new SubsystemCommand(this.registeredCommands, "hatch_floor_intake") {
+		new SubsystemCommand(this.registeredCommands, "hatch_floor_intake") {
 			boolean intaking;
 
 			@Override
@@ -348,7 +347,7 @@ public class Intake extends SubsystemModule {
 			}
 		};
 
-        new SubsystemCommand(this.registeredCommands, "hatch_station_intake") {
+		new SubsystemCommand(this.registeredCommands, "hatch_station_intake") {
 			boolean intaking;
 
 			@Override
@@ -361,35 +360,6 @@ public class Intake extends SubsystemModule {
 				pumpHatch();
 
 				if(!intaking && atPosition) {
-					pumpMotor.set(1);
-					intaking = true;
-				}
-			}
-
-			@Override
-			public boolean isFinished() {
-				return cargoState || hatchState || pumpState;
-			}
-
-			@Override
-			public void end() {
-				cargoMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
-			}
-		};
-
-		new SubsystemCommand(this.registeredCommands, "hatch_intake") {
-			boolean intaking;
-
-			@Override
-			public void initialize() {
-				intaking = false;
-			}
-
-			@Override
-			public void execute() {
-				pumpHatch();
-
-				if(!intaking) {
 					pumpMotor.set(1);
 					intaking = true;
 				}
@@ -445,7 +415,36 @@ public class Intake extends SubsystemModule {
 			@Override
 			public void end() { }
 		};
-    }
+
+		new SubsystemCommand(this.registeredCommands, "hatch_intake") {
+			boolean intaking;
+
+			@Override
+			public void initialize() {
+				intaking = false;
+			}
+
+			@Override
+			public void execute() {
+				pumpHatch();
+
+				if(!intaking) {
+					pumpMotor.set(1);
+					intaking = true;
+				}
+			}
+
+			@Override
+			public boolean isFinished() {
+				return cargoState || hatchState || pumpState;
+			}
+
+			@Override
+			public void end() {
+				cargoMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+			}
+		};
+	}
 
 	@Override
 	public void init() {

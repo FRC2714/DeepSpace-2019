@@ -118,7 +118,9 @@ public class Robot extends TimedRobot {
 				append("driver_control -p", this.rightStick);
 				append("vision_align -s", this.leftStick);
 				append("vision_align -s", this.lb);
-				
+
+				append("hatch_station_intake -s",this.a);
+				append("extake -s",this.b);
 
 				// append("auton_vision_align -s", this.y);
 
