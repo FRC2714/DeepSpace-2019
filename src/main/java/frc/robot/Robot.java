@@ -119,21 +119,8 @@ public class Robot extends TimedRobot {
 
 				// Toggle driver control
 				append("driver_control -p", this.rightStick);
-				append("vision_align -s", this.leftStick);
 				append("vision_align -s", this.lb);
-
-				append("get_climber_positions -s", this.a);
-				
-
-				// append("auton_vision_align -s", this.y);
-
-				// append("go_to_position -p 126,58", this.a);
-				// append("debug_print -p", this.lb);
-
-				//append("debug_print -s", this.rb);
-				// append("servo2 -p 0", this.b);
-				// append("servo1 -p 0", this.x);
-				// append("servo2 -p 0", this.y);
+				append("break_mode -s", this.rb);
 
 				// // Toggle end game
 				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 1))

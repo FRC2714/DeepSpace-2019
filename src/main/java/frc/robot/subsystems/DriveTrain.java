@@ -387,6 +387,39 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
+		new SubsystemCommand(this.registeredCommands, "brake_mode") {
+
+			@Override
+			public void initialize() {
+				lMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
+				lMotor1.setIdleMode(CANSparkMax.IdleMode.kBrake);
+				lMotor2.setIdleMode(CANSparkMax.IdleMode.kBrake);
+				rMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
+				rMotor1.setIdleMode(CANSparkMax.IdleMode.kBrake);
+				rMotor2.setIdleMode(CANSparkMax.IdleMode.kBrake);
+			}
+
+			@Override
+			public void execute() {
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {
+				lMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
+				lMotor1.setIdleMode(CANSparkMax.IdleMode.kCoast);
+				lMotor2.setIdleMode(CANSparkMax.IdleMode.kCoast);
+				rMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
+				rMotor1.setIdleMode(CANSparkMax.IdleMode.kCoast);
+				rMotor2.setIdleMode(CANSparkMax.IdleMode.kCoast);
+			}
+		};
+
 		new SubsystemCommand(this.registeredCommands, "closed_loop_tank") {
 
 			@Override
