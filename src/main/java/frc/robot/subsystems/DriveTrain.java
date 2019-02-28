@@ -74,7 +74,7 @@ public class DriveTrain extends SubsystemModule {
 	private double prevAccelY = 0;
 	private double mPrevTimeAccel = 0;
 
-	// 
+	//
 	private double leftEncoderOffset = 0;
 	private double rightEncoderOffset = 0;
 	private double lastVelocity = 0;
@@ -142,15 +142,15 @@ public class DriveTrain extends SubsystemModule {
 			this.headingAngle = -navX.getYaw() + 90;
 			if(this.headingAngle < 0) {
 				this.headingAngle += 360;
-			}	
+			}
 
 			this.leftPos = leftShaftEncoder.getDistance();
 			this.rightPos = rightShaftEncoder.getDistance();
-			
+
 			double leftVelocity = leftShaftEncoder.getRate();
 			double rightVelocity = rightShaftEncoder.getRate();
 
-			this.currentAverageVelocity = (leftVelocity + rightVelocity) / 2;	
+			this.currentAverageVelocity = (leftVelocity + rightVelocity) / 2;
 		}
 	};
 
@@ -220,7 +220,7 @@ public class DriveTrain extends SubsystemModule {
 		disable();
 		drivingController.clearControlPath();
 	}
-	
+
 	/**
 	 * Subsystem run function, uses ControlsProcessor (multi-threaded at fast period)
 	 */
@@ -248,7 +248,7 @@ public class DriveTrain extends SubsystemModule {
 		if (currentDirection * desiredDirection > 0) {
 			if(currentOpenArcadePower < power) {
 				currentOpenArcadePower += rampUp;
-				
+
 				if(currentOpenArcadePower > power) { currentOpenArcadePower = power; }
 			}
 			else if(currentOpenArcadePower > power) {
@@ -259,7 +259,7 @@ public class DriveTrain extends SubsystemModule {
 		} else {
 			if(currentOpenArcadePower < power) {
 				currentOpenArcadePower += rampDown;
-				
+
 				if(currentOpenArcadePower > power) { currentOpenArcadePower = power; }
 			}
 			else if(currentOpenArcadePower > power) {
@@ -372,7 +372,7 @@ public class DriveTrain extends SubsystemModule {
 				double power = 0;
 				double pivot = 0;
 
-				if (Math.abs(controlsProcessor.getLeftJoystick()) > .15)	
+				if (Math.abs(controlsProcessor.getLeftJoystick()) > .15)
 					power = controlsProcessor.getLeftJoystick();
 				if (Math.abs(controlsProcessor.getRightJoystick()) > .15)
 					pivot = controlsProcessor.getRightJoystick();
@@ -453,7 +453,7 @@ public class DriveTrain extends SubsystemModule {
 
 				lMotor0.set(0);
 				rMotor0.set(0);
-				
+
 			}
 
 			@Override
@@ -495,9 +495,9 @@ public class DriveTrain extends SubsystemModule {
 				thetaFinal = Math.toRadians(thetaFinal);
 
 				double x2 = lInitial * Math.cos(thetaInitial) + xInitial;
-				double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal; 
-				double y2 = lInitial * Math.sin(thetaInitial) + yInitial; 
-				double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal; 
+				double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal;
+				double y2 = lInitial * Math.sin(thetaInitial) + yInitial;
+				double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal;
 
 				drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
 						Double.parseDouble(this.args[8]), Double.parseDouble(this.args[9]),
@@ -516,7 +516,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
-				
+
 			}
 		};
 
@@ -585,11 +585,11 @@ public class DriveTrain extends SubsystemModule {
 				thetaFinal = Math.toRadians(thetaFinal);
 
 				double x2 = lInitial * Math.cos(thetaInitial + Math.PI) + xInitial;
-				double x3 = lFinal * Math.cos(thetaFinal) + xFinal; 
-				double y2 = lInitial * Math.sin(thetaInitial + Math.PI) + yInitial; 
-				double y3 = lFinal * Math.sin(thetaFinal) + yFinal; 
+				double x3 = lFinal * Math.cos(thetaFinal) + xFinal;
+				double y2 = lInitial * Math.sin(thetaInitial + Math.PI) + yInitial;
+				double y3 = lFinal * Math.sin(thetaFinal) + yFinal;
 
-				
+
 				drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
 						Double.parseDouble(this.args[8]), Double.parseDouble(this.args[9]),
 						Double.parseDouble(this.args[10]), Double.parseDouble(this.args[11]), false);
@@ -728,9 +728,9 @@ public class DriveTrain extends SubsystemModule {
 			public void initialize() {
 
 				lMotor0.setIdleMode(IdleMode.kCoast);
-				rMotor0.setIdleMode(IdleMode.kCoast); 
+				rMotor0.setIdleMode(IdleMode.kCoast);
 
-				lMotor0.set(0);    
+				lMotor0.set(0);
 				rMotor0.set(0);
 
 
@@ -744,7 +744,7 @@ public class DriveTrain extends SubsystemModule {
 				else if (theta1 < 0)
 					theta1 += 360;
 
-				// //Stage 1	
+				// //Stage 1
 				// 	double currentX = odometer.getCurrentX();
 				// 	double currentY = odometer.getCurrentY();
 				// 	double odometerHeading = odometer.getHeadingAngle();
@@ -808,10 +808,10 @@ public class DriveTrain extends SubsystemModule {
 				// double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal;
 
 				//System.out.println(xInitial + " : " + yInitial + " : " + odometer.getHeadingAngle() + " : " + xFinal + " : " + yFinal + " : " + (-data[4] + odometer.getHeadingAngle()));
-				
+
 				// drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
 				//  		10, 4, 0, 0, true);
-								
+
 				// enable();
 			}
 			double l2;
@@ -831,7 +831,7 @@ public class DriveTrain extends SubsystemModule {
 				double num2 = deltaX*Math.sin(Math.toRadians(theta1));
 				double denom1 = Math.sin(Math.toRadians(theta1))*Math.cos(Math.toRadians(theta2));
 				double denom2 = Math.sin(Math.toRadians(theta2))*Math.cos(Math.toRadians(theta1));
-				
+
 				l2 =  (num1 - num2) / (denom1 - denom2);
 				System.out.println(theta1 + " : " + theta2 + " ; " + deltaX + " : " + deltaY);
 			}
@@ -855,7 +855,7 @@ public class DriveTrain extends SubsystemModule {
 			public void initialize() {
 				waitTimer.reset();
 				waitTimer.start();
-				
+
 			}
 
 			@Override
@@ -923,6 +923,7 @@ public class DriveTrain extends SubsystemModule {
 
 
 		new SubsystemCommand(this.registeredCommands, "auton_vision_align"){
+
 			boolean isAboveMax = false;
 			double maxBlobArea = 6;
 			double currentBlobArea;
@@ -1000,9 +1001,9 @@ public class DriveTrain extends SubsystemModule {
 				return true;
 			}
 
-			
+
 		};
-		
+
 	}
 
 }
