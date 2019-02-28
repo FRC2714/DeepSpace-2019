@@ -10,6 +10,7 @@ import frc.robot.subsystems.Arm;
 import frc.robot.autontasks.DelayAutonTesterTask;
 import frc.robot.autontasks.LeftCargoHatchAuton;
 import frc.robot.autontasks.LeftRocketHatchAuton;
+import frc.robot.autontasks.RightCargoHatchAuton;
 import frc.robot.autontasks.RightRocketHatchAuton;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.util.AutonTask;
@@ -128,7 +129,7 @@ public class Robot extends TimedRobot {
 				// append("go_to_position -p 126,58", this.a);
 				// append("debug_print -p", this.lb);
 
-				//append("debug_print -s", this.rb);
+				append("debug_print -s", this.rb);
 				// append("servo2 -p 0", this.b);
 				// append("servo1 -p 0", this.x);
 				// append("servo2 -p 0", this.y);
@@ -186,8 +187,9 @@ public class Robot extends TimedRobot {
 		AutonTask leftRocket = new LeftRocketHatchAuton(controlsProcessor);
 		AutonTask leftCargo = new LeftCargoHatchAuton(controlsProcessor);
 		AutonTask rightRocket = new RightRocketHatchAuton(controlsProcessor);
+		AutonTask rightCargo = new RightCargoHatchAuton(controlsProcessor);
 
-		leftRocket.run();
+		leftCargo.run();
 	}
 
 	/**
