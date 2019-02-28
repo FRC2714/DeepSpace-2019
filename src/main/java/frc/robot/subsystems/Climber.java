@@ -17,8 +17,8 @@ public class Climber extends SubsystemModule {
     private CANEncoder pusherEncoder = pusherMotor.getEncoder();
     
     // Motor to output ratios
-    private final double lifterRatio = ;
-    private final double pusherRatio = ;
+    private final double lifterRatio = 1; //TODO: Get real value
+    private final double pusherRatio = 1; //TODO: Get real value
 
     // Climber positions
     private double lifterPosition;
@@ -49,8 +49,8 @@ public class Climber extends SubsystemModule {
         pusherInDone = false;
     }
 
-    public boolean lifterDown() {
-        if(!lifterDownDone && lifterPosition < ) {
+    public void lifterDown() {
+        if(!lifterDownDone && lifterPosition < 0) {
             lifterMotor.set(1.0);
         } else {
             lifterMotor.set(0.0);
@@ -58,8 +58,8 @@ public class Climber extends SubsystemModule {
         }
     }
 
-    public boolean lifterUp() {
-        if(!lifterUpDone && lifterPosition > ) {
+    public void lifterUp() {
+        if(!lifterUpDone && lifterPosition > 0) {
             lifterMotor.set(-1.0);
         } else {
             lifterMotor.set(0.0);
@@ -67,8 +67,8 @@ public class Climber extends SubsystemModule {
         }
     }
 
-    public boolean pusherOut() {
-        if(!pusherOutDone && pusherPosition < ) {
+    public void pusherOut() {
+        if(!pusherOutDone && pusherPosition < 0) {
             pusherMotor.set(1.0);
         } else {
             pusherMotor.set(0.0);
@@ -76,12 +76,12 @@ public class Climber extends SubsystemModule {
         }
     }
 
-    public boolean pusherIn() {
-        if(!pusherInDone && pusherPosition > ) {
+    public void pusherIn() {
+        if(!pusherInDone && pusherPosition > 0) {
             pusherMotor.set(-1.0);
         } else {
-            pusherMotor.set();
-            return true;
+            pusherMotor.set(0.0);
+            pusherInDone = true;
         }
     }
 
@@ -90,6 +90,29 @@ public class Climber extends SubsystemModule {
     }
 
     @Override public void registerCommands() {
+
+        new SubsystemCommand(this.registeredCommands, "get_climber_positions") {
+
+			@Override
+			public void initialize() {
+
+			}
+
+			@Override
+			public void execute() {
+                System.out.println("Lifter: " + lifterEncoder.getPosition() + "\tPusher: " + pusherEncoder.getPosition());
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {
+
+			}
+        };
 
         new SubsystemCommand(this.registeredCommands, "send_climb") {
             boolean done;
