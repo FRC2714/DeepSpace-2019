@@ -458,9 +458,9 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void execute() {
-				getEncoderValues();
+				// getEncoderValues();
 				//System.out.println(odometer.getHeadingAngle());
-				//System.out.println(odometer.getCurrentX() + " : " + odometer.getCurrentY());
+				System.out.println(odometer.getCurrentX() + " : " + odometer.getCurrentY());
 				//System.out.println(navX.getYaw());
 			}
 
@@ -960,8 +960,8 @@ public class DriveTrain extends SubsystemModule {
 //				System.out.println("kDistanceDivisor: " + kDistanceDivisor + "| blobArea : " + currentBlobArea);
 
 
-				if (power > 0.3)
-					power = 0.3;
+				if (power > 0.4)
+					power = 0.4;
 
 //				System.out.println("power: " + power);
 
