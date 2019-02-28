@@ -31,7 +31,5 @@ public class RightRocketHatchAuton extends AutonTask {
 //		queueTask("start_path -s");
 //		queueTask("back_score -s");
 //		queueTast("extake -s");
-
-
 	}
 }

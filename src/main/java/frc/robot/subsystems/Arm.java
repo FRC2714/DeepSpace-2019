@@ -176,7 +176,13 @@ public class Arm extends SubsystemModule {
 		if(shoulderAngleDelta < 2.0) { atShoulderAngle = true; }
 		if(wristAngleDelta < 2.0) { atWristAngle = true; }
 
-		return atShoulderAngle && atWristAngle;
+		if(atShoulderAngle && atWristAngle) {
+			intake.setAtPosition(true);
+			return true;
+		} else {
+			intake.setAtPosition(false);
+			return false;
+		}
 	}
 
 	@Override
