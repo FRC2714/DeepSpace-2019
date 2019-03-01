@@ -51,7 +51,7 @@ public class Climber extends SubsystemModule {
 
     public void lifterDown() {
         if(!lifterDownDone && lifterPosition < 0) {
-            lifterMotor.set(1.0);
+            lifterMotor.set(0.75);
         } else {
             lifterMotor.set(0.0);
             lifterDownDone = true;
@@ -60,7 +60,7 @@ public class Climber extends SubsystemModule {
 
     public void lifterUp() {
         if(!lifterUpDone && lifterPosition > 0) {
-            lifterMotor.set(-1.0);
+            lifterMotor.set(-0.25);
         } else {
             lifterMotor.set(0.0);
             lifterUpDone = true;
@@ -69,7 +69,7 @@ public class Climber extends SubsystemModule {
 
     public void pusherOut() {
         if(!pusherOutDone && pusherPosition < 0) {
-            pusherMotor.set(1.0);
+            pusherMotor.set(-0.5);
         } else {
             pusherMotor.set(0.0);
             pusherOutDone = true;
@@ -78,7 +78,7 @@ public class Climber extends SubsystemModule {
 
     public void pusherIn() {
         if(!pusherInDone && pusherPosition > 0) {
-            pusherMotor.set(-1.0);
+            pusherMotor.set(0.25);
         } else {
             pusherMotor.set(0.0);
             pusherInDone = true;
@@ -91,17 +91,14 @@ public class Climber extends SubsystemModule {
 
     @Override public void registerCommands() {
 
-        new SubsystemCommand(this.registeredCommands, "get_climber_positions") {
-
+        new SubsystemCommand(this.registeredCommands, "robot_up") {
 			@Override
 			public void initialize() {
-
+                lifterMotor.set(0.75);
 			}
 
 			@Override
-			public void execute() {
-                System.out.println("Lifter: " + lifterEncoder.getPosition() + "\tPusher: " + pusherEncoder.getPosition());
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
@@ -110,8 +107,48 @@ public class Climber extends SubsystemModule {
 
 			@Override
 			public void end() {
-
+                lifterMotor.set(0.0);
+                System.out.println("Lifter: " + lifterEncoder.getPosition());
 			}
+        };
+
+        new SubsystemCommand(this.registeredCommands, "robot_out") {
+			@Override
+			public void initialize() {
+                pusherMotor.set(-0.5);
+			}
+
+			@Override
+			public void execute() {}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {
+                lifterMotor.set(0.0);
+                System.out.println("Pusher: " + pusherEncoder.getPosition());
+			}
+        };
+
+        new SubsystemCommand(this.registeredCommands, "get_climber_positions") {
+			@Override
+			public void initialize() {
+                System.out.println("Lifter: " + lifterEncoder.getPosition() + "\tPusher: " + pusherEncoder.getPosition());
+			}
+
+			@Override
+			public void execute() {}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {}
         };
 
         new SubsystemCommand(this.registeredCommands, "send_climb") {

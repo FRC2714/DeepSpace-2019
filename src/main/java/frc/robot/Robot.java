@@ -120,6 +120,11 @@ public class Robot extends TimedRobot {
 				append("vision_align -s", this.lb);
 				append("break_mode -s", this.rb);
 
+				append("robot_up -s", this.a);
+				append("robot_out -s", this.b);
+				append("get_climber_positions -s", this.y);
+
+
 				// // Toggle end game
 				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 1))
 				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 2))
