@@ -123,7 +123,7 @@ public class Robot extends TimedRobot {
 				append("hatch_station_intake -s",this.a);
 				append("extake -s",this.b);
 
-				// append("auton_vision_align -s", this.y);
+				append("auton_vision_align -s 4.1", this.y);
 
 				// append("go_to_position -p 126,58", this.a);
 				// append("debug_print -p", this.lb);
@@ -230,6 +230,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void testInit(){
 		NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
+		NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
 	}
 
 
