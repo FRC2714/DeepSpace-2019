@@ -191,8 +191,6 @@ public class Arm extends SubsystemModule {
 
 		setShoulderPower();
 		setWristPower();
-
-		if(atPosition(desiredShoulderAngle, desiredWristAngle)) { intake.setAtPosition(true); }
 	}
 
 	@Override
@@ -203,7 +201,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void execute() {
-				goToPosition(currentShoulderAngle + 3, currentWristAngle + 1.5);
+				goToPosition(currentShoulderAngle + 3.5, currentWristAngle + 1.5);
 			}
 
 			@Override
@@ -339,7 +337,7 @@ public class Arm extends SubsystemModule {
 			public void initialize() {
 				if(intake.getCargoState()) {
 					shoulderAngle = 28;
-					wristAngle = 95;
+					wristAngle = 125;
 				} else if(intake.getHatchState()) {
 					shoulderAngle = 4;
 					wristAngle = 82;
@@ -457,16 +455,17 @@ public class Arm extends SubsystemModule {
 		};
 
 		new SubsystemCommand(this.registeredCommands, "extake") {
-
-			int timer = 0;
+			int timer;
 
 			@Override
 			public void initialize() {
-				if(intake.getHatchState()) {
-					intake.pumpMotor.set(0);
-				} else {
+				timer = 0;
+				
+				intake.pumpMotor.set(0);
+
+				if(!intake.getHatchState())
 					intake.cargoMotor.set(-1);
-				}
+
 				intake.clearStates();
 			}
 
