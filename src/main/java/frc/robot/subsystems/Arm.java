@@ -191,8 +191,6 @@ public class Arm extends SubsystemModule {
 
 		setShoulderPower();
 		setWristPower();
-
-		if(atPosition(desiredShoulderAngle, desiredWristAngle)) { intake.setAtPosition(true); }
 	}
 
 	@Override
