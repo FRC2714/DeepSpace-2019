@@ -45,6 +45,14 @@ public abstract class SubsystemCommand {
     }
 
     /**
+     *
+     * @return returns command name
+     */
+    public String getName() {
+        return this.commandName;
+    }
+
+    /**
      * Gets called instead of execute until the delay expires
      * @return True if delay is expired
      */

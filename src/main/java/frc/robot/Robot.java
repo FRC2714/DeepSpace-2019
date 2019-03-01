@@ -1,16 +1,14 @@
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.autontasks.*;
 import frc.robot.subsystems.Arm;
-import frc.robot.autontasks.DelayAutonTesterTask;
-import frc.robot.autontasks.LeftCargoHatchAuton;
-import frc.robot.autontasks.LeftRocketHatchAuton;
-import frc.robot.autontasks.RightRocketHatchAuton;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.util.AutonTask;
 import frc.robot.util.ControlsProcessor;
@@ -151,6 +149,7 @@ public class Robot extends TimedRobot {
 		Scheduler.getInstance().removeAll();
 
 		if (controlsProcessor != null) {
+			System.out.println("Disabled, clearing and disabling controlsProcessor");
 			controlsProcessor.cancelAll();
 			controlsProcessor.disable();
 		}
@@ -170,30 +169,40 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousInit() {
+		NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
+		NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
+
 		generalInit();
 		
 		AutonTask leftRocket = new LeftRocketHatchAuton(controlsProcessor);
 		AutonTask leftCargo = new LeftCargoHatchAuton(controlsProcessor);
 		AutonTask rightRocket = new RightRocketHatchAuton(controlsProcessor);
+		AutonTask testPath = new TestTask(controlsProcessor);
+		AutonTask rightCargo = new RightCargoHatchAuton(controlsProcessor);
 
-		rightRocket.run();
+		leftCargo.run();
 	}
 
 	/**
 	 * Runs periodically during auton
 	 */
 	@Override
-	public void autonomousPeriodic() { Scheduler.getInstance().run(); }
+	public void autonomousPeriodic() {
+		Scheduler.getInstance().run();
+	}
 
 	/**
 	 * Runs at the start of teleop mode
 	 */
 	@Override
 	public void teleopInit() {
+		NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(1);
+		NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
 		if (autonomousCommand != null)
 			autonomousCommand.cancel();
 
 		generalInit();
+		drivetrain.closedLoopArcade(0,0);
 	}
 
 	/**
@@ -211,7 +220,8 @@ public class Robot extends TimedRobot {
 	@Override
 	public void testInit(){
 		NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
-			}
+		NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
+	}
 
 
 	/**
@@ -225,6 +235,8 @@ public class Robot extends TimedRobot {
 	 * Called at the start of both auton and teleop init
 	 */
 	private void generalInit() {
+		controlsProcessor.cancelAll();
+
 		if (controlsProcessor != null) {
 			controlsProcessor.enable();
 		}

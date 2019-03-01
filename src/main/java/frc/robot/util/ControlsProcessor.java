@@ -1,6 +1,7 @@
 package frc.robot.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
@@ -175,9 +176,13 @@ public abstract class ControlsProcessor extends Thread {
 
 	// Cancels all commands running
 	public void cancelAll() {
+		commandQueue = new ArrayList<CommandDetails>(0);
 		controllers.forEach((k, v) -> {
 			v.registeredCommands.forEach((k1, v1) -> {
-				if(v1.running) { v1.cancel(); }
+				if(v1.running) {
+					System.out.println("Cancelling Command :- " + v1.getName());
+					v1.cancel();
+				}
 			});
 		});
 	}
