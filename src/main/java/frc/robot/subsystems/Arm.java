@@ -329,6 +329,54 @@ public class Arm extends SubsystemModule {
 			public void end() {}
 		};
 
+		new SubsystemCommand(this.registeredCommands, "auton_lower_hatch") {
+			double shoulderAngle;
+			double wristAngle;
+
+			@Override
+			public void initialize() {
+				shoulderAngle = 14;
+				wristAngle = 90;
+
+				goToPosition(shoulderAngle, wristAngle);
+			}
+
+			@Override
+			public void execute() {}
+
+			@Override
+			public boolean isFinished() {
+				return atPosition(shoulderAngle, wristAngle);
+			}
+
+			@Override
+			public void end() {}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "go_to_position") {
+			double shoulderAngle;
+			double wristAngle;
+
+			@Override
+			public void initialize() {
+				shoulderAngle = Double.parseDouble(this.args[0]);
+				wristAngle = Double.parseDouble(this.args[1]);
+
+				goToPosition(shoulderAngle, wristAngle);
+			}
+
+			@Override
+			public void execute() {}
+
+			@Override
+			public boolean isFinished() {
+				return atPosition(shoulderAngle, wristAngle);
+			}
+
+			@Override
+			public void end() {}
+		};
+
 		new SubsystemCommand(this.registeredCommands, "lower_score") {
 			double shoulderAngle;
 			double wristAngle;
