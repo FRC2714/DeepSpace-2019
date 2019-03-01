@@ -156,6 +156,10 @@ public abstract class DrivingController {
 		controlPath.clear();
 	}
 
+	public ArrayList<MotionPose> getControlPath(){
+		return controlPath;
+	}
+
 	/**
 	 * 
 	 * @return

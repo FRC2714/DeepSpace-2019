@@ -16,11 +16,7 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import frc.robot.RobotMap;
-import frc.robot.util.ControlsProcessor;
-import frc.robot.util.DrivingController;
-import frc.robot.util.Odometer;
-import frc.robot.util.SubsystemCommand;
-import frc.robot.util.SubsystemModule;
+import frc.robot.util.*;
 
 @SuppressWarnings("Duplicates")
 public class DriveTrain extends SubsystemModule {
@@ -691,8 +687,8 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
-				closedLoopArcade(0, 0);
 				disable();
+				closedLoopArcade(0, 0);
 				System.out.println(odometer.getCurrentX() + " : " + odometer.getCurrentY() + "Final Heading : " + odometer.getHeadingAngle());
 			}
 		};
@@ -977,14 +973,14 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public boolean isFinished() {
 //				System.out.println("Boolean : " + (currentBlobArea > maxBlobArea));
-				return isAboveMax;
+					return isAboveMax;
 			}
 
 			@Override
 			public void end() {
-				limelightTable.getEntry("camMode").setNumber(0);
+//				limelightTable.getEntry("camMode").setNumber(1);
 				closedLoopArcade(0, 0);
-				limelightTable.getEntry("ledMode").setNumber(1);
+//				limelightTable.getEntry("ledMode").setNumber(1);
 				System.out.println("x: " + odometer.getCurrentX() + "y: " + odometer.getCurrentY() + "thetaF: " + odometer.getHeadingAngle());
 			}
 		};
