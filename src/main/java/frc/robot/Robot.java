@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
@@ -161,6 +162,7 @@ public class Robot extends TimedRobot {
 		Scheduler.getInstance().removeAll();
 
 		if (controlsProcessor != null) {
+			System.out.println("Disabled, clearing and disabling controlsProcessor");
 			controlsProcessor.cancelAll();
 			controlsProcessor.disable();
 		}
@@ -195,17 +197,22 @@ public class Robot extends TimedRobot {
 	 * Runs periodically during auton
 	 */
 	@Override
-	public void autonomousPeriodic() { Scheduler.getInstance().run(); }
+	public void autonomousPeriodic() {
+		Scheduler.getInstance().run();
+	}
 
 	/**
 	 * Runs at the start of teleop mode
 	 */
 	@Override
 	public void teleopInit() {
+		NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(1);
+		NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
 		if (autonomousCommand != null)
 			autonomousCommand.cancel();
 
 		generalInit();
+		drivetrain.closedLoopArcade(0,0);
 	}
 
 	/**
@@ -223,7 +230,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void testInit(){
 		NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
-			}
+	}
 
 
 	/**
@@ -237,6 +244,8 @@ public class Robot extends TimedRobot {
 	 * Called at the start of both auton and teleop init
 	 */
 	private void generalInit() {
+		controlsProcessor.cancelAll();
+
 		if (controlsProcessor != null) {
 			controlsProcessor.enable();
 		}
