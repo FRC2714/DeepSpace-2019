@@ -31,7 +31,7 @@ public class Climber extends SubsystemModule {
     private boolean pusherInDone;
 
     public Climber() { 
-        registerCommands(); // Puts commands onto the hashmap 
+        registerCommands(); // Puts commands onto the hashmaps
     }
 
     /**
@@ -91,10 +91,30 @@ public class Climber extends SubsystemModule {
 
     @Override public void registerCommands() {
 
-        new SubsystemCommand(this.registeredCommands, "robot_up") {
+        new SubsystemCommand(this.registeredCommands, "lifter_down") {
 			@Override
 			public void initialize() {
-                lifterMotor.set(0.75);
+                lifterMotor.set(1.0);
+			}
+
+			@Override
+			public void execute() {}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {
+                System.out.println("Lifter: " + lifterEncoder.getPosition());
+			}
+        };
+
+        new SubsystemCommand(this.registeredCommands, "lifter_up") {
+			@Override
+			public void initialize() {
+                lifterMotor.set(-0.5);
 			}
 
 			@Override
@@ -108,11 +128,10 @@ public class Climber extends SubsystemModule {
 			@Override
 			public void end() {
                 lifterMotor.set(0.0);
-                System.out.println("Lifter: " + lifterEncoder.getPosition());
 			}
         };
 
-        new SubsystemCommand(this.registeredCommands, "robot_out") {
+        new SubsystemCommand(this.registeredCommands, "pusher_out") {
 			@Override
 			public void initialize() {
                 pusherMotor.set(-0.5);
@@ -123,13 +142,33 @@ public class Climber extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return false;
+				return pusherEncoder.getPosition() < -33;
 			}
 
 			@Override
 			public void end() {
-                lifterMotor.set(0.0);
+                pusherMotor.set(0.0);
                 System.out.println("Pusher: " + pusherEncoder.getPosition());
+			}
+        };
+
+        new SubsystemCommand(this.registeredCommands, "pusher_in") {
+			@Override
+			public void initialize() {
+                pusherMotor.set(-0.5);
+			}
+
+			@Override
+			public void execute() {}
+
+			@Override
+			public boolean isFinished() {
+				return pusherEncoder.getPosition() > 0;
+			}
+
+			@Override
+			public void end() {
+                pusherMotor.set(0.0);
 			}
         };
 
@@ -210,6 +249,9 @@ public class Climber extends SubsystemModule {
 	public void init() {
         clearClimbState();
 
+        lifterMotor.setSmartCurrentLimit(38);
+        pusherMotor.setSmartCurrentLimit(38);
+
         lifterMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		pusherMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
@@ -221,5 +263,8 @@ public class Climber extends SubsystemModule {
 	public void destruct() {
         lifterMotor.set(0.0);
         pusherMotor.set(0.0);
+
+        lifterMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
+		pusherMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
 	}
 }

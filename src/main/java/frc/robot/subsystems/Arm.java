@@ -33,7 +33,7 @@ public class Arm extends SubsystemModule {
 	private double desiredShoulderAngle;
 	private double desiredWristAngle;
 
-	// Start arm anngles
+	// Start arm angles
 	private double startShoulderAngle;
 	private double startWristAngle;
 
