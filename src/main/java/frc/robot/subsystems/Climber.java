@@ -94,7 +94,7 @@ public class Climber extends SubsystemModule {
         new SubsystemCommand(this.registeredCommands, "lifter_down") {
 			@Override
 			public void initialize() {
-                lifterMotor.set(1.0);
+                lifterMotor.set(0.75);
 			}
 
 			@Override
@@ -134,7 +134,7 @@ public class Climber extends SubsystemModule {
         new SubsystemCommand(this.registeredCommands, "pusher_out") {
 			@Override
 			public void initialize() {
-                pusherMotor.set(-0.5);
+                pusherMotor.set(-0.2);
 			}
 
 			@Override
@@ -142,7 +142,7 @@ public class Climber extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return pusherEncoder.getPosition() < -33;
+				return pusherEncoder.getPosition() < -31;
 			}
 
 			@Override
@@ -155,7 +155,7 @@ public class Climber extends SubsystemModule {
         new SubsystemCommand(this.registeredCommands, "pusher_in") {
 			@Override
 			public void initialize() {
-                pusherMotor.set(-0.5);
+                pusherMotor.set(0.2);
 			}
 
 			@Override
@@ -163,7 +163,7 @@ public class Climber extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return pusherEncoder.getPosition() > 0;
+				return pusherEncoder.getPosition() > 1;
 			}
 
 			@Override
@@ -249,8 +249,8 @@ public class Climber extends SubsystemModule {
 	public void init() {
         clearClimbState();
 
-        lifterMotor.setSmartCurrentLimit(38);
-        pusherMotor.setSmartCurrentLimit(38);
+        lifterMotor.setSmartCurrentLimit(40);
+        pusherMotor.setSmartCurrentLimit(40);
 
         lifterMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		pusherMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);

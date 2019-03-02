@@ -120,6 +120,7 @@ public class Robot extends TimedRobot {
 				append("driver_control -p", this.rightStick);
 				append("vision_align -s", this.lb);
 				append("break_mode -s", this.rb);
+				append("station_position -s", this.a);
 
 				// Toggle end game
 				append("lifter_down -s", this.launchpad.getButtonInstance(0, 0));
@@ -140,6 +141,7 @@ public class Robot extends TimedRobot {
 
 		controlsProcessor.start();
 		
+		arm.init();
 	}
 
 	/**
@@ -185,7 +187,7 @@ public class Robot extends TimedRobot {
 		AutonTask testPath = new TestTask(controlsProcessor);
 		AutonTask rightCargo = new RightCargoHatchAuton(controlsProcessor);
 
-		leftCargo.run();
+		leftRocket.run();
 	}
 
 	/**
@@ -247,7 +249,6 @@ public class Robot extends TimedRobot {
 		}
 
 		drivetrain.init();
-		arm.init();
 		climber.init();
 	}
 }
