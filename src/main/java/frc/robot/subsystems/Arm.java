@@ -409,6 +409,30 @@ public class Arm extends SubsystemModule {
 			public void end() {}
 		};
 
+		new SubsystemCommand(this.registeredCommands, "cargo_station_score") {
+			double shoulderAngle;
+			double wristAngle;
+
+			@Override
+			public void initialize() {
+				shoulderAngle = 70;
+				wristAngle = 295;
+
+				goToPosition(shoulderAngle, wristAngle);
+			}
+
+			@Override
+			public void execute() {}
+
+			@Override
+			public boolean isFinished() {
+				return atPosition(shoulderAngle, wristAngle);
+			}
+
+			@Override
+			public void end() {}
+		};
+
 		new SubsystemCommand(this.registeredCommands, "middle_score") {
 			double shoulderAngle;
 			double wristAngle;

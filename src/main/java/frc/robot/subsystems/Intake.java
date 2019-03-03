@@ -291,10 +291,16 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public void execute() {
-				if (!intaking && atPosition) {
+//				if (!intaking && atPosition) {
+//					cargoMotor.set(0.75);
+//					intaking = true;
+//				}
+				if (!intaking) {
 					cargoMotor.set(0.75);
 					intaking = true;
 				}
+//					cargoMotor.set(0.75);
+//					intaking = true;
 			}
 
 			@Override
@@ -307,7 +313,7 @@ public class Intake extends SubsystemModule {
 				cargoMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
 				if (cargoState) {
-					cargoMotor.set(0.05);
+					cargoMotor.set(0.15);
 				} else {
 					cargoMotor.set(0);
 				}

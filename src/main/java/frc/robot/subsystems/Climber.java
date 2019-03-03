@@ -114,7 +114,7 @@ public class Climber extends SubsystemModule {
         new SubsystemCommand(this.registeredCommands, "lifter_up") {
 			@Override
 			public void initialize() {
-                lifterMotor.set(-0.5);
+                lifterMotor.set(-1);
 			}
 
 			@Override

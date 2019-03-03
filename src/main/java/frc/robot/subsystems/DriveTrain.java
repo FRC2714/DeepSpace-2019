@@ -128,6 +128,15 @@ public class DriveTrain extends SubsystemModule {
 		lMotor0.enableVoltageCompensation(12.0);
 		rMotor0.enableVoltageCompensation(12.0);
 
+		lMotor0.setSmartCurrentLimit(40);
+		lMotor1.setSmartCurrentLimit(40);
+		lMotor2.setSmartCurrentLimit(40);
+
+		rMotor0.setSmartCurrentLimit(40);
+		rMotor1.setSmartCurrentLimit(40);
+		rMotor2.setSmartCurrentLimit(40);
+
+
 	}
 
 	// Instantiate odometer and link in encoders and navX
@@ -360,7 +369,6 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 				driverControlled = true;
-				// System.out.println("Right Encoder: " + rightShaftEncoder.getDistance() + "\tLeft Encoder: " + leftShaftEncoder.getDistance());
 			}
 
 			@Override
@@ -374,6 +382,7 @@ public class DriveTrain extends SubsystemModule {
 					pivot = controlsProcessor.getRightJoystick();
 
 				arcadeDrive(-power, pivot, 0.04, 0.08);
+				 System.out.println("Right Encoder: " + rightShaftEncoder.getDistance() + "\tLeft Encoder: " + leftShaftEncoder.getDistance());
 
 				//System.out.println("Odometer heading angle " + odometer.getHeadingAngle());
 			}

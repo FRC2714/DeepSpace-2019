@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
@@ -13,7 +12,6 @@ import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.util.AutonTask;
 import frc.robot.util.ControlsProcessor;
-import frc.robot.util.SubsystemCommand;
 
 /*
   The VM is configured to automatically run this class, and to call the
@@ -99,13 +97,13 @@ public class Robot extends TimedRobot {
 				append("middle_score -p", this.launchpad.getButtonInstance(7, 6));
 				append("upper_score -p", this.launchpad.getButtonInstance(6, 4));
 				append("upper_score -p", this.launchpad.getButtonInstance(7, 4));
-				append("back_score -p", this.launchpad.getButtonInstance(6, 2));
-				append("back_score -p", this.launchpad.getButtonInstance(7, 2));
+				append("cargo_station_score -p", this.launchpad.getButtonInstance(6, 2));
+				append("cargo_station_score -p", this.launchpad.getButtonInstance(7, 2));
 
 				// Extake
-				append("extake -s", this.launchpad.getButtonInstance(0, 1));
+//				append("extake -s", this.launchpad.getButtonInstance(0, 1));
 				append("extake -s", this.launchpad.getButtonInstance(0, 2));
-				append("extake -s", this.launchpad.getButtonInstance(1, 1));
+//				append("extake -s", this.launchpad.getButtonInstance(1, 1));
 				append("extake -s", this.launchpad.getButtonInstance(1, 2));
 
 				// Jog
@@ -122,10 +120,10 @@ public class Robot extends TimedRobot {
 				append("break_mode -s", this.rb);
 				append("station_position -s", this.a);
 
-				// Toggle end game
+				//Toggle end game
 				append("lifter_down -s", this.launchpad.getButtonInstance(0, 0));
 				append("lifter_up -s", this.launchpad.getButtonInstance(1, 0));
-				append("pusher_in -s", this.launchpad.getButtonInstance(2, 0));
+//				append("pusher_in -s", this.launchpad.getButtonInstance(2, 0));
 				append("pusher_out -s", this.launchpad.getButtonInstance(3, 0));
 			}
 		};
@@ -182,12 +180,17 @@ public class Robot extends TimedRobot {
 		generalInit();
 		
 		AutonTask leftRocket = new LeftRocketHatchAuton(controlsProcessor);
+		AutonTask leftFullSend = new LeftHatchLevelTwoAuton(controlsProcessor);
 		AutonTask leftCargo = new LeftCargoHatchAuton(controlsProcessor);
+
 		AutonTask rightRocket = new RightRocketHatchAuton(controlsProcessor);
-		AutonTask testPath = new TestTask(controlsProcessor);
+		AutonTask rightFullSend = new RightRocketLevelTwoAuton(controlsProcessor);
 		AutonTask rightCargo = new RightCargoHatchAuton(controlsProcessor);
 
-		leftRocket.run();
+
+		AutonTask testPath = new TestTask(controlsProcessor);
+
+		leftFullSend.run();
 	}
 
 	/**
