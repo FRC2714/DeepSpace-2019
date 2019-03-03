@@ -114,7 +114,7 @@ public class Climber extends SubsystemModule {
         new SubsystemCommand(this.registeredCommands, "lifter_up") {
 			@Override
 			public void initialize() {
-                lifterMotor.set(-1);
+                lifterMotor.set(-0.5);
 			}
 
 			@Override
@@ -142,12 +142,11 @@ public class Climber extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return pusherEncoder.getPosition() < -31;
+				return true;
 			}
 
 			@Override
 			public void end() {
-                pusherMotor.set(0.0);
                 System.out.println("Pusher: " + pusherEncoder.getPosition());
 			}
         };
@@ -163,13 +162,11 @@ public class Climber extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return pusherEncoder.getPosition() > 1;
+				return true;
 			}
 
 			@Override
-			public void end() {
-                pusherMotor.set(0.0);
-			}
+			public void end() {}
         };
 
         new SubsystemCommand(this.registeredCommands, "get_climber_positions") {
