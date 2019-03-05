@@ -382,7 +382,8 @@ public class DriveTrain extends SubsystemModule {
 					pivot = controlsProcessor.getRightJoystick();
 
 				arcadeDrive(-power, pivot, 0.04, 0.08);
-				 System.out.println("Right Encoder: " + rightShaftEncoder.getDistance() + "\tLeft Encoder: " + leftShaftEncoder.getDistance());
+//				 System.out.println("Right Encoder: " + rightShaftEncoder.getDistance() + "\tLeft Encoder: " + leftShaftEncoder.getDistance());
+//				System.out.println("X = " + odometer.getCurrentX() + "|| Y = " + odometer.getCurrentY());
 
 				//System.out.println("Odometer heading angle " + odometer.getHeadingAngle());
 			}

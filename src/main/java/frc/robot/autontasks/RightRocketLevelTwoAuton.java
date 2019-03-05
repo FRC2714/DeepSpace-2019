@@ -23,6 +23,7 @@ public class RightRocketLevelTwoAuton extends AutonTask {
 		queueTask("upper_score -s");
 		queueTask("auton_vision_align -s 4.9");
 		queueTask("extake -s");
+
 		queueTask("set_current_position -s 7.2,16.5");
 		queueTask("add_backwards_spline -s 7.2,16.5,298,1,4.5,18.5,270,1,10,8,0,0");
 		queueTask("start_path -s");
