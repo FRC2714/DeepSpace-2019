@@ -58,9 +58,9 @@ public abstract class ControlsProcessor extends Thread {
 	public ControlsProcessor(double periodNanoseconds, int commandDivider) {
 		this.periodNanoseconds = periodNanoseconds;
 		this.commandDivider = commandDivider;
-
+		
 		try {
-			launchpad = new WebsocketButtonPad( new URI( "ws://10.27.14.207:9001" ));
+			launchpad = new WebsocketButtonPad( new URI( "ws://10.27.14.5:5802" )); // 10.27.14.207:9001 on driver station
 			launchpad.connect();
 		} catch (Exception e) {
 			System.out.println("Websocket failure");

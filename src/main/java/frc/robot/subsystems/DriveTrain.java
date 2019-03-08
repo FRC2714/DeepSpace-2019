@@ -128,6 +128,15 @@ public class DriveTrain extends SubsystemModule {
 		lMotor0.enableVoltageCompensation(12.0);
 		rMotor0.enableVoltageCompensation(12.0);
 
+		lMotor0.setSmartCurrentLimit(40);
+		lMotor1.setSmartCurrentLimit(40);
+		lMotor2.setSmartCurrentLimit(40);
+
+		rMotor0.setSmartCurrentLimit(40);
+		rMotor1.setSmartCurrentLimit(40);
+		rMotor2.setSmartCurrentLimit(40);
+
+
 	}
 
 	// Instantiate odometer and link in encoders and navX
@@ -360,7 +369,6 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 				driverControlled = true;
-				// System.out.println("Right Encoder: " + rightShaftEncoder.getDistance() + "\tLeft Encoder: " + leftShaftEncoder.getDistance());
 			}
 
 			@Override
@@ -374,6 +382,8 @@ public class DriveTrain extends SubsystemModule {
 					pivot = controlsProcessor.getRightJoystick();
 
 				arcadeDrive(-power, pivot, 0.04, 0.08);
+//				 System.out.println("Right Encoder: " + rightShaftEncoder.getDistance() + "\tLeft Encoder: " + leftShaftEncoder.getDistance());
+//				System.out.println("X = " + odometer.getCurrentX() + "|| Y = " + odometer.getCurrentY());
 
 				//System.out.println("Odometer heading angle " + odometer.getHeadingAngle());
 			}
@@ -386,6 +396,39 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void end() {
 				closedLoopArcade(0, 0);
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "brake_mode") {
+
+			@Override
+			public void initialize() {
+				lMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
+				lMotor1.setIdleMode(CANSparkMax.IdleMode.kBrake);
+				lMotor2.setIdleMode(CANSparkMax.IdleMode.kBrake);
+				rMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
+				rMotor1.setIdleMode(CANSparkMax.IdleMode.kBrake);
+				rMotor2.setIdleMode(CANSparkMax.IdleMode.kBrake);
+			}
+
+			@Override
+			public void execute() {
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {
+				lMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
+				lMotor1.setIdleMode(CANSparkMax.IdleMode.kCoast);
+				lMotor2.setIdleMode(CANSparkMax.IdleMode.kCoast);
+				rMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
+				rMotor1.setIdleMode(CANSparkMax.IdleMode.kCoast);
+				rMotor2.setIdleMode(CANSparkMax.IdleMode.kCoast);
 			}
 		};
 

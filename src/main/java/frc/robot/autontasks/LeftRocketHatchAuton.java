@@ -21,11 +21,12 @@ public class LeftRocketHatchAuton extends AutonTask {
         queueTask("add_backwards_spline -s -6.2,16.5,242,1,-3.5,19.5,270,1,5,5,0,0");
         queueTask("start_path -s");
         queueTask("station_position -s");
-        // queueTask("add_forwards_spline -s -4.25,19.7,270,2,-7,-3,268,4,14,12,0,0");
-        // queueTask("start_path -s");
-        // queueTask("auton_vision_align -s");
-        // queueTask("add_backwards_spline -s -7.3,-4.5,268,2,-8.25,10.5,296,3,10,8,0,0");
-        // queueTask("start_path -s");
+        queueTask("add_forwards_spline -s -3.5,19.7,270,2,-6.8,-3,268,4,14,12,0,0");
+        queueTask("start_path -s");
+        queueTask("hatch_station_intake -p");
+        queueTask("auton_vision_align -s");
+        queueTask("add_backwards_spline -s -7.3,-4.5,268,2,-8.25,10.5,296,3,10,8,0,0");
+        queueTask("start_path -s");
     }
 
 

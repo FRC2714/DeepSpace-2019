@@ -33,7 +33,7 @@ public class Arm extends SubsystemModule {
 	private double desiredShoulderAngle;
 	private double desiredWristAngle;
 
-	// Start arm anngles
+	// Start arm angles
 	private double startShoulderAngle;
 	private double startWristAngle;
 
@@ -177,10 +177,8 @@ public class Arm extends SubsystemModule {
 		if(wristAngleDelta < 2.0) { atWristAngle = true; }
 
 		if(atShoulderAngle && atWristAngle) {
-			intake.setAtPosition(true);
 			return true;
 		} else {
-			intake.setAtPosition(false);
 			return false;
 		}
 	}
@@ -201,7 +199,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void execute() {
-				goToPosition(currentShoulderAngle + 3.5, currentWristAngle + 1.5);
+				goToPosition(currentShoulderAngle + 5, currentWristAngle + 1.5); //Shoulder previously +3.5
 			}
 
 			@Override
@@ -239,6 +237,30 @@ public class Arm extends SubsystemModule {
 			public void initialize() {
 				shoulderAngle = Double.parseDouble(this.args[0]);
 				wristAngle = Double.parseDouble(this.args[1]);
+
+				goToPosition(shoulderAngle, wristAngle);
+			}
+
+			@Override
+			public void execute() {}
+
+			@Override
+			public boolean isFinished() {
+				return atPosition(shoulderAngle, wristAngle);
+			}
+
+			@Override
+			public void end() {}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "start_position") {
+			double shoulderAngle;
+			double wristAngle;
+
+			@Override
+			public void initialize() {
+				shoulderAngle = 0;
+				wristAngle = 0;
 
 				goToPosition(shoulderAngle, wristAngle);
 			}
@@ -312,7 +334,7 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void initialize() {
 				shoulderAngle = 4;
-				wristAngle = 80;
+				wristAngle = 88;
 
 				goToPosition(shoulderAngle, wristAngle);
 			}
@@ -385,14 +407,38 @@ public class Arm extends SubsystemModule {
 			public void initialize() {
 				if(intake.getCargoState()) {
 					shoulderAngle = 28;
-					wristAngle = 125;
+					wristAngle = 145;
 				} else if(intake.getHatchState()) {
 					shoulderAngle = 4;
-					wristAngle = 82;
+					wristAngle = 88;
 				} else {
 					shoulderAngle = currentShoulderAngle;
 					wristAngle = currentWristAngle;
 				}
+
+				goToPosition(shoulderAngle, wristAngle);
+			}
+
+			@Override
+			public void execute() {}
+
+			@Override
+			public boolean isFinished() {
+				return atPosition(shoulderAngle, wristAngle);
+			}
+
+			@Override
+			public void end() {}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "cargo_station_score") {
+			double shoulderAngle;
+			double wristAngle;
+
+			@Override
+			public void initialize() {
+				shoulderAngle = 77; //Previously 70
+				wristAngle = 295;
 
 				goToPosition(shoulderAngle, wristAngle);
 			}
@@ -555,9 +601,6 @@ public class Arm extends SubsystemModule {
 	@Override
 	public void destruct() {
 		intake.destruct();
-
-		shoulderMotor.set(0);
-		wristMotor.set(0);
 
 		shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
 		wristMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);

@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
@@ -9,10 +8,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.autontasks.*;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.util.AutonTask;
 import frc.robot.util.ControlsProcessor;
-import frc.robot.util.SubsystemCommand;
 
 /*
   The VM is configured to automatically run this class, and to call the
@@ -26,6 +25,7 @@ public class Robot extends TimedRobot {
 	// Initialize subsystems
 	private DriveTrain drivetrain;
 	private Arm arm;
+	private Climber climber;
 
 	// Initialize auton mode selector
 	private Command autonomousCommand;
@@ -44,7 +44,7 @@ public class Robot extends TimedRobot {
 		controlsProcessor = new ControlsProcessor(10000000, 2) {
 			@Override
 			public void registerOperatorControls() {
-				// Go to start postion
+				// Go to start position
 				append("start_position -p", this.launchpad.getButtonInstance(3, 1));
 				append("start_position -p", this.launchpad.getButtonInstance(3, 2));
 				append("start_position -p", this.launchpad.getButtonInstance(4, 1));
@@ -78,7 +78,6 @@ public class Robot extends TimedRobot {
 				append("station_position -p", this.launchpad.getButtonInstance(1, 4));
 				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 4));
 				append("station_position -p", this.launchpad.getButtonInstance(1, 5));
-//				append("station_position -p", this.a);
 				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 5));
 
 				// Intake hatch from station
@@ -98,13 +97,13 @@ public class Robot extends TimedRobot {
 				append("middle_score -p", this.launchpad.getButtonInstance(7, 6));
 				append("upper_score -p", this.launchpad.getButtonInstance(6, 4));
 				append("upper_score -p", this.launchpad.getButtonInstance(7, 4));
-				append("back_score -p", this.launchpad.getButtonInstance(6, 2));
-				append("back_score -p", this.launchpad.getButtonInstance(7, 2));
+				append("cargo_station_score -p", this.launchpad.getButtonInstance(6, 2));
+				append("cargo_station_score -p", this.launchpad.getButtonInstance(7, 2));
 
 				// Extake
-				append("extake -s", this.launchpad.getButtonInstance(0, 1));
+				// append("extake -s", this.launchpad.getButtonInstance(0, 1));
 				append("extake -s", this.launchpad.getButtonInstance(0, 2));
-				append("extake -s", this.launchpad.getButtonInstance(1, 1));
+				// append("extake -s", this.launchpad.getButtonInstance(1, 1));
 				append("extake -s", this.launchpad.getButtonInstance(1, 2));
 
 				// Jog
@@ -115,40 +114,32 @@ public class Robot extends TimedRobot {
 				append("cargo_true -p", this.launchpad.getButtonInstance(8, 1));
 				append("hatch_true -p", this.launchpad.getButtonInstance(8, 3));
 
-				// Toggle driver control
+				// Driver controls
 				append("driver_control -p", this.rightStick);
-				append("vision_align -s", this.leftStick);
 				append("vision_align -s", this.lb);
+				append("break_mode -s", this.rb);
 
-				append("hatch_station_intake -s",this.a);
-				append("extake -s",this.b);
+				//Toggle end game
+				append("lifter_down -s", this.launchpad.getButtonInstance(0, 0));
+				append("lifter_up -s", this.launchpad.getButtonInstance(1, 0));
 
-				append("auton_vision_align -s 4.1", this.y);
-
-				// append("go_to_position -p 126,58", this.a);
-				// append("debug_print -p", this.lb);
-
-				append("debug_print -s", this.rb);
-				// append("servo2 -p 0", this.b);
-				// append("servo1 -p 0", this.x);
-				// append("servo2 -p 0", this.y);
-
-				// // Toggle end game
-				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 1))
-				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 2))
-				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 3))
-				// append("endgame_toggle -p", this.launchpad.getButtonInstance(8, 4))
+				append("pusher_in -s", this.launchpad.getButtonInstance(2, 0));
+				append("pusher_out -s", this.launchpad.getButtonInstance(3, 0));
 			}
 		};
 
 		drivetrain = new DriveTrain(controlsProcessor);
 		arm = new Arm(controlsProcessor);
+		climber = new Climber();
 
 		// Required to register all subsystems in order to be processed. 
 		controlsProcessor.registerController("DriveTrain", drivetrain);
 		controlsProcessor.registerController("Arm", arm);
+		controlsProcessor.registerController("Climber", climber);
+
 		controlsProcessor.start();
 		
+		arm.init();
 	}
 
 	/**
@@ -159,6 +150,7 @@ public class Robot extends TimedRobot {
 	public void disabledInit() {
 		drivetrain.destruct();
 		arm.destruct();
+		climber.destruct();
 		Scheduler.getInstance().removeAll();
 
 		if (controlsProcessor != null) {
@@ -188,12 +180,17 @@ public class Robot extends TimedRobot {
 		generalInit();
 		
 		AutonTask leftRocket = new LeftRocketHatchAuton(controlsProcessor);
+		AutonTask leftFullSend = new LeftRocketHabTwoAuton(controlsProcessor);
 		AutonTask leftCargo = new LeftCargoHatchAuton(controlsProcessor);
+
 		AutonTask rightRocket = new RightRocketHatchAuton(controlsProcessor);
-		AutonTask testPath = new TestTask(controlsProcessor);
+		AutonTask rightFullSend = new RightRocketHabTwoAuton(controlsProcessor);
 		AutonTask rightCargo = new RightCargoHatchAuton(controlsProcessor);
 
-		leftCargo.run();
+
+		AutonTask testPath = new TestTask(controlsProcessor);
+
+		leftFullSend.run();
 	}
 
 	/**
@@ -255,6 +252,6 @@ public class Robot extends TimedRobot {
 		}
 
 		drivetrain.init();
-		arm.init();
+		climber.init();
 	}
 }
