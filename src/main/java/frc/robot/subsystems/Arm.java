@@ -431,28 +431,6 @@ public class Arm extends SubsystemModule {
 			public void end() {}
 		};
 
-		new SubsystemCommand(this.registeredCommands, "start_position"){
-			double shoulderAngle;
-			double wristAngle;
-			@Override
-			public void initialize() {
-				shoulderAngle = 0;
-				wristAngle = 0;
-
-				goToPosition(shoulderAngle, wristAngle);
-			}
-
-			@Override
-			public boolean isFinished() {
-				return atPosition(shoulderAngle,wristAngle);
-			}
-
-			@Override
-			public void end() {
-				super.end();
-			}
-		};
-
 		new SubsystemCommand(this.registeredCommands, "cargo_station_score") {
 			double shoulderAngle;
 			double wristAngle;
@@ -594,30 +572,6 @@ public class Arm extends SubsystemModule {
 			@Override
 			public boolean isFinished() {
 				return timer >= 500;
-			}
-
-			@Override
-			public void end() {
-				intake.cargoMotor.set(0);
-			}
-		};
-
-
-		new SubsystemCommand(this.registeredCommands, "low_reset"){
-			@Override
-			public void initialize() {
-				shoulderMotorEncoder.setPosition(4 * shoulderRatio);
-				wristEncoder.setPosition(88 * wristRatio);
-			}
-
-			@Override
-			public void execute() {
-	
-			}
-
-			@Override
-			public boolean isFinished() {
-				return true;
 			}
 
 			@Override

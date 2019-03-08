@@ -3,13 +3,13 @@ package frc.robot.autontasks;
 import frc.robot.util.AutonTask;
 import frc.robot.util.ControlsProcessor;
 
-public class RightRocketLevelTwoAuton extends AutonTask {
+public class RightRocketHabTwoAuton extends AutonTask {
 	/**
 	 * Accepts the object of the running controlsProcessor to modify
 	 *
 	 * @param controlsProcessor
 	 */
-	public RightRocketLevelTwoAuton(ControlsProcessor controlsProcessor) {
+	public RightRocketHabTwoAuton(ControlsProcessor controlsProcessor) {
 		super(controlsProcessor);
 
 

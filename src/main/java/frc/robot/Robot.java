@@ -118,7 +118,6 @@ public class Robot extends TimedRobot {
 				append("driver_control -p", this.rightStick);
 				append("vision_align -s", this.lb);
 				append("break_mode -s", this.rb);
-				append("station_position -s", this.a);
 
 				//Toggle end game
 				append("lifter_down -s", this.launchpad.getButtonInstance(0, 0));
@@ -181,11 +180,11 @@ public class Robot extends TimedRobot {
 		generalInit();
 		
 		AutonTask leftRocket = new LeftRocketHatchAuton(controlsProcessor);
-		AutonTask leftFullSend = new LeftHatchLevelTwoAuton(controlsProcessor);
+		AutonTask leftFullSend = new LeftRocketHabTwoAuton(controlsProcessor);
 		AutonTask leftCargo = new LeftCargoHatchAuton(controlsProcessor);
 
 		AutonTask rightRocket = new RightRocketHatchAuton(controlsProcessor);
-		AutonTask rightFullSend = new RightRocketLevelTwoAuton(controlsProcessor);
+		AutonTask rightFullSend = new RightRocketHabTwoAuton(controlsProcessor);
 		AutonTask rightCargo = new RightCargoHatchAuton(controlsProcessor);
 
 
