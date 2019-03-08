@@ -724,7 +724,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				System.out.println("driving controller finished? " + ":" + drivingController.isFinished());
+				// System.out.println("driving controller finished? " + ":" + drivingController.isFinished());
 				return drivingController.isFinished();
 			}
 
