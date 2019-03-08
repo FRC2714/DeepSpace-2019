@@ -177,10 +177,8 @@ public class Arm extends SubsystemModule {
 		if(wristAngleDelta < 2.0) { atWristAngle = true; }
 
 		if(atShoulderAngle && atWristAngle) {
-			intake.setAtPosition(true);
 			return true;
 		} else {
-			intake.setAtPosition(false);
 			return false;
 		}
 	}
@@ -239,6 +237,30 @@ public class Arm extends SubsystemModule {
 			public void initialize() {
 				shoulderAngle = Double.parseDouble(this.args[0]);
 				wristAngle = Double.parseDouble(this.args[1]);
+
+				goToPosition(shoulderAngle, wristAngle);
+			}
+
+			@Override
+			public void execute() {}
+
+			@Override
+			public boolean isFinished() {
+				return atPosition(shoulderAngle, wristAngle);
+			}
+
+			@Override
+			public void end() {}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "start_position") {
+			double shoulderAngle;
+			double wristAngle;
+
+			@Override
+			public void initialize() {
+				shoulderAngle = 0;
+				wristAngle = 0;
 
 				goToPosition(shoulderAngle, wristAngle);
 			}

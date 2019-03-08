@@ -101,9 +101,9 @@ public class Robot extends TimedRobot {
 				append("cargo_station_score -p", this.launchpad.getButtonInstance(7, 2));
 
 				// Extake
-//				append("extake -s", this.launchpad.getButtonInstance(0, 1));
+				// append("extake -s", this.launchpad.getButtonInstance(0, 1));
 				append("extake -s", this.launchpad.getButtonInstance(0, 2));
-//				append("extake -s", this.launchpad.getButtonInstance(1, 1));
+				// append("extake -s", this.launchpad.getButtonInstance(1, 1));
 				append("extake -s", this.launchpad.getButtonInstance(1, 2));
 
 				// Jog
@@ -123,6 +123,7 @@ public class Robot extends TimedRobot {
 				//Toggle end game
 				append("lifter_down -s", this.launchpad.getButtonInstance(0, 0));
 				append("lifter_up -s", this.launchpad.getButtonInstance(1, 0));
+
 				append("pusher_in -s", this.launchpad.getButtonInstance(2, 0));
 				append("pusher_out -s", this.launchpad.getButtonInstance(3, 0));
 			}
