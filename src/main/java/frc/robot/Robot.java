@@ -118,7 +118,7 @@ public class Robot extends TimedRobot {
 				append("driver_control -p", this.rightStick);
 				append("vision_align -s", this.lb);
 				append("break_mode -s", this.rb);
-				append("debug_print -s", this.a);
+				// append("debug_print -s", this.a);
 
 				//Toggle end game
 				append("lifter_down -s", this.launchpad.getButtonInstance(0, 0));
@@ -126,6 +126,9 @@ public class Robot extends TimedRobot {
 
 				append("pusher_in -s", this.launchpad.getButtonInstance(2, 0));
 				append("pusher_out -s", this.launchpad.getButtonInstance(3, 0));
+
+				//Oh no!  Plz stop Brisket
+				append("cancel_all -p", this.a);
 			}
 		};
 

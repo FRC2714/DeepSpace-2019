@@ -1,7 +1,6 @@
 package frc.robot.util;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
