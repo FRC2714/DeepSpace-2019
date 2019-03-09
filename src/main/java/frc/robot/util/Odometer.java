@@ -111,8 +111,4 @@ public abstract class Odometer {
 	public void printOdometerPosition() {
 		System.out.println("X: " + current_x + " Y: " + current_y);
 	}
-
-
-
-
 }

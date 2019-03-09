@@ -8,7 +8,7 @@ public class LeftCargoHatchHabTwo extends AutonTask {
     public LeftCargoHatchHabTwo(ControlsProcessor controlsProcessor) {
         super(controlsProcessor);
 
-        queueTask("add_forwards_spline -s 0,0,90,2,-1,22.55,180,2,5,5,0,0");
+        queueTask("add_forwards_spline -s 0,0,90,2,-2,23.5,0,2,5,5,0,0");
         queueTask("start_path -s");
         queueTask("auton_vision_align -s 4.05");
 

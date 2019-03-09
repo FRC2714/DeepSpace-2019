@@ -493,13 +493,14 @@ public class DriveTrain extends SubsystemModule {
 				lMotor0.set(0);
 				rMotor0.set(0);
 
+				System.out.println(odometer.getCurrentX() + " : " + odometer.getCurrentY());
 			}
 
 			@Override
 			public void execute() {
-				// getEncoderValues();
-				//System.out.println(odometer.getHeadingAngle());
-				System.out.println(odometer.getCurrentX() + " : " + odometer.getCurrentY());
+				getEncoderValues();
+				System.out.println("Heading Angle: " + odometer.getHeadingAngle());
+				System.out.println("X : Y = " + odometer.getCurrentX() + " : " + odometer.getCurrentY());
 				//System.out.println(navX.getYaw());
 			}
 
@@ -732,7 +733,7 @@ public class DriveTrain extends SubsystemModule {
 			public void end() {
 				disable();
 				closedLoopArcade(0, 0);
-				System.out.println(odometer.getCurrentX() + " : " + odometer.getCurrentY() + "Final Heading : " + odometer.getHeadingAngle());
+				System.out.println("x : y" + odometer.getCurrentX() + " : " + odometer.getCurrentY() + "Final Heading : " + odometer.getHeadingAngle());
 			}
 		};
 
@@ -1024,7 +1025,7 @@ public class DriveTrain extends SubsystemModule {
 //				limelightTable.getEntry("camMode").setNumber(1);
 				closedLoopArcade(0, 0);
 //				limelightTable.getEntry("ledMode").setNumber(1);
-				System.out.println("x: " + odometer.getCurrentX() + "y: " + odometer.getCurrentY() + "thetaF: " + odometer.getHeadingAngle());
+				System.out.println("x: " + odometer.getCurrentX() + " y: " + odometer.getCurrentY() + " thetaF: " + odometer.getHeadingAngle());
 			}
 		};
 
