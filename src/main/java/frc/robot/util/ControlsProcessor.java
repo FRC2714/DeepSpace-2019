@@ -218,15 +218,14 @@ public abstract class ControlsProcessor extends Thread {
 			}
 		}
 
-//
-//		controllers.forEach((k, v) -> {
-//			v.registeredCommands.forEach((a,b) -> {
-//				if (b.running){
-//					return;
-//				}
-//
-//			});
-//		});
+		// controllers.forEach((k, v) -> {
+		// 	v.registeredCommands.forEach((a,b) -> {
+		// 		if (b.running){
+		// 			return;
+		// 		}
+
+		// 	});
+		// });
 
 		/**
 		 * If it is a sequential command, we can clear the list and then we add

@@ -6,7 +6,7 @@ public class CommandDetails {
      * Enum list of type of commands available
      */
     public enum CommandType {
-        // Runs at a time independant of other commands
+        // Runs at a time independent of other commands
         PARALLEL,
         
         // Runs after previous command ends
@@ -33,18 +33,18 @@ public class CommandDetails {
      * @param commandInput String input containing the name and arguments for a command
      */
     public CommandDetails(String commandInput) {
-        //Splits commandInput String into an array when spaces are found
+        // Splits commandInput String into an array when spaces are found
         String[] commandParts = commandInput.split(" ");
-//        for (String currentParts : commandParts){
-//            System.out.print("CURRENT PARTS = " + currentParts + " || ");
-//        }
-//        System.out.println();
+        // for (String currentParts : commandParts){
+        //     System.out.print("CURRENT PARTS = " + currentParts + " || ");
+        // }
+        // System.out.println();
 
         // Sets commandName as the first string found in the commandInput
         this.commandName = commandParts[0];
 
         if (commandParts.length == 1) {
-//            System.out.println("RETURNING ");
+            // System.out.println("RETURNING ");
             return;
         }
 
