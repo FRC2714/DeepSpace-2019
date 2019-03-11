@@ -227,7 +227,6 @@ public class Robot extends TimedRobot {
 		Scheduler.getInstance().run();
 	}
 
-
 	/**
 	 * Unused
 	 */
@@ -236,7 +235,6 @@ public class Robot extends TimedRobot {
 		NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
 		NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
 	}
-
 
 	/**
 	 * Unused

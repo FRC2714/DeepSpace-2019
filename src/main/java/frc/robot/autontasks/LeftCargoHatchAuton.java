@@ -32,7 +32,6 @@ public class LeftCargoHatchAuton extends AutonTask {
         queueTask("add_forwards_spline -s -5,21,320,2,-1,18.5,0,2.5,5,5,0,0");
         queueTask("start_path -s");
         queueTask("auton_vision_align -s 5.3");
-
         
         // queueTask("add_forwards_spline -s -5,20.5,320,5,-6.5,-2.5,270,5,12,12,0,0");
         // queueTask("add_backwards_spline -s -6.5,-2.5,270,5,-5,20.5,340,3,12,12,0,0");
