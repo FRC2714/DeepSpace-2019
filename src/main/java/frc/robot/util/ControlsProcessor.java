@@ -1,7 +1,6 @@
 package frc.robot.util;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
@@ -219,15 +218,14 @@ public abstract class ControlsProcessor extends Thread {
 			}
 		}
 
-//
-//		controllers.forEach((k, v) -> {
-//			v.registeredCommands.forEach((a,b) -> {
-//				if (b.running){
-//					return;
-//				}
-//
-//			});
-//		});
+		// controllers.forEach((k, v) -> {
+		// 	v.registeredCommands.forEach((a,b) -> {
+		// 		if (b.running){
+		// 			return;
+		// 		}
+
+		// 	});
+		// });
 
 		/**
 		 * If it is a sequential command, we can clear the list and then we add

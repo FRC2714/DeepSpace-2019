@@ -8,8 +8,6 @@ public class RightRocketHatchAuton extends AutonTask {
 	public RightRocketHatchAuton(ControlsProcessor controlsProcessor) {
 		super(controlsProcessor);
 
-
-
 		queueTask("set_angular_offset -s -180");
 
 		queueTask("hatch_intake -p");
@@ -20,20 +18,20 @@ public class RightRocketHatchAuton extends AutonTask {
 		queueTask("upper_score -s");
 		queueTask("auton_vision_align -s 4.4");
 		queueTask("extake -s");
-//
-		//UNTESTED ON COMPETITION ROBOT
-//		queueTask("add_backwards_spline -s 6.8,16.9,298,1,3.5,19.5,270,1,5,5,0,0");
-//		queueTask("start_path -s");
-//		queueTask("station_position -s");
-//		queueTask("add_forwards_spline -s 3.5,19.7,270,2,6.7,-2,268,6.5,10,8,0,0");
-//		queueTask("start_path -s");
-//		queueTask("auton_vision_align -s 4.7");
+
+		// UNTESTED ON COMPETITION ROBOT
+		// queueTask("add_backwards_spline -s 6.8,16.9,298,1,3.5,19.5,270,1,5,5,0,0");
+		// queueTask("start_path -s");
+		// queueTask("station_position -s");
+		// queueTask("add_forwards_spline -s 3.5,19.7,270,2,6.7,-2,268,6.5,10,8,0,0");
+		// queueTask("start_path -s");
+		// queueTask("auton_vision_align -s 4.7");
 
 
-//		queueTask("hatch_station_intake -s");
-//		queueTask("add_backwards_spline -s 7,-4.5,268,2,8.3,10.5,240,3,10,8,0,0");
-//		queueTask("start_path -s");
-//		queueTask("back_score -s");
-//		queueTast("extake -s");
+		// queueTask("hatch_station_intake -s");
+		// queueTask("add_backwards_spline -s 7,-4.5,268,2,8.3,10.5,240,3,10,8,0,0");
+		// queueTask("start_path -s");
+		// queueTask("back_score -s");
+		// queueTast("extake -s");
 	}
 }

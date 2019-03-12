@@ -22,7 +22,5 @@ public class RightCargoHatchAuton extends AutonTask {
 		// queueTask("start_path -s");
 		// queueTask("auton_vision_align -s 4.5");
 		// queueTask("add_forwards_spline -s 6.1,-4.7,261,");
-
-
 	}
 }

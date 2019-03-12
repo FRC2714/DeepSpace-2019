@@ -549,11 +549,11 @@ public class Arm extends SubsystemModule {
 		};
 
 		new SubsystemCommand(this.registeredCommands, "extake") {
-			int timer;
+			long timer;
 
 			@Override
 			public void initialize() {
-				timer = 0;
+				timer = System.nanoTime();
 				
 				intake.pumpMotor.set(0);
 
@@ -566,12 +566,11 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void execute() {
 				intake.pumpRelease();
-				timer += 20;
 			}
 
 			@Override
 			public boolean isFinished() {
-				return timer >= 500;
+				return System.nanoTime() - timer >= 1000000000;
 			}
 
 			@Override

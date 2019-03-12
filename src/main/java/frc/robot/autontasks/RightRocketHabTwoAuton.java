@@ -12,7 +12,6 @@ public class RightRocketHabTwoAuton extends AutonTask {
 	public RightRocketHabTwoAuton(ControlsProcessor controlsProcessor) {
 		super(controlsProcessor);
 
-
 		queueTask("set_angular_offset -s -180");
 
 		queueTask("hatch_intake -p");
@@ -28,7 +27,6 @@ public class RightRocketHabTwoAuton extends AutonTask {
 		queueTask("add_backwards_spline -s 7.2,16.5,298,1,4.5,18.5,270,1,10,8,0,0");
 		queueTask("start_path -s");
 		queueTask("station_position -s");
-
 
 //		queueTask("add_forwards_spline -s 4,19.7,270,2,7.1,-2,268,4,14,12,0,0");
 //		queueTask("start_path -s");

@@ -30,6 +30,10 @@ public class Climber extends SubsystemModule {
     private boolean pusherOutDone;
     private boolean pusherInDone;
 
+    // Double press for climb
+    public long timeAtPress;
+    public boolean climbMode;
+
     public Climber() { 
         registerCommands(); // Puts commands onto the hashmaps
     }
@@ -92,9 +96,15 @@ public class Climber extends SubsystemModule {
     @Override public void registerCommands() {
 
         new SubsystemCommand(this.registeredCommands, "lifter_down") {
-			@Override
+
+            @Override
 			public void initialize() {
-                lifterMotor.set(1.0);
+                if(System.nanoTime() - timeAtPress < 1000000000 || climbMode == true) {
+                    lifterMotor.set(1.0);
+                    climbMode = true;
+                } else {
+                    timeAtPress = System.nanoTime();
+                }
 			}
 
 			@Override
@@ -114,7 +124,9 @@ public class Climber extends SubsystemModule {
         new SubsystemCommand(this.registeredCommands, "lifter_up") {
 			@Override
 			public void initialize() {
-                lifterMotor.set(-0.5);
+                if(climbMode == true) {
+                    lifterMotor.set(-0.5);
+                }
 			}
 
 			@Override
@@ -134,7 +146,9 @@ public class Climber extends SubsystemModule {
         new SubsystemCommand(this.registeredCommands, "pusher_out") {
 			@Override
 			public void initialize() {
-                pusherMotor.set(-0.2);
+                if(climbMode == true) {
+                    pusherMotor.set(-0.2);
+                }
 			}
 
 			@Override
@@ -154,7 +168,9 @@ public class Climber extends SubsystemModule {
         new SubsystemCommand(this.registeredCommands, "pusher_in") {
 			@Override
 			public void initialize() {
-                pusherMotor.set(0.2);
+                if(climbMode == true) {
+                    pusherMotor.set(0.2);
+                }
 			}
 
 			@Override
@@ -254,6 +270,9 @@ public class Climber extends SubsystemModule {
 
         lifterEncoder.setPosition(0);
         pusherEncoder.setPosition(0);
+
+        timeAtPress = 0;
+        climbMode = false;
 	}
 
 	@Override

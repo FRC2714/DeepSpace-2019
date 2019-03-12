@@ -100,7 +100,7 @@ public class Robot extends TimedRobot {
 				append("cargo_station_score -p", this.launchpad.getButtonInstance(6, 2));
 				append("cargo_station_score -p", this.launchpad.getButtonInstance(7, 2));
 
-				// Extake
+				// 
 				// append("extake -s", this.launchpad.getButtonInstance(0, 1));
 				append("extake -s", this.launchpad.getButtonInstance(0, 2));
 				// append("extake -s", this.launchpad.getButtonInstance(1, 1));
@@ -118,6 +118,9 @@ public class Robot extends TimedRobot {
 				append("driver_control -p", this.rightStick);
 				append("vision_align -s", this.lb);
 				append("break_mode -s", this.rb);
+				// append("hatch_station_intake -s", this.a);
+				append("climber_up -s", this.a);
+				append("climber_down -s", this.b);
 
 				//Toggle end game
 				append("lifter_down -s", this.launchpad.getButtonInstance(0, 0));
@@ -125,6 +128,9 @@ public class Robot extends TimedRobot {
 
 				append("pusher_in -s", this.launchpad.getButtonInstance(2, 0));
 				append("pusher_out -s", this.launchpad.getButtonInstance(3, 0));
+
+				//Oh no!  Plz stop Brisket
+				append("cancel_all -p", this.b);
 			}
 		};
 
@@ -182,15 +188,15 @@ public class Robot extends TimedRobot {
 		AutonTask leftRocket = new LeftRocketHatchAuton(controlsProcessor);
 		AutonTask leftFullSend = new LeftRocketHabTwoAuton(controlsProcessor);
 		AutonTask leftCargo = new LeftCargoHatchAuton(controlsProcessor);
+		AutonTask leftCargoTest = new LeftCargoHatchHabTwo(controlsProcessor);
 
 		AutonTask rightRocket = new RightRocketHatchAuton(controlsProcessor);
 		AutonTask rightFullSend = new RightRocketHabTwoAuton(controlsProcessor);
-		AutonTask rightCargo = new RightCargoHatchAuton(controlsProcessor);
-
+		AutonTask rightCargo = new RightCargoHabTwoAuton(controlsProcessor);
 
 		AutonTask testPath = new TestTask(controlsProcessor);
 
-		leftFullSend.run();
+		rightCargo.run();
 	}
 
 	/**
@@ -223,7 +229,6 @@ public class Robot extends TimedRobot {
 		Scheduler.getInstance().run();
 	}
 
-
 	/**
 	 * Unused
 	 */
@@ -232,7 +237,6 @@ public class Robot extends TimedRobot {
 		NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
 		NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
 	}
-
 
 	/**
 	 * Unused

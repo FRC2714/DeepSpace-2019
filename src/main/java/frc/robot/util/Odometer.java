@@ -34,6 +34,7 @@ public abstract class Odometer {
 	public void reset() {
 		current_x = 0;
 		current_y = 0;
+		headingAngle = 90;
 	}
 
 	public void setCurrentPosition(double inputX, double inputY) {
@@ -111,8 +112,4 @@ public abstract class Odometer {
 	public void printOdometerPosition() {
 		System.out.println("X: " + current_x + " Y: " + current_y);
 	}
-
-
-
-
 }

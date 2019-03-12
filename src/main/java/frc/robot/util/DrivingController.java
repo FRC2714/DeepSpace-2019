@@ -8,7 +8,7 @@ public abstract class DrivingController {
 	 * Controls the magnitude of angular correction
 	 * Corrects both the anglular and perpendicular error
 	 */
-	//Samson control was originally at 0.25 * 0.6
+	// Samson control was originally at 0.25 * 0.6
 	private PID samsonControl = new PID(0.06, 0.0001, 0.0);
 	private double samsonOutput;
 
@@ -48,11 +48,9 @@ public abstract class DrivingController {
 	 * @param period In seconds
 	 */
 	public DrivingController(double period) {
-
 		this.period = period;
 
 		this.samsonControl.setMaxIOutput(0.15);
-
 	}
 
 
@@ -61,7 +59,7 @@ public abstract class DrivingController {
 	 */
 	public void run() {
 		// Test
-		//System.out.println(System.nanoTime());
+		// System.out.println(System.nanoTime());
 
 		// Update using abstracted functions from the calling class
 		updateVariables();
@@ -93,11 +91,11 @@ public abstract class DrivingController {
 		samsonOutput = samsonControl.getOutput(samsonSum, 0);
 		tangentialOutput = tangentialControl.getOutput(tangentialError, 0);
 
-		//System.out.println("Ref Velocity: " + refVelocity);
+		// System.out.println("Ref Velocity: " + refVelocity);
 
 		// Both +
 		driveRobot(refVelocity + tangentialOutput, samsonOutput);
-		//System.out.println(samsonOutput);
+		// System.out.println(samsonOutput);
 
 	}
 
