@@ -100,7 +100,7 @@ public class Robot extends TimedRobot {
 				append("cargo_station_score -p", this.launchpad.getButtonInstance(6, 2));
 				append("cargo_station_score -p", this.launchpad.getButtonInstance(7, 2));
 
-				// Extake
+				// 
 				// append("extake -s", this.launchpad.getButtonInstance(0, 1));
 				append("extake -s", this.launchpad.getButtonInstance(0, 2));
 				// append("extake -s", this.launchpad.getButtonInstance(1, 1));
@@ -118,7 +118,9 @@ public class Robot extends TimedRobot {
 				append("driver_control -p", this.rightStick);
 				append("vision_align -s", this.lb);
 				append("break_mode -s", this.rb);
-				// append("debug_print -s", this.a);
+				// append("hatch_station_intake -s", this.a);
+				append("climber_up -s", this.a);
+				append("climber_down -s", this.b);
 
 				//Toggle end game
 				append("lifter_down -s", this.launchpad.getButtonInstance(0, 0));
@@ -128,7 +130,7 @@ public class Robot extends TimedRobot {
 				append("pusher_out -s", this.launchpad.getButtonInstance(3, 0));
 
 				//Oh no!  Plz stop Brisket
-				append("cancel_all -p", this.a);
+				append("cancel_all -p", this.b);
 			}
 		};
 
@@ -190,11 +192,11 @@ public class Robot extends TimedRobot {
 
 		AutonTask rightRocket = new RightRocketHatchAuton(controlsProcessor);
 		AutonTask rightFullSend = new RightRocketHabTwoAuton(controlsProcessor);
-		AutonTask rightCargo = new RightCargoHatchAuton(controlsProcessor);
+		AutonTask rightCargo = new RightCargoHabTwoAuton(controlsProcessor);
 
 		AutonTask testPath = new TestTask(controlsProcessor);
 
-		leftCargoTest.run();
+		rightCargo.run();
 	}
 
 	/**

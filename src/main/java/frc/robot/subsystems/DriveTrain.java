@@ -890,6 +890,7 @@ public class DriveTrain extends SubsystemModule {
 			boolean isAboveMax = false;
 			double maxBlobArea = 6;
 			double currentBlobArea;
+			double startingTime;
 
 			@Override
 			public void initialize() {
@@ -897,6 +898,7 @@ public class DriveTrain extends SubsystemModule {
 				limelightTable.getEntry("ledMode").setNumber(3);
 				limelightTable.getEntry("camMode").setNumber(0);
 				isAboveMax = false;
+				startingTime = System.nanoTime();
 			}
 
 
@@ -940,7 +942,7 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public boolean isFinished() {
 				// System.out.println("Boolean : " + (currentBlobArea > maxBlobArea));
-					return isAboveMax;
+					return isAboveMax || ((System.nanoTime() - startingTime) > 3000000000.0);
 			}
 
 			@Override

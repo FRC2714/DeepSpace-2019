@@ -12,13 +12,25 @@ public class RightCargoHabTwoAuton extends AutonTask {
 	public RightCargoHabTwoAuton(ControlsProcessor controlsProcessor) {
 		super(controlsProcessor);
 
-		queueTask("set_angular_offset -s -180");
-		queueTask("add_backwards_spline -s 0,0,270,3,5,20.5,220,5,12,12,0,0");
-		queueTask("add_forwards_spline -s -5,20.5,320,2,0.5,18,0,2.5,12,4.5,0,0");
-		// queueTask("add_backwards_spline -s 0.5,18,0,2.5,-5,20.5,320,2,12,4.5,0,0");
-		// queueTask("add_forwards_spline -s -5,20.5,320,5,-6.5,-2.5,270,5,12,12,0,0");
-		// queueTask("add_backwards_spline -s -6.5,-2.5,270,5,-5,20.5,340,3,12,12,0,0");
-		// queueTask("add_forwards_spline -s -5,20.5,340,0.5,0.5,18.85,0,1.5,12,4.5,0,0");
+        queueTask("hatch_intake -p");
+        queueTask("hatch_true -p");
+        
+        // Start position to far cargo bay
+        queueTask("start_position -s");
+        queueTask("add_forwards_spline -s 0,0,90,10,3.25,21.3,180,6,3,12,0,3");
+        queueTask("start_path -s");
+        queueTask("station_position -s");
+        queueTask("auton_vision_align -p 4.2");
+		queueTask("extake -s");
+        
+        // Backwards spline from far cargo bay
+		queueTask("add_backwards_spline -p -0.55,21.3,180,2,4.45,19.3,225,2,3,12,0,0");
 		queueTask("start_path -s");
+
+		// Backwards spline to cargo
+        queueTask("add_forwards_spline -p 4.45,19.3,225,4,1.45,1,270,10,3,12,0,0");
+		queueTask("start_path -s");
+		queueTask("floor_cargo_position -p");
+		queueTask("cargo_intake -p");
 	}
 }

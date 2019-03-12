@@ -106,7 +106,7 @@ public class Intake extends SubsystemModule {
 
 	public boolean checkPumpState() {
 		if(pumpState) { return pumpState; }
-		if(pumpMotor.get() != 0) {
+		if(pumpMotor.get() > 0) {
 			pumpCurrents.add(0, Math.abs(pumpMotor.getOutputCurrent()));
 
 			if(pumpCurrents.size() != numberOfPumpCurrents) {
@@ -117,13 +117,11 @@ public class Intake extends SubsystemModule {
 			else {
 				if(pumpStateCounter > 10 && pumpStateIsFirstAvg) {
 					pumpStateFirstAvg = pumpAverageCurrent;
-					// System.out.println("First CD: " + pumpStateFirstAvg);
 					pumpStateIsFirstAvg = false;
 				}
 
 				pumpStateCounter++;
 
-				// System.out.println("Current: " + pumpAverageCurrent);
 				pumpAverageCurrent += (pumpCurrents.get(0) - pumpCurrents.get(pumpCurrents.size() - 1)) / numberOfPumpCurrents;
 				pumpCurrents.remove(pumpCurrents.size() - 1);
 
@@ -371,6 +369,27 @@ public class Intake extends SubsystemModule {
 			@Override
 			public boolean isFinished() {
 				return cargoState || pumpState;
+			}
+
+			@Override
+			public void end() {}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "climber_up") {
+
+			@Override
+			public void initialize() {
+				pumpMotor.set(-1.0);
+			}
+
+			@Override
+			public void execute() {
+				pumpRelease();
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
 			}
 
 			@Override
