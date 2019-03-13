@@ -185,18 +185,13 @@ public class Robot extends TimedRobot {
 
 		generalInit();
 		
-		AutonTask leftRocket = new LeftRocketHatchAuton(controlsProcessor);
 		AutonTask leftFullSend = new LeftRocketHabTwoAuton(controlsProcessor);
-		AutonTask leftCargo = new LeftCargoHatchAuton(controlsProcessor);
-		AutonTask leftCargoTest = new LeftCargoHatchHabTwo(controlsProcessor);
+		AutonTask leftCargo = new LeftCargoHabTwoAuton(controlsProcessor);
 
-		AutonTask rightRocket = new RightRocketHatchAuton(controlsProcessor);
 		AutonTask rightFullSend = new RightRocketHabTwoAuton(controlsProcessor);
 		AutonTask rightCargo = new RightCargoHabTwoAuton(controlsProcessor);
 
-		AutonTask testPath = new TestTask(controlsProcessor);
-
-		rightCargo.run();
+		leftCargo.run();
 	}
 
 	/**
@@ -242,7 +237,7 @@ public class Robot extends TimedRobot {
 	 * Unused
 	 */
 	@Override
-	public void testPeriodic() { 
+	public void testPeriodic() {
 	}
 
 	/**
