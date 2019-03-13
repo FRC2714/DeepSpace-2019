@@ -117,17 +117,20 @@ public class Intake extends SubsystemModule {
 			else {
 				if(pumpStateCounter > 10 && pumpStateIsFirstAvg) {
 					pumpStateFirstAvg = pumpAverageCurrent;
-					// System.out.println("First CD: " + pumpStateFirstAvg);
 					pumpStateIsFirstAvg = false;
 				}
 
 				pumpStateCounter++;
 
-				// System.out.println("Current: " + pumpAverageCurrent);
 				pumpAverageCurrent += (pumpCurrents.get(0) - pumpCurrents.get(pumpCurrents.size() - 1)) / numberOfPumpCurrents;
 				pumpCurrents.remove(pumpCurrents.size() - 1);
 
-				return Math.abs(pumpAverageCurrent) < Math.abs(pumpStateFirstAvg) - pumpCurrentDiffrence;
+				if(Math.abs(pumpAverageCurrent) < Math.abs(pumpStateFirstAvg) - pumpCurrentDiffrence) {
+					pumpMotor.set(0.5);
+					return true;
+				} else {
+					return false;
+				}
 			}
 		}
 
@@ -307,7 +310,7 @@ public class Intake extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {}
+			public void end() { }
 		};
 
 		new SubsystemCommand(this.registeredCommands, "set_cargo_mode") {

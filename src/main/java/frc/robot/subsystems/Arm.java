@@ -333,8 +333,8 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				shoulderAngle = 4;
-				wristAngle = 88;
+				shoulderAngle = 7;
+				wristAngle = 86;
 
 				goToPosition(shoulderAngle, wristAngle);
 			}
@@ -406,8 +406,8 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void initialize() {
 				if(intake.getCargoState()) {
-					shoulderAngle = 28;
-					wristAngle = 145;
+					shoulderAngle = 45;
+					wristAngle = 160;
 				} else if(intake.getHatchState()) {
 					shoulderAngle = 4;
 					wristAngle = 88;
@@ -462,7 +462,7 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void initialize() {
 				if(intake.getCargoState()) {
-					shoulderAngle = 95;
+					shoulderAngle = 88;
 					wristAngle = 200;
 				} else if(intake.getHatchState()) {
 					shoulderAngle = 66;
