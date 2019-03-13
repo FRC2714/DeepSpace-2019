@@ -125,7 +125,12 @@ public class Intake extends SubsystemModule {
 				pumpAverageCurrent += (pumpCurrents.get(0) - pumpCurrents.get(pumpCurrents.size() - 1)) / numberOfPumpCurrents;
 				pumpCurrents.remove(pumpCurrents.size() - 1);
 
-				return Math.abs(pumpAverageCurrent) < Math.abs(pumpStateFirstAvg) - pumpCurrentDiffrence;
+				if(Math.abs(pumpAverageCurrent) < Math.abs(pumpStateFirstAvg) - pumpCurrentDiffrence) {
+					pumpMotor.set(0.5);
+					return true;
+				} else {
+					return false;
+				}
 			}
 		}
 
@@ -305,7 +310,7 @@ public class Intake extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {}
+			public void end() { }
 		};
 
 		new SubsystemCommand(this.registeredCommands, "set_cargo_mode") {
