@@ -100,7 +100,7 @@ public class Robot extends TimedRobot {
 				append("cargo_station_score -p", this.launchpad.getButtonInstance(6, 2));
 				append("cargo_station_score -p", this.launchpad.getButtonInstance(7, 2));
 
-				// 
+				// Extake buttons
 				// append("extake -s", this.launchpad.getButtonInstance(0, 1));
 				append("extake -s", this.launchpad.getButtonInstance(0, 2));
 				// append("extake -s", this.launchpad.getButtonInstance(1, 1));
@@ -118,19 +118,15 @@ public class Robot extends TimedRobot {
 				append("driver_control -p", this.rightStick);
 				append("vision_align -s", this.lb);
 				append("break_mode -s", this.rb);
-				// append("hatch_station_intake -s", this.a);
-				append("climber_up -s", this.a);
-				append("climber_down -s", this.b);
 
-				//Toggle end game
-				append("lifter_down -s", this.launchpad.getButtonInstance(0, 0));
-				append("lifter_up -s", this.launchpad.getButtonInstance(1, 0));
+				// Climber
+				append("climber_up -s", this.launchpad.getButtonInstance(0, 0));
+				append("climber_pump -p", this.launchpad.getButtonInstance(0, 0));
+				append("climber_down -s", this.launchpad.getButtonInstance(1, 0));
 
-				append("pusher_in -s", this.launchpad.getButtonInstance(2, 0));
-				append("pusher_out -s", this.launchpad.getButtonInstance(3, 0));
-
-				//Oh no!  Plz stop Brisket
-				append("cancel_all -p", this.b);
+				// Oh no! Plz stop Brisket
+				append("cancel_all -p", this.launchpad.getButtonInstance(7, 0));
+				append("cancel_all -p", this.launchpad.getButtonInstance(8, 0));
 			}
 		};
 
