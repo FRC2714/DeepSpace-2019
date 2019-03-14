@@ -437,7 +437,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				shoulderAngle = 77; //Previously 70
+				shoulderAngle = 82; //Previously 77
 				wristAngle = 295;
 
 				goToPosition(shoulderAngle, wristAngle);
