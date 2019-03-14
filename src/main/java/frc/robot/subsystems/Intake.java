@@ -375,7 +375,7 @@ public class Intake extends SubsystemModule {
 			public void end() {}
 		};
 
-		new SubsystemCommand(this.registeredCommands, "climber_up") {
+		new SubsystemCommand(this.registeredCommands, "climber_pump") {
 
 			@Override
 			public void initialize() {
@@ -384,12 +384,12 @@ public class Intake extends SubsystemModule {
 
 			@Override
 			public void execute() {
-				pumpRelease();
+				pumpHatch();
 			}
 
 			@Override
 			public boolean isFinished() {
-				return false;
+				return true;
 			}
 
 			@Override
