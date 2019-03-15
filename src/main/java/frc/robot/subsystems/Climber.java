@@ -86,13 +86,13 @@ public class Climber extends SubsystemModule {
 
 			@Override
 			public void execute() {
-				if(climberEncoder.getPosition() <= -85) // in rotations
+				if(climberEncoder.getPosition() <= -90) // in rotations
                     climberMotor.set(0);
             }
 
 			@Override
 			public boolean isFinished() {
-				return climberEncoder.getPosition() <= -85;
+				return climberEncoder.getPosition() <= -90;
 			}
 
 			@Override
