@@ -105,18 +105,21 @@ public class Climber extends SubsystemModule {
 
 
 	    new SubsystemCommand(this.registeredCommands, "valve_off") {
+	    	double initTime;
 		    @Override
 		    public void initialize() {
+		    	initTime = System.nanoTime();
 		    }
 
 		    @Override
 		    public void execute() {
 			    climberValve.set(1);
+			    System.out.println("Valve Setting to 1");
 		    }
 
 		    @Override
 		    public boolean isFinished() {
-			    return false;
+			    return (System.nanoTime() - initTime) > 1000000000;
 		    }
 
 		    @Override

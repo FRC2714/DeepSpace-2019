@@ -12,20 +12,21 @@ public class LeftCargoHabTwoAuton extends AutonTask {
 	public LeftCargoHabTwoAuton(ControlsProcessor controlsProcessor) {
 		super(controlsProcessor);
 
+		queueTask("valve_off -p");
 		queueTask("hatch_intake -p");
 		queueTask("hatch_true -p");
 
 		// Start position to far cargo bay
 		queueTask("start_position -s");
-		queueTask("add_forwards_spline -s 0,0,90,10,-3.25,23,15,6,4,12,0,3");
+		queueTask("add_forwards_spline -s 0,0,90,10,-3.25,23,30,6,4,12,0,3");
 		queueTask("start_path -s");
 		queueTask("station_position -s");
-		queueTask("auton_vision_align -p 4.2");
-		queueTask("extake -s");;
+		queueTask("auton_vision_align -p 4.3");
+		queueTask("extake -s");
 
 
 		// Backwards spline from far cargo bay
-		queueTask("add_backwards_spline -p 0.55,21.3,0,2,-4.45,21,315,2,5,12,0,0");
+		queueTask("add_backwards_spline -p 0.55,21.3,0,2,-4.45,19.3,315,2,5,12,0,0");
 		queueTask("start_path -s");
 
 		// Backwards spline to cargo
