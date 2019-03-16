@@ -18,11 +18,12 @@ public class LeftCargoHabTwoAuton extends AutonTask {
 
 		// Start position to far cargo bay
 		queueTask("start_position -s");
-		queueTask("add_forwards_spline -s 0,0,90,10,-3.25,23,20,6,3,12,0,0");
+		queueTask("add_forwards_spline -s 0,0,90,10,-3.25,23,15,6,3,12,0,0");
 		queueTask("start_path -s");
 		queueTask("station_position -s");
 		queueTask("auton_vision_align -p 4.3");
-		queueTask("extake -s");
+
+//		queueTask("extake -s");
 //
 //
 //		// Backwards spline from far cargo bay
