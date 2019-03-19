@@ -732,43 +732,22 @@ public class DriveTrain extends SubsystemModule {
 
 		new SubsystemCommand(this.registeredCommands, "turn_to_angle"){
 			double requestedDelta;
-			double aimAngle;
-			PIDSource headingSource = new PIDSource() {
-				@Override
-				public void setPIDSourceType(PIDSourceType pidSource) {
+			double finalRequestedAngle;
 
-				}
-
-				@Override
-				public PIDSourceType getPIDSourceType() {
-					return null;
-				}
-
-				@Override
-				public double pidGet() {
-					return 0;
-				}
-			};
-
-			PIDOutput pidOutput = new PIDOutput() {
-				@Override
-				public void pidWrite(double output) {
-
-				}
-			};
-
-			PIDController headingAngleController = new PIDController(0, 0, 0, 0, headingSource, pidOutput);
-
+			PIDController headingController = new PIDController(0, 0, 0, 0, navX, lMotor0);
 			@Override
 			public void initialize() {
 				requestedDelta = Double.parseDouble(this.args[0]);
-				aimAngle = odometer.getHeadingAngle() + requestedDelta;
-				System.out.println("Turn to Angle Command Aim:- " + aimAngle);
+				finalRequestedAngle = odometer.getHeadingAngle() + requestedDelta;
+				System.out.println("Turn to Angle Command Aim:- " + finalRequestedAngle);
+				headingController.setSetpoint(finalRequestedAngle);
+				headingController.setOutputRange(-0.6,0.6);
+				headingController.setContinuous(true);
 			}
 
 			@Override
 			public void execute() {
-
+				
 			}
 
 			@Override
@@ -778,6 +757,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
+
 			}
 		};
 
