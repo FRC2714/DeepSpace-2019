@@ -8,12 +8,10 @@ import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import frc.robot.RobotMap;
 import frc.robot.util.*;
@@ -735,6 +733,31 @@ public class DriveTrain extends SubsystemModule {
 		new SubsystemCommand(this.registeredCommands, "turn_to_angle"){
 			double requestedDelta;
 			double aimAngle;
+			PIDSource headingSource = new PIDSource() {
+				@Override
+				public void setPIDSourceType(PIDSourceType pidSource) {
+
+				}
+
+				@Override
+				public PIDSourceType getPIDSourceType() {
+					return null;
+				}
+
+				@Override
+				public double pidGet() {
+					return 0;
+				}
+			};
+
+			PIDOutput pidOutput = new PIDOutput() {
+				@Override
+				public void pidWrite(double output) {
+
+				}
+			};
+
+			PIDController headingAngleController = new PIDController(0, 0, 0, 0, headingSource, pidOutput);
 
 			@Override
 			public void initialize() {
@@ -745,6 +768,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void execute() {
+
 			}
 
 			@Override
