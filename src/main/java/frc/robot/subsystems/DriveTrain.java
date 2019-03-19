@@ -734,30 +734,35 @@ public class DriveTrain extends SubsystemModule {
 			double requestedDelta;
 			double finalRequestedAngle;
 
-			PIDController headingController = new PIDController(0, 0, 0, 0, navX, lMotor0);
+			PID headingController = new PID(0, 0, 0, 0);
 			@Override
 			public void initialize() {
 				requestedDelta = Double.parseDouble(this.args[0]);
 				finalRequestedAngle = odometer.getHeadingAngle() + requestedDelta;
 				System.out.println("Turn to Angle Command Aim:- " + finalRequestedAngle);
+				headingController.setOutputLimits(-0.6, 0.6);
 				headingController.setSetpoint(finalRequestedAngle);
-				headingController.setOutputRange(-0.6,0.6);
-				headingController.setContinuous(true);
 			}
 
 			@Override
 			public void execute() {
-				
+				double errorCorrection = headingController.getOutput(odometer.getHeadingAngle());
+				if(Math.abs(odometer.getHeadingAngle() - finalRequestedAngle) > 20){
+					lMotor0.set(errorCorrection);
+					rMotor0.set(-errorCorrection);
+				}
 			}
 
 			@Override
 			public boolean isFinished() {
-				return false;
+				return Math.abs(odometer.getHeadingAngle() - finalRequestedAngle) > 20;
 			}
 
 			@Override
 			public void end() {
-
+				System.out.println("Finished turn to angle, expected angle was " + finalRequestedAngle +
+						" and your actual angle was " + odometer.getHeadingAngle() +
+						". Error of " + (Math.abs(odometer.getHeadingAngle() - finalRequestedAngle) > 20));
 			}
 		};
 
