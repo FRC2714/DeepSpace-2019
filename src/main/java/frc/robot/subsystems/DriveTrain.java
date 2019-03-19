@@ -732,6 +732,33 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
+		new SubsystemCommand(this.registeredCommands, "turn_to_angle"){
+			double requestedDelta;
+			double aimAngle;
+
+			@Override
+			public void initialize() {
+				requestedDelta = Double.parseDouble(this.args[0]);
+				aimAngle = odometer.getHeadingAngle() + requestedDelta;
+				System.out.println("Turn to Angle Command Aim:- " + aimAngle);
+			}
+
+			@Override
+			public void execute() {
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {
+			}
+		};
+
+
+
 		new SubsystemCommand(this.registeredCommands, "delay_tester"){
 			@Override
 			public void initialize() {
