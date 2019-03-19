@@ -8,7 +8,6 @@ import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Spark;
-import frc.robot.Robot;
 import frc.robot.util.SubsystemCommand;
 import frc.robot.util.SubsystemModule;
 
