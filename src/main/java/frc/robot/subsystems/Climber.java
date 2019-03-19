@@ -4,6 +4,7 @@ import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.Servo;
 import frc.robot.util.SubsystemCommand;
 import frc.robot.util.SubsystemModule;
 
@@ -14,6 +15,8 @@ public class Climber extends SubsystemModule {
 
     // MAX encoders
 	private CANEncoder climberEncoder = climberMotor.getEncoder();
+
+	private Servo climberValve = new Servo(2);
 
     // Climber positions
     private double climberPosition;
@@ -43,7 +46,8 @@ public class Climber extends SubsystemModule {
 
             @Override
 			public void initialize() {
-                if(System.nanoTime() - timeAtPress < 1000000000 || climbMode == true) {
+                if(System.nanoTime() - timeAtPress < 1000000000 || climbMode) {
+	                System.out.println("Giving Power 1.0 to climber");
                     climberMotor.set(1.0);
                     climbMode = true;
                 } else {
@@ -53,17 +57,21 @@ public class Climber extends SubsystemModule {
 
 			@Override
 			public void execute() {
-                if(climberPosition >= 500) // in rotations
-                    climberMotor.set(0);
-            }
+				if(climberEncoder.getPosition() >= 485) { // in rotations
+					System.out.println("Stopping Climber Motor");
+					climberMotor.set(0);
+				}
+				climberValve.set(0);
+			}
 
 			@Override
 			public boolean isFinished() {
-				return false;
+				return climberEncoder.getPosition() >= 485;
 			}
 
 			@Override
 			public void end() {
+				System.out.println("Ending climber motor movement");
                 System.out.println("Lifter: " + climberEncoder.getPosition());
                 climberMotor.set(0);
 			}
@@ -78,21 +86,47 @@ public class Climber extends SubsystemModule {
 
 			@Override
 			public void execute() {
-                if(climberPosition <= -85) // in rotations
+				if(climberEncoder.getPosition() <= -90) // in rotations
                     climberMotor.set(0);
             }
 
 			@Override
 			public boolean isFinished() {
-				return false;
+				return climberEncoder.getPosition() <= -90;
 			}
 
 			@Override
 			public void end() {
-                climberMotor.set(0.0);
+				System.out.println("Ending downward climber motor movement");
+				climberMotor.set(0.0);
                 System.out.println("Lifter: " + climberEncoder.getPosition());
 			}
         };
+
+
+	    new SubsystemCommand(this.registeredCommands, "valve_off") {
+	    	double initTime;
+		    @Override
+		    public void initialize() {
+		    	initTime = System.nanoTime();
+		    }
+
+		    @Override
+		    public void execute() {
+			    climberValve.set(1);
+			    System.out.println("Valve Setting to 1");
+		    }
+
+		    @Override
+		    public boolean isFinished() {
+			    return (System.nanoTime() - initTime) > 1000000000;
+		    }
+
+		    @Override
+		    public void end() {
+
+		    }
+	    };
 
         new SubsystemCommand(this.registeredCommands, "get_climber_positions") {
 			@Override

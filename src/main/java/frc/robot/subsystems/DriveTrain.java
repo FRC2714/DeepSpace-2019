@@ -925,8 +925,8 @@ public class DriveTrain extends SubsystemModule {
 				// System.out.println("kDistanceDivisor: " + kDistanceDivisor + "| blobArea : " + currentBlobArea);
 
 
-				if (power > 0.4)
-					power = 0.4;
+				if (power > 0.2)
+					power = 0.2;
 
 				// System.out.println("power: " + power);
 
