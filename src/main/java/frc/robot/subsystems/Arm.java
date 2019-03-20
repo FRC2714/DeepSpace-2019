@@ -30,10 +30,6 @@ public class Arm extends SubsystemModule {
 	private final double wristRatio = 360 / (140.0);
 	private final double shoulderRatio = 360 / (512.0 / 3);
 
-	// Desired arm angles in degrees
-	private double desiredShoulderAngle;
-	private double desiredWristAngle;
-
 	// Arm PIDs
 	private CANPIDController shoulderPID;
 	private CANPIDController wristPID;
@@ -90,16 +86,13 @@ public class Arm extends SubsystemModule {
 	 * @param wristAngle the desired wrist angle in degrees
 	 */
 	public void goToPosition(double shoulderAngle, double wristAngle) {
-		desiredShoulderAngle = shoulderAngle;
-		desiredWristAngle = wristAngle;
+		shoulderPID.setReference(shoulderAngle, ControlType.kPosition);
+		wristPID.setReference(wristAngle, ControlType.kPosition);
 	}
 
 	@Override
 	public void run() {
 		shoulderPID.setFF(getShoulderFeedforward(shoulderEncoder.getPosition()));
-		shoulderPID.setReference(desiredShoulderAngle, ControlType.kPosition);
-
-		wristPID.setReference(desiredWristAngle, ControlType.kPosition);
 	}
 
 	@Override
@@ -463,9 +456,6 @@ public class Arm extends SubsystemModule {
 
 		shoulderEncoder.setPosition(0);
 		wristEncoder.setPosition(0);
-
-		desiredShoulderAngle = 0;
-		desiredWristAngle = 0;
 	}
 
 	@Override
