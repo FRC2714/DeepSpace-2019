@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
-import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
@@ -33,10 +32,6 @@ public class DriveTrain extends SubsystemModule {
 	private CANPIDController lPidController = lMotor0.getPIDController();
 	private CANPIDController rPidController = rMotor0.getPIDController();
 
-	// MAX encoders
-	private CANEncoder lEncoder = lMotor0.getEncoder();
-	private CANEncoder rEncoder = rMotor0.getEncoder();
-
 	// Differential drivetrain
 	private DifferentialDrive drive = new DifferentialDrive(lMotor0, rMotor0);
 
@@ -53,31 +48,14 @@ public class DriveTrain extends SubsystemModule {
 	private final double rKFF = 1.78e-4;
 
 	private final double rpmToFeet = 0.003135; // Convert RPM to ft/s
-	private final double rotationsToFeet = 0.1881; // Convert rotations to feet
-
-	private double startTime;
-	private int numberOfRuns;
-
 
 	private final double sensitivity = 2.5;
 	private final double maxVelocity = 13;
-	private final double maxAcceleration = 5;
-
-	private double collisionThreshold = 0;
-	private double tippingThreshold = 0;
-
-	private double prevAccelX = 0;
-	private double prevAccelY = 0;
-	private double mPrevTimeAccel = 0;
 
 	private double lastVelocity = 0;
 
 	// Ramp code
 	private double currentOpenArcadePower;
-	private double currentOpenArcadePivot;
-
-	// Robot characteristics
-	private double wheelSeparation = 2;
 
 	private boolean driverControlled = false;
 
@@ -191,7 +169,6 @@ public class DriveTrain extends SubsystemModule {
 		odometer.reset();
 
 		currentOpenArcadePower = 0;
-		currentOpenArcadePivot = 0;
 
 		// leftEncoder.setDistancePerPulse(-0.0495);
 		// rightEncoder.setDistancePerPulse(0.00105);
@@ -278,48 +255,6 @@ public class DriveTrain extends SubsystemModule {
 		lPidController.setReference(leftVelocity / rpmToFeet, ControlType.kVelocity);
 		rPidController.setReference(-rightVelocity / rpmToFeet, ControlType.kVelocity);
 		// System.out.println("ls: " + leftVelocity / rpmToFeet + " rs: " + -rightVelocity / rpmToFeet);
-	}
-
-	public synchronized void setCollisionJerkThreshold(double jerkCollisionThreshold) {
-		collisionThreshold = jerkCollisionThreshold;
-	}
-
-	public synchronized void setTippingThreshold(double tippingThreshold) {
-		this.tippingThreshold = tippingThreshold;
-	}
-
-
-	public boolean isTipping() {
-		return Math.abs(navX.getPitch()) > tippingThreshold ||
-				Math.abs(navX.getRoll()) > tippingThreshold;
-	}
-
-	public boolean isCollisionOccurring() {
-		boolean collisionOccurring = false;
-
-		double accelX = navX.getWorldLinearAccelX();
-		double accelY = navX.getWorldLinearAccelY();
-
-
-		double currTime = Timer.getFPGATimestamp();
-		double dt = currTime - mPrevTimeAccel;
-
-		double jerkX = (accelX - prevAccelX) / (dt);
-		double jerkY = (accelY - prevAccelY) / (dt);
-
-		if (Math.abs(jerkX) > collisionThreshold || Math.abs(jerkY) > collisionThreshold)
-			collisionOccurring = true;
-
-		prevAccelX = accelX;
-		prevAccelY = accelY;
-
-		if (mPrevTimeAccel == 0) {
-			mPrevTimeAccel = currTime;
-			return false;
-		}
-
-		mPrevTimeAccel = currTime;
-		return collisionOccurring;
 	}
 
 	// Closed loop arcade based tank
@@ -696,8 +631,6 @@ public class DriveTrain extends SubsystemModule {
 		};
 
 		new SubsystemCommand(this.registeredCommands, "start_path") {
-			double startTime;
-			int counter = 0;
 
 			@Override
 			public void initialize() {
@@ -707,16 +640,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void execute() {
-				if(counter < 5){
-					startTime = System.nanoTime();
-				}
-				// System.out.println("CURRENT HEADING ANGLE: " + odometer.getHeadingAngle());
-				// double averageTime = (System.nanoTime() - startTime)/counter;
-
-				// System.out.println("average time " + averageTime);
-				counter++;
-			}
+			public void execute() { }
 
 			@Override
 			public boolean isFinished() {
@@ -923,7 +847,6 @@ public class DriveTrain extends SubsystemModule {
 				double pivot = tx * kAngleP;
 
 				// System.out.println("kDistanceDivisor: " + kDistanceDivisor + "| blobArea : " + currentBlobArea);
-
 
 				if (power > 0.2)
 					power = 0.2;
