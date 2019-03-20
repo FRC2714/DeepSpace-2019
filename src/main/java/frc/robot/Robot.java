@@ -83,12 +83,16 @@ public class Robot extends TimedRobot {
 				// Intake hatch from station
 				append("station_position -p", this.launchpad.getButtonInstance(3, 4));
 				append("hatch_station_intake -s", this.launchpad.getButtonInstance(3, 4));
+				append("valve_off -s", this.launchpad.getButtonInstance(3, 4));
 				append("station_position -p", this.launchpad.getButtonInstance(3, 5));
 				append("hatch_station_intake -s", this.launchpad.getButtonInstance(3, 5));
+				append("valve_off -s", this.launchpad.getButtonInstance(3, 5));
 				append("station_position -p", this.launchpad.getButtonInstance(4, 4));
 				append("hatch_station_intake -s", this.launchpad.getButtonInstance(4, 4));
+				append("valve_off -s", this.launchpad.getButtonInstance(4, 4));
 				append("station_position -p", this.launchpad.getButtonInstance(4, 5));
 				append("hatch_station_intake -s", this.launchpad.getButtonInstance(4, 5));
+				append("valve_off -s", this.launchpad.getButtonInstance(4, 5));
 
 				// Score positions
 				append("lower_score -p", this.launchpad.getButtonInstance(6, 8));
@@ -176,6 +180,8 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousInit() {
+		drivetrain.odometer.reset();
+
 		NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
 		NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
 
