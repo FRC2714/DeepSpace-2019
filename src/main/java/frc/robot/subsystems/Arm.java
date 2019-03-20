@@ -1,10 +1,15 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANEncoder;
+import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.CounterBase.EncodingType;
+import frc.robot.RobotMap;
 import frc.robot.util.ControlsProcessor;
 import frc.robot.util.SubsystemCommand;
 import frc.robot.util.SubsystemModule;
@@ -18,32 +23,20 @@ public class Arm extends SubsystemModule {
 	private final CANSparkMax wristMotor = new CANSparkMax(8, MotorType.kBrushless);
 
 	// Initialize arm encoders
-	private CANEncoder shoulderMotorEncoder = shoulderMotor.getEncoder();
+	private CANEncoder shoulderEncoder = shoulderMotor.getEncoder();
 	private CANEncoder wristEncoder = wristMotor.getEncoder();
 
 	// Arm characteristics
 	private final double wristRatio = 360 / (140.0);
 	private final double shoulderRatio = 360 / (512.0 / 3);
 
-	// Current arm angles in degrees
-	private double currentShoulderAngle;
-	private double currentWristAngle;
-
 	// Desired arm angles in degrees
 	private double desiredShoulderAngle;
 	private double desiredWristAngle;
 
-	// Start arm angles
-	private double startShoulderAngle;
-	private double startWristAngle;
-
-	// Movement direction
-	private double shoulderCoefficient;
-	private double wristCoefficient;
-
-	// Arm start powers
-	private double shoulderPowerFactor;
-	private double wristPowerFactor;
+	// Arm PIDs
+	private CANPIDController shoulderPID;
+	private CANPIDController wristPID;
 
 	// Arm initialization
 	public Arm(ControlsProcessor controlsProcessor) {
@@ -64,84 +57,31 @@ public class Arm extends SubsystemModule {
 
 		// Inverts wrist motor direction
 		wristMotor.setInverted(true);
+
+		// Setups arm PIDs
+		shoulderPID = shoulderMotor.getPIDController();
+		wristPID = wristMotor.getPIDController();
+
+		shoulderPID.setP();
+		shoulderPID.setI();
+		shoulderPID.setD();
+
+		wristPID.setP(0.00525);
+
+		// Coverts motor rotations to degrees
+		shoulderEncoder.setPositionConversionFactor(factor);
+		wristEncoder.setPositionConversionFactor(factor);
 	}
 
 	/**
-	 * Sets currentShoulderAngle and currentWristAngle to the encoder values
+	 * @return the required feedforward for the shoulder to stay in place
 	 */
-	public void updateCurrentAngles() {
-		currentShoulderAngle = shoulderMotorEncoder.getPosition() * shoulderRatio;
-		currentWristAngle = wristEncoder.getPosition() * wristRatio;
-	}
+	public double getShoulderFeedforward(double currentShoulderAngle) {
+		double loadedShoulderAngle = 47.0;
+		double angleDelta = Math.abs(loadedShoulderAngle - currentShoulderAngle);
+		double shoulderFeedforward = ;
 
-	/**
-	 * Uses costrol and feedforward value to set shoulder motor power
-	 */
-	public void setShoulderPower() {
-		double motorPower = 0;
-
-		if(Math.abs(desiredShoulderAngle - currentShoulderAngle) < 0.5) {}
-		else if(desiredShoulderAngle - currentShoulderAngle != 0) {
-			motorPower += Math.pow(desiredShoulderAngle - currentShoulderAngle, 2);
-			motorPower *= shoulderCoefficient;
-			motorPower = Math.sin(motorPower);
-			motorPower += 0.2;
-			motorPower *= (int)((desiredShoulderAngle - currentShoulderAngle) / Math.abs(desiredShoulderAngle - currentShoulderAngle));
-			motorPower *= shoulderPowerFactor;
-		}
-
-		shoulderMotor.set(motorPower);
-	}
-
-	/**
-	 * Plugs in desired wrist angle to the wrist costrol
-	 */
-	public void setWristPower() {
-		double motorPower = 0;
-
-		if(Math.abs(desiredWristAngle - currentWristAngle) < 0.5) {}
-		else if(desiredWristAngle - currentWristAngle != 0) {
-			motorPower += Math.pow(desiredWristAngle - currentWristAngle, 2);
-			motorPower *= wristCoefficient;
-			motorPower = Math.sin(motorPower);
-			motorPower += 0.05;
-			motorPower *= (int)((desiredWristAngle - currentWristAngle) / Math.abs(desiredWristAngle - currentWristAngle));
-			motorPower *= wristPowerFactor;
-		}
-
-		wristMotor.set(motorPower);
-	}
-
-	/**
-	 *
-	 * @param shoulderPower
-	 * @param wristPower
-	 */
-	public void setPowerFactors(double shoulderPower, double wristPower) {
-		shoulderPowerFactor = (Math.abs(desiredShoulderAngle - startShoulderAngle) / 40) * shoulderPower;
-		if(shoulderPowerFactor > shoulderPower) { shoulderPowerFactor = shoulderPower; }
-
-		wristPowerFactor = (Math.abs(desiredWristAngle - startWristAngle) / 40) * wristPower;
-		if(wristPowerFactor > wristPower) { wristPowerFactor = wristPower; }
-	}
-
-	/**
-	 *
-	 */
-	public void setArmValues() {
-		if(desiredShoulderAngle - startShoulderAngle != 0) {
-			shoulderCoefficient = Math.PI / (2 * Math.pow(desiredShoulderAngle - startShoulderAngle, 2));
-		}
-		else {
-			shoulderCoefficient = 0;
-		}
-
-		if(desiredWristAngle - startWristAngle != 0) {
-			wristCoefficient = Math.PI / (2 * Math.pow(desiredWristAngle - startWristAngle, 2));
-		}
-		else {
-			wristCoefficient = 0;
-		}
+		return shoulderFeedforward * Math.cos(Math.toRadians(angleDelta));
 	}
 
 	/**
@@ -152,43 +92,14 @@ public class Arm extends SubsystemModule {
 	public void goToPosition(double shoulderAngle, double wristAngle) {
 		desiredShoulderAngle = shoulderAngle;
 		desiredWristAngle = wristAngle;
-
-		startShoulderAngle = currentShoulderAngle;
-		startWristAngle = currentWristAngle;
-
-		setPowerFactors(0.75, 1.0);
-		setArmValues();
-	}
-
-	/**
-	 *
-	 * @param shoulderAngle
-	 * @param wristAngle
-	 * @return
-	 */
-	public boolean atPosition(double shoulderAngle, double wristAngle) {
-		boolean atShoulderAngle = false;
-		boolean atWristAngle = false;
-
-		double shoulderAngleDelta = Math.abs(currentShoulderAngle - shoulderAngle);
-		double wristAngleDelta = Math.abs(currentWristAngle - wristAngle);
-
-		if(shoulderAngleDelta < 2.0) { atShoulderAngle = true; }
-		if(wristAngleDelta < 2.0) { atWristAngle = true; }
-
-		if(atShoulderAngle && atWristAngle) {
-			return true;
-		} else {
-			return false;
-		}
 	}
 
 	@Override
 	public void run() {
-		updateCurrentAngles();
+		shoulderPID.setFF(getShoulderFeedforward(shoulderEncoder.getPosition()));
+		shoulderPID.setReference(desiredShoulderAngle, ControlType.kPosition);
 
-		setShoulderPower();
-		setWristPower();
+		wristPID.setReference(desiredWristAngle, ControlType.kPosition);
 	}
 
 	@Override
@@ -199,7 +110,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void execute() {
-				goToPosition(currentShoulderAngle + 5, currentWristAngle + 1.5); //Shoulder previously +3.5
+				goToPosition(shoulderEncoder.getPosition() + 3, wristEncoder.getPosition() + 3); //Shoulder previously +3.5
 			}
 
 			@Override
@@ -217,36 +128,12 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void execute() {
-				goToPosition(currentShoulderAngle - 3, currentWristAngle - 3);
+				goToPosition(shoulderEncoder.getPosition() - 3, wristEncoder.getPosition() - 3);
 			}
 
 			@Override
 			public boolean isFinished() {
 				return false;
-			}
-
-			@Override
-			public void end() {}
-		};
-
-		new SubsystemCommand(this.registeredCommands, "arm_to_position") {
-			double shoulderAngle;
-			double wristAngle;
-
-			@Override
-			public void initialize() {
-				shoulderAngle = Double.parseDouble(this.args[0]);
-				wristAngle = Double.parseDouble(this.args[1]);
-
-				goToPosition(shoulderAngle, wristAngle);
-			}
-
-			@Override
-			public void execute() {}
-
-			@Override
-			public boolean isFinished() {
-				return atPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
@@ -270,7 +157,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return atPosition(shoulderAngle, wristAngle);
+				return true;
 			}
 
 			@Override
@@ -294,7 +181,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return atPosition(shoulderAngle, wristAngle);
+				return true;
 			}
 
 			@Override
@@ -318,7 +205,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return atPosition(shoulderAngle, wristAngle);
+				return true;
 			}
 
 			@Override
@@ -344,7 +231,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return atPosition(shoulderAngle, wristAngle);
+				return true;
 			}
 
 			@Override
@@ -368,7 +255,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return atPosition(shoulderAngle, wristAngle);
+				return true;
 			}
 
 			@Override
@@ -392,7 +279,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return atPosition(shoulderAngle, wristAngle);
+				return true;
 			}
 
 			@Override
@@ -408,12 +295,9 @@ public class Arm extends SubsystemModule {
 				if(intake.getCargoState()) {
 					shoulderAngle = 45;
 					wristAngle = 160;
-				} else if(intake.getHatchState()) {
+				} else {
 					shoulderAngle = 4;
 					wristAngle = 88;
-				} else {
-					shoulderAngle = currentShoulderAngle;
-					wristAngle = currentWristAngle;
 				}
 
 				goToPosition(shoulderAngle, wristAngle);
@@ -424,7 +308,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return atPosition(shoulderAngle, wristAngle);
+				return true;
 			}
 
 			@Override
@@ -448,7 +332,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return atPosition(shoulderAngle, wristAngle);
+				return true;
 			}
 
 			@Override
@@ -464,12 +348,9 @@ public class Arm extends SubsystemModule {
 				if(intake.getCargoState()) {
 					shoulderAngle = 88;
 					wristAngle = 200;
-				} else if(intake.getHatchState()) {
+				} else {
 					shoulderAngle = 66;
 					wristAngle = 129;
-				} else {
-					shoulderAngle = currentShoulderAngle;
-					wristAngle = currentWristAngle;
 				}
 
 				goToPosition(shoulderAngle, wristAngle);
@@ -480,7 +361,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return atPosition(shoulderAngle, wristAngle);
+				return true;
 			}
 
 			@Override
@@ -496,12 +377,9 @@ public class Arm extends SubsystemModule {
 				if(intake.getCargoState()) {
 					shoulderAngle = 122;
 					wristAngle = 217;
-				} else if(intake.getHatchState()) {
+				} else {
 					shoulderAngle = 116;
 					wristAngle = 185;
-				} else {
-					shoulderAngle = currentShoulderAngle;
-					wristAngle = currentWristAngle;
 				}
 
 				goToPosition(shoulderAngle, wristAngle);
@@ -512,7 +390,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return atPosition(shoulderAngle, wristAngle);
+				return true;
 			}
 
 			@Override
@@ -528,12 +406,8 @@ public class Arm extends SubsystemModule {
 				if(intake.getHatchState()) {
 					shoulderAngle = 130;
 					wristAngle = 58;
-				} else {
-					shoulderAngle = currentShoulderAngle;
-					wristAngle = currentWristAngle;
+					goToPosition(shoulderAngle, wristAngle);
 				}
-
-				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
@@ -541,7 +415,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return atPosition(shoulderAngle, wristAngle);
+				return true;
 			}
 
 			@Override
@@ -587,14 +461,11 @@ public class Arm extends SubsystemModule {
 		shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		wristMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
-		shoulderMotorEncoder.setPosition(0);
+		shoulderEncoder.setPosition(0);
 		wristEncoder.setPosition(0);
 
 		desiredShoulderAngle = 0;
 		desiredWristAngle = 0;
-
-		startShoulderAngle = 0;
-		startWristAngle = 0;
 	}
 
 	@Override
@@ -603,7 +474,5 @@ public class Arm extends SubsystemModule {
 
 		shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
 		wristMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
-
-		System.out.println("Current Shoulder Angle: " + currentShoulderAngle + "\tCurrent Wrist Angle: " + currentWristAngle);
 	}
 }
