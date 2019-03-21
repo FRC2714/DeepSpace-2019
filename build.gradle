@@ -38,6 +38,12 @@ deploy {
     }
 }
 
+sonarqube {
+    properties {
+        property 'sonar.2019Competition', 'Example of SonarQube Scanner for Gradle Usage'
+    }
+}
+
 // Set this to true to enable desktop support.
 def includeDesktopSupport = false
 

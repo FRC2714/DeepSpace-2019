@@ -5,13 +5,12 @@ jdk:
 jobs:
   include:
     - stage: build
-      script: ./gradlew build
+      script: sonar-scanner
+              
+
 
 addons:
   sonarcloud:
     organization: "frc2714" # the key of the org you chose at step #3
     token:
       secure: t83KZoKgiXKyH+kfIuqCrrZ1WNGtjIzsP9HcbFsbpmXBORoJY5SmlZaakDJuMK/8TD+mhHbJT9IeiaNNnh6XN1PcOgM6C6Ve8E1iIFq0bNI6XGpuSAjs8u7LAIVMw0J3nxvl3+ZuD+LRZ00G09zbM8rCBXst2u0DTu99tVY8XahQO5io4KSZXsg+TJO+S6qGKs5JOubHs7QMrgXbpRUvlf6JM+VNT1xQMhzHiWD97Jh77tawKPjSdEGIgNbLLfBm0gs/sMEC/gM7MRt8ANpUPd3ybjuSnv78CFUoYD5KNIOqXOuoH0dykQqBPtsxePb815Hey78MRw/2r47ADaFLIbTvmhSypM8+F51Q9AIaghCevlrB/1oQLPwHlnzzThbaqkpL+J/Gj01Q2NM2+TBi5KZy5N/HditeBvRhgMT71oGHbktenRE9tJUSJ5Ab1xJm82fMbAmzPwkR1wufL6wtLFwNGhRExrUpDR47K0zhAEVIY92dJgMU2MJIVXOqd8o1vrl05MGlL8kYf3cY7dFj0ngIqu8q7dgUKJm0aZACwxLYBpiFhgbfqBgmTIG1EVzswDAodKyPFTyIabFTpM/xOhXabPkcnHMt1/7wWs+wjIMDSJYWzxoVfycQr8suHigIBiCrIouwm/FlFVCwrE+1pBBnF88MriCfcNCCDl+hFOQ= # encrypted value of your token
-script:
-  # other script steps might be done before running the actual analysis
-  - sonar-scanner
