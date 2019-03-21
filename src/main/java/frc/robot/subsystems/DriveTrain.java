@@ -90,7 +90,7 @@ public class DriveTrain extends SubsystemModule {
 	private AHRS navX = new AHRS(SPI.Port.kMXP);
 
 	//limelight
-	NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
+	private NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
 
 	// Drivetrain initializations
 	public DriveTrain(ControlsProcessor controlsProcessor) {
@@ -155,7 +155,7 @@ public class DriveTrain extends SubsystemModule {
 	};
 
 	// Instantiate point controller for autonomous driving
-	public DrivingController drivingController = new DrivingController(0.01) {
+	private DrivingController drivingController = new DrivingController(0.01) {
 
 		/**
 		 * Use output from odometer and pass into autonomous driving controller
@@ -235,11 +235,11 @@ public class DriveTrain extends SubsystemModule {
 	}
 
 	// General arcade drive
-	public void arcadeDrive(double power, double pivot) {
+	private void arcadeDrive(double power, double pivot) {
 		drive.arcadeDrive(power, pivot);
 	}
 
-	public void arcadeDrive(double power, double pivot, double rampUp, double rampDown) {
+	private void arcadeDrive(double power, double pivot, double rampUp, double rampDown) {
 		int currentDirection = (int)(Math.abs(currentOpenArcadePower) / currentOpenArcadePower);
 		int desiredDirection = (int)(Math.abs(power) / power);
 
@@ -272,7 +272,7 @@ public class DriveTrain extends SubsystemModule {
 	}
 
 	// Closed loop velocity based tank without an acceleration limit
-	public void closedLoopTank(double leftVelocity, double rightVelocity) {
+	private void closedLoopTank(double leftVelocity, double rightVelocity) {
 		lPidController.setReference(leftVelocity / rpmToFeet, ControlType.kVelocity);
 		rPidController.setReference(-rightVelocity / rpmToFeet, ControlType.kVelocity);
 		// System.out.println("ls: " + leftVelocity / rpmToFeet + " rs: " + -rightVelocity / rpmToFeet);
@@ -347,7 +347,7 @@ public class DriveTrain extends SubsystemModule {
 	}
 
 	// Output encoder values
-	public void getEncoderValues() {
+	private void getEncoderValues() {
 		System.out.println("LE: " + leftShaftEncoder.getDistance() + " RE: " + rightShaftEncoder.getDistance());
 	}
 
@@ -782,6 +782,7 @@ public class DriveTrain extends SubsystemModule {
 				} catch(Exception foo) {
 					System.out.println("Oof, forgot to enter an argument?");
 				}
+
 				finalRequestedAngle = odometer.getHeadingAngle() + requestedDelta;
 				System.out.println("Circumference Turn to Angle Command Aim:- " + finalRequestedAngle);
 				System.out.println("% of Circle = " + Math.abs(requestedDelta / 360));
@@ -985,7 +986,7 @@ public class DriveTrain extends SubsystemModule {
 				if (this.args[0] != null)
 					maxBlobArea = Double.parseDouble(this.args[0]);
 
-				double power = 0;
+				double power;
 				if (currentBlobArea < maxBlobArea && currentBlobArea != 0)
 					power = kDistanceDivisor / currentBlobArea;
 				else
