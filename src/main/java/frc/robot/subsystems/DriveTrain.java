@@ -730,16 +730,20 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
-		new SubsystemCommand(this.registeredCommands, "turn_to_angle"){
+		new SubsystemCommand(this.registeredCommands, "navx_turn_to_angle"){
 			double requestedDelta;
 			double finalRequestedAngle;
 
 			PID headingController = new PID(0, 0, 0, 0);
 			@Override
 			public void initialize() {
-				requestedDelta = Double.parseDouble(this.args[0]);
+				try{
+					requestedDelta = Double.parseDouble(this.args[0]);
+				} catch(Exception foo) {
+					System.out.println("Oof, forgot to enter an argument?");
+				}
 				finalRequestedAngle = odometer.getHeadingAngle() + requestedDelta;
-				System.out.println("Turn to Angle Command Aim:- " + finalRequestedAngle);
+				System.out.println("NavX Turn to Angle Command Aim:- " + finalRequestedAngle);
 				headingController.setOutputLimits(-0.6, 0.6);
 				headingController.setSetpoint(finalRequestedAngle);
 			}
@@ -766,7 +770,38 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
+		new SubsystemCommand(this.registeredCommands, "circumference_turn_to_angle"){
+			double requestedDelta;
+			double finalRequestedAngle;
 
+
+			@Override
+			public void initialize() {
+				try{
+					requestedDelta = Double.parseDouble(this.args[0]);
+				} catch(Exception foo) {
+					System.out.println("Oof, forgot to enter an argument?");
+				}
+				finalRequestedAngle = odometer.getHeadingAngle() + requestedDelta;
+				System.out.println("Circumference Turn to Angle Command Aim:- " + finalRequestedAngle);
+				System.out.println("% of Circle = " + Math.abs(requestedDelta / 360));
+			}
+
+			@Override
+			public void execute() {
+				super.execute();
+			}
+
+			@Override
+			public boolean isFinished() {
+				return super.isFinished();
+			}
+
+			@Override
+			public void end() {
+				super.end();
+			}
+		};
 
 		new SubsystemCommand(this.registeredCommands, "delay_tester"){
 			@Override
