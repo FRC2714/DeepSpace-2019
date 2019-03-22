@@ -26,10 +26,6 @@ public class Arm extends SubsystemModule {
 	private CANEncoder shoulderEncoder = shoulderMotor.getEncoder();
 	private CANEncoder wristEncoder = wristMotor.getEncoder();
 
-	// Arm characteristics
-	private final double wristRatio = 360 / (140.0);
-	private final double shoulderRatio = 360 / (512.0 / 3);
-
 	// Arm PIDs
 	private CANPIDController shoulderPID;
 	private CANPIDController wristPID;
@@ -60,13 +56,25 @@ public class Arm extends SubsystemModule {
 
 		shoulderPID.setP();
 		shoulderPID.setI();
-		shoulderPID.setD();
 
 		wristPID.setP(0.00525);
 
-		// Coverts motor rotations to degrees
-		shoulderEncoder.setPositionConversionFactor(factor);
-		wristEncoder.setPositionConversionFactor(factor);
+		// Coverts motor rotations to inches
+		shoulderEncoder.setPositionConversionFactor(1/4);
+
+		// Converts motor rotations to degrees
+		wristEncoder.setPositionConversionFactor(18/7);
+	}
+
+	public double convertShoulderAngleToInches(double desiredAngle) {
+		final double shoulderToMotor = ;
+		final double shoulderToLeadscrew = ;
+
+		double length = Math.pow(shoulderToMotor, 2) + Math.pow(shoulderToLeadscrew, 2);
+		length -= 2 * shoulderToMotor * shoulderToLeadscrew * Math.cos(desiredAngle);
+		length = Math.sqrt(length);
+
+		return length;
 	}
 
 	/**
@@ -86,7 +94,7 @@ public class Arm extends SubsystemModule {
 	 * @param wristAngle the desired wrist angle in degrees
 	 */
 	public void goToPosition(double shoulderAngle, double wristAngle) {
-		shoulderPID.setReference(shoulderAngle, ControlType.kPosition);
+		shoulderPID.setReference(convertShoulderAngleToInches(shoulderAngle), ControlType.kPosition);
 		wristPID.setReference(wristAngle, ControlType.kPosition);
 	}
 
