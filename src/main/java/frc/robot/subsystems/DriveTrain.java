@@ -797,6 +797,19 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
+		new SubsystemCommand(this.registeredCommands, "set_current_position"){	
+			@Override	
+			public void initialize() {	
+				odometer.setCurrentPosition(Double.parseDouble(this.args[0]), Double.parseDouble(this.args[1]));	
+				// System.out.println("SET POSITIONS: " + " X = " + odometer.getCurrentX() + " Y = " + odometer.getCurrentY());	
+			}	
+
+ 			@Override	
+			public boolean isFinished() {	
+				return true;	
+			}	
+		};
+
 		new SubsystemCommand(this.registeredCommands, "cancel_all") {
 
 			@Override

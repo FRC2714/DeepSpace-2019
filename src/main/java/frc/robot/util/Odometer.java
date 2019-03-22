@@ -92,6 +92,11 @@ public abstract class Odometer {
 		return current_y;
 	}
 
+	public void setCurrentPosition(double inputX, double inputY) {	
+		current_x = inputX;	
+		current_y = inputY;	
+	}
+
 	public double getHeadingAngle() {
 		return headingAngle;
 	}
