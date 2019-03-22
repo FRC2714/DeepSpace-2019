@@ -656,86 +656,6 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
-		new SubsystemCommand(this.registeredCommands, "delay_tester"){
-			@Override
-			public void initialize() {
-				// System.out.println("Delay = " + Double.parseDouble(this.args[1]));
-				// enable();
-			}
-
-			@Override
-			public void execute() {
-				System.out.println("DELAY TESTER running!" );
-			}
-
-			@Override
-			public boolean isFinished() {
-				return false;
-			}
-
-			@Override
-			public void end() {
-			}
-		};
-
-		new SubsystemCommand(this.registeredCommands, "drive_to_target"){
-			double initialX;
-			double initialY;
-			double theta1;
-
-			@Override
-			public void initialize() {
-				lMotor0.setIdleMode(IdleMode.kCoast);
-				rMotor0.setIdleMode(IdleMode.kCoast);
-
-				lMotor0.set(0);
-				rMotor0.set(0);
-
-
-				initialX = odometer.getCurrentX();
-				initialY = odometer.getCurrentY();
-
-				theta1 = odometer.getHeadingAngle() - limelightTable.getEntry("tx").getDouble(0);
-
-				if (theta1 > 360)
-					theta1 -= 360;
-				else if (theta1 < 0)
-					theta1 += 360;
-			}
-			double l2;
-			@Override
-			public void execute() {
-				double deltaX = odometer.getCurrentX() - initialX;
-				double deltaY = odometer.getCurrentY() - initialY;
-
-				double theta2 = odometer.getHeadingAngle() - limelightTable.getEntry("tx").getDouble(0);
-
-				if (theta2 > 360)
-					theta2 -= 360;
-				else if (theta2 < 0)
-					theta2 += 360;
-
-				double num1 = deltaY*Math.cos(Math.toRadians(theta1));
-				double num2 = deltaX*Math.sin(Math.toRadians(theta1));
-				double denom1 = Math.sin(Math.toRadians(theta1))*Math.cos(Math.toRadians(theta2));
-				double denom2 = Math.sin(Math.toRadians(theta2))*Math.cos(Math.toRadians(theta1));
-
-				l2 =  (num1 - num2) / (denom1 - denom2);
-				System.out.println(theta1 + " : " + theta2 + " ; " + deltaX + " : " + deltaY);
-			}
-
-			@Override
-			public boolean isFinished() {
-				return false;
-			}
-
-			@Override
-			public void end() {
-				System.out.println("l2: " + l2);
-			}
-		};
-
-
 		new SubsystemCommand(this.registeredCommands, "wait") {
 
 			Timer waitTimer = new Timer();
@@ -874,19 +794,6 @@ public class DriveTrain extends SubsystemModule {
 				closedLoopArcade(0, 0);
 				// limelightTable.getEntry("ledMode").setNumber(1);
 				System.out.println("x: " + odometer.getCurrentX() + " y: " + odometer.getCurrentY() + " thetaF: " + odometer.getHeadingAngle());
-			}
-		};
-
-		new SubsystemCommand(this.registeredCommands, "set_current_position"){
-			@Override
-			public void initialize() {
-				odometer.setCurrentPosition(Double.parseDouble(this.args[0]), Double.parseDouble(this.args[1]));
-				// System.out.println("SET POSITIONS: " + " X = " + odometer.getCurrentX() + " Y = " + odometer.getCurrentY());
-			}
-
-			@Override
-			public boolean isFinished() {
-				return true;
 			}
 		};
 

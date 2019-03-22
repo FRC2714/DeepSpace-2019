@@ -37,11 +37,6 @@ public abstract class Odometer {
 		headingAngle = 90;
 	}
 
-	public void setCurrentPosition(double inputX, double inputY) {
-		current_x = inputX;
-		current_y = inputY;
-	}
-
 	/**
 	 * Must be defined to update the odometer variables from the subsystem
 	 */
