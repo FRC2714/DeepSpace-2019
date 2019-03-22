@@ -6,7 +6,7 @@ jobs:
   include:
     - stage: build
       script: ./gradlew build
-    -
+    - stage: test
       script: ./gradlew sonarqube -Dsonar.projectKey=FRC2714_2019Competition -Dsonar.organization=frc2714 -Dsonar.host.url=https://sonarcloud.io-Dsonar.login=b11be615bbbfd72908fa3aefbae26fa4e82bd86a
 
 #        - stage: sonarcloud
