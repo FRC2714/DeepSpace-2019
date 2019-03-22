@@ -25,13 +25,15 @@ public class Robot extends TimedRobot {
 	/**
 	 * Autons:
 	 * 
-	 * LeftCargo	= 0
-	 * RightCargo	= 1
-	 * LeftRocket	= 2
-	 * RightRocket	= 3
+	 * autonSide: Left	 = 0
+	 * 			  Right	 = 1
+	 * 
+	 * autonMode: Cargo	 = 0
+	 * 			  Rocket = 1
 	 */
 
-	private int autonTask = 0;
+	private int autonSide;
+	private int autonMode;
 
 	// Initialize subsystems
 	private DriveTrain drivetrain;
@@ -48,24 +50,21 @@ public class Robot extends TimedRobot {
 	// Init and Periodic functions
 	@Override
 	public void robotInit() {
-		autoChooser = new SendableChooser<>();
-		SmartDashboard.putData("Autonomous Mode Selector", autoChooser);
-
-		switch (autonTask) {
-			case 0: // LeftCargo
+		
+		if (autonSide == 0) { // Left
+			if (autonMode == 0) { // Left Side Cargo
 				drivetrain.addForwardSpline(0,0,90,10,-3.25,23,10,6,3,12,0,0);
-				break;
-			case 1: // RightCargo
-				drivetrain.addForwardSpline(0,0,90,10,3.25,23,170,6,3,12,0,0);
-				break;
-			case 2: // LeftRocket
+			} else if (autonMode == 1) { // Left Side Rocket
 				drivetrain.addBackwardsSpline(0,0,270,7,-4.75,18,270,7,12,10,0,8);
 				drivetrain.addBackwardsSpline(-4.75,18,270,1,-4.5,24.5,236,2,12,8,8,0);
-				break;
-			case 3: // RightRocket
+			}
+		} else if (autonSide == 1) { // Right
+			if (autonMode == 0) { // Right Side Cargo
+				drivetrain.addForwardSpline(0,0,90,10,3.25,23,170,6,3,12,0,0);
+			} else if (autonMode == 1) { // Right Side Rocket
 				drivetrain.addBackwardsSpline(0,0,270,7,4.75,18,270,7,12,10,0,8);
 				drivetrain.addBackwardsSpline(4.75,18,270,1,4.5,24.5,304,2,12,8,8,0);
-				break;
+			}
 		}
 
 		// Controls processor only gets created ONCE when code is run
@@ -221,19 +220,18 @@ public class Robot extends TimedRobot {
 		AutonTask rightRocket = new RightRocketHabTwoAuton(controlsProcessor);
 		AutonTask rightCargo = new RightCargoHabTwoAuton(controlsProcessor);
 
-		switch (autonTask) {
-			case 0:
+		if (autonSide == 0) { // Left
+			if (autonMode == 0) { // Left Side Cargo
 				leftCargo.run();
-				break;
-			case 1:
-				rightCargo.run();
-				break;
-			case 2:
+			} else if (autonMode == 1) { // Left Side Rocket
 				leftRocket.run();
-				break;
-			case 3:
+			}
+		} else if (autonSide == 1) { // Right
+			if (autonMode == 0) { // Right Side Cargo
+				rightCargo.run();
+			} else if (autonMode == 1) { // Right Side Rocket
 				rightRocket.run();
-				break;
+			}
 		}
 	}
 

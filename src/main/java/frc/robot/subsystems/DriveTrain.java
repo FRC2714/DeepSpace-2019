@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
-import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
@@ -33,10 +32,6 @@ public class DriveTrain extends SubsystemModule {
 	private CANPIDController lPidController = lMotor0.getPIDController();
 	private CANPIDController rPidController = rMotor0.getPIDController();
 
-	// MAX encoders
-	private CANEncoder lEncoder = lMotor0.getEncoder();
-	private CANEncoder rEncoder = rMotor0.getEncoder();
-
 	// Differential drivetrain
 	private DifferentialDrive drive = new DifferentialDrive(lMotor0, rMotor0);
 
@@ -53,30 +48,14 @@ public class DriveTrain extends SubsystemModule {
 	private final double rKFF = 1.78e-4;
 
 	private final double rpmToFeet = 0.003135; // Convert RPM to ft/s
-	private final double rotationsToFeet = 0.1881; // Convert rotations to feet
-
-	private double startTime;
-	private int numberOfRuns;
 
 	private final double sensitivity = 2.5;
 	private final double maxVelocity = 13;
-	private final double maxAcceleration = 5;
-
-	private double collisionThreshold = 0;
-	private double tippingThreshold = 0;
-
-	private double prevAccelX = 0;
-	private double prevAccelY = 0;
-	private double mPrevTimeAccel = 0;
 
 	private double lastVelocity = 0;
 
 	// Ramp code
 	private double currentOpenArcadePower;
-	private double currentOpenArcadePivot;
-
-	// Robot characteristics
-	private double wheelSeparation = 2;
 
 	private boolean driverControlled = false;
 
@@ -190,7 +169,6 @@ public class DriveTrain extends SubsystemModule {
 		odometer.reset();
 
 		currentOpenArcadePower = 0;
-		currentOpenArcadePivot = 0;
 
 		// leftEncoder.setDistancePerPulse(-0.0495);
 		// rightEncoder.setDistancePerPulse(0.00105);
@@ -277,48 +255,6 @@ public class DriveTrain extends SubsystemModule {
 		lPidController.setReference(leftVelocity / rpmToFeet, ControlType.kVelocity);
 		rPidController.setReference(-rightVelocity / rpmToFeet, ControlType.kVelocity);
 		// System.out.println("ls: " + leftVelocity / rpmToFeet + " rs: " + -rightVelocity / rpmToFeet);
-	}
-
-	public synchronized void setCollisionJerkThreshold(double jerkCollisionThreshold) {
-		collisionThreshold = jerkCollisionThreshold;
-	}
-
-	public synchronized void setTippingThreshold(double tippingThreshold) {
-		this.tippingThreshold = tippingThreshold;
-	}
-
-
-	public boolean isTipping() {
-		return Math.abs(navX.getPitch()) > tippingThreshold ||
-				Math.abs(navX.getRoll()) > tippingThreshold;
-	}
-
-	public boolean isCollisionOccurring() {
-		boolean collisionOccurring = false;
-
-		double accelX = navX.getWorldLinearAccelX();
-		double accelY = navX.getWorldLinearAccelY();
-
-
-		double currTime = Timer.getFPGATimestamp();
-		double dt = currTime - mPrevTimeAccel;
-
-		double jerkX = (accelX - prevAccelX) / (dt);
-		double jerkY = (accelY - prevAccelY) / (dt);
-
-		if (Math.abs(jerkX) > collisionThreshold || Math.abs(jerkY) > collisionThreshold)
-			collisionOccurring = true;
-
-		prevAccelX = accelX;
-		prevAccelY = accelY;
-
-		if (mPrevTimeAccel == 0) {
-			mPrevTimeAccel = currTime;
-			return false;
-		}
-
-		mPrevTimeAccel = currTime;
-		return collisionOccurring;
 	}
 
 	// Closed loop arcade based tank
@@ -727,8 +663,6 @@ public class DriveTrain extends SubsystemModule {
 		};
 
 		new SubsystemCommand(this.registeredCommands, "start_path") {
-			double startTime;
-			int counter = 0;
 
 			@Override
 			public void initialize() {
@@ -738,16 +672,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void execute() {
-				if(counter < 5){
-					startTime = System.nanoTime();
-				}
-				// System.out.println("CURRENT HEADING ANGLE: " + odometer.getHeadingAngle());
-				// double averageTime = (System.nanoTime() - startTime)/counter;
-
-				// System.out.println("average time " + averageTime);
-				counter++;
-			}
+			public void execute() { }
 
 			@Override
 			public boolean isFinished() {
@@ -762,86 +687,6 @@ public class DriveTrain extends SubsystemModule {
 				System.out.println("x : y" + odometer.getCurrentX() + " : " + odometer.getCurrentY() + "Final Heading : " + odometer.getHeadingAngle());
 			}
 		};
-
-		new SubsystemCommand(this.registeredCommands, "delay_tester"){
-			@Override
-			public void initialize() {
-				// System.out.println("Delay = " + Double.parseDouble(this.args[1]));
-				// enable();
-			}
-
-			@Override
-			public void execute() {
-				System.out.println("DELAY TESTER running!" );
-			}
-
-			@Override
-			public boolean isFinished() {
-				return false;
-			}
-
-			@Override
-			public void end() {
-			}
-		};
-
-		new SubsystemCommand(this.registeredCommands, "drive_to_target"){
-			double initialX;
-			double initialY;
-			double theta1;
-
-			@Override
-			public void initialize() {
-				lMotor0.setIdleMode(IdleMode.kCoast);
-				rMotor0.setIdleMode(IdleMode.kCoast);
-
-				lMotor0.set(0);
-				rMotor0.set(0);
-
-
-				initialX = odometer.getCurrentX();
-				initialY = odometer.getCurrentY();
-
-				theta1 = odometer.getHeadingAngle() - limelightTable.getEntry("tx").getDouble(0);
-
-				if (theta1 > 360)
-					theta1 -= 360;
-				else if (theta1 < 0)
-					theta1 += 360;
-			}
-			double l2;
-			@Override
-			public void execute() {
-				double deltaX = odometer.getCurrentX() - initialX;
-				double deltaY = odometer.getCurrentY() - initialY;
-
-				double theta2 = odometer.getHeadingAngle() - limelightTable.getEntry("tx").getDouble(0);
-
-				if (theta2 > 360)
-					theta2 -= 360;
-				else if (theta2 < 0)
-					theta2 += 360;
-
-				double num1 = deltaY*Math.cos(Math.toRadians(theta1));
-				double num2 = deltaX*Math.sin(Math.toRadians(theta1));
-				double denom1 = Math.sin(Math.toRadians(theta1))*Math.cos(Math.toRadians(theta2));
-				double denom2 = Math.sin(Math.toRadians(theta2))*Math.cos(Math.toRadians(theta1));
-
-				l2 =  (num1 - num2) / (denom1 - denom2);
-				System.out.println(theta1 + " : " + theta2 + " ; " + deltaX + " : " + deltaY);
-			}
-
-			@Override
-			public boolean isFinished() {
-				return false;
-			}
-
-			@Override
-			public void end() {
-				System.out.println("l2: " + l2);
-			}
-		};
-
 
 		new SubsystemCommand(this.registeredCommands, "wait") {
 
@@ -955,7 +800,6 @@ public class DriveTrain extends SubsystemModule {
 
 				// System.out.println("kDistanceDivisor: " + kDistanceDivisor + "| blobArea : " + currentBlobArea);
 
-
 				if (power > 0.2)
 					power = 0.2;
 
@@ -982,19 +826,6 @@ public class DriveTrain extends SubsystemModule {
 				closedLoopArcade(0, 0);
 				// limelightTable.getEntry("ledMode").setNumber(1);
 				System.out.println("x: " + odometer.getCurrentX() + " y: " + odometer.getCurrentY() + " thetaF: " + odometer.getHeadingAngle());
-			}
-		};
-
-		new SubsystemCommand(this.registeredCommands, "set_current_position"){
-			@Override
-			public void initialize() {
-				odometer.setCurrentPosition(Double.parseDouble(this.args[0]), Double.parseDouble(this.args[1]));
-				// System.out.println("SET POSITIONS: " + " X = " + odometer.getCurrentX() + " Y = " + odometer.getCurrentY());
-			}
-
-			@Override
-			public boolean isFinished() {
-				return true;
 			}
 		};
 
