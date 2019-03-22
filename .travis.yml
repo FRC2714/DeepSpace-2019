@@ -8,7 +8,7 @@ jobs:
       script: ./gradlew build
 
     - stage: git pull
-      script: git fetch --unshallow -quiet
+      script: git fetch --unshallow --quiet
 
     - stage: test
       script: ./gradlew sonarqube -Dsonar.projectKey=FRC2714_2019Competition -Dsonar.organization=frc2714 -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=b11be615bbbfd72908fa3aefbae26fa4e82bd86a
