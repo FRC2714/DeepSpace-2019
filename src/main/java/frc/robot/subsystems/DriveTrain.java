@@ -58,7 +58,6 @@ public class DriveTrain extends SubsystemModule {
 	private double startTime;
 	private int numberOfRuns;
 
-
 	private final double sensitivity = 2.5;
 	private final double maxVelocity = 13;
 	private final double maxAcceleration = 5;
@@ -355,6 +354,38 @@ public class DriveTrain extends SubsystemModule {
 
 	public double getMaxVelocity(){
 		return maxVelocity;
+	}
+
+	public void addForwardSpline(double xInitial, double xFinal, double yInitial, double yFinal,
+			double thetaInitial, double thetaFinal, double lInitial, double lFinal, double maxAcceleration,
+			double maxVelocity, double startVelocity, double endVelocity) {
+
+		thetaInitial = Math.toRadians(thetaInitial);
+		thetaFinal = Math.toRadians(thetaFinal);
+
+		double x2 = lInitial * Math.cos(thetaInitial) + xInitial;
+		double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal;
+		double y2 = lInitial * Math.sin(thetaInitial) + yInitial;
+		double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal;
+
+		drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
+				maxAcceleration, maxVelocity, startVelocity, endVelocity, true);
+	}
+
+	public void addBackwardsSpline(double xInitial, double xFinal, double yInitial, double yFinal,
+			double thetaInitial, double thetaFinal, double lInitial, double lFinal, double maxAcceleration,
+			double maxVelocity, double startVelocity, double endVelocity) {
+
+		thetaInitial = Math.toRadians(thetaInitial);
+		thetaFinal = Math.toRadians(thetaFinal);
+
+		double x2 = lInitial * Math.cos(thetaInitial) + xInitial;
+		double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal;
+		double y2 = lInitial * Math.sin(thetaInitial) + yInitial;
+		double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal;
+
+		drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
+				maxAcceleration, maxVelocity, startVelocity, endVelocity, false);
 	}
 
 	@Override

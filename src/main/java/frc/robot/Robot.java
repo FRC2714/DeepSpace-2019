@@ -22,6 +22,17 @@ import frc.robot.util.ControlsProcessor;
 */
 public class Robot extends TimedRobot {
 
+	/**
+	 * Autons:
+	 * 
+	 * LeftCargo	= 0
+	 * RightCargo	= 1
+	 * LeftRocket	= 2
+	 * RightRocket	= 3
+	 */
+
+	private int autonTask = 0;
+
 	// Initialize subsystems
 	private DriveTrain drivetrain;
 	private Arm arm;
@@ -39,6 +50,23 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		autoChooser = new SendableChooser<>();
 		SmartDashboard.putData("Autonomous Mode Selector", autoChooser);
+
+		switch (autonTask) {
+			case 0: // LeftCargo
+				drivetrain.addForwardSpline(0,0,90,10,-3.25,23,10,6,3,12,0,0);
+				break;
+			case 1: // RightCargo
+				drivetrain.addForwardSpline(0,0,90,10,3.25,23,170,6,3,12,0,0);
+				break;
+			case 2: // LeftRocket
+				drivetrain.addBackwardsSpline(0,0,270,7,-4.75,18,270,7,12,10,0,8);
+				drivetrain.addBackwardsSpline(-4.75,18,270,1,-4.5,24.5,236,2,12,8,8,0);
+				break;
+			case 3: // RightRocket
+				drivetrain.addBackwardsSpline(0,0,270,7,4.75,18,270,7,12,10,0,8);
+				drivetrain.addBackwardsSpline(4.75,18,270,1,4.5,24.5,304,2,12,8,8,0);
+				break;
+		}
 
 		// Controls processor only gets created ONCE when code is run
 		controlsProcessor = new ControlsProcessor(10000000, 2) {
@@ -187,13 +215,26 @@ public class Robot extends TimedRobot {
 
 		generalInit();
 		
-		AutonTask leftFullSend = new LeftRocketHabTwoAuton(controlsProcessor);
+		AutonTask leftRocket = new LeftRocketHabTwoAuton(controlsProcessor);
 		AutonTask leftCargo = new LeftCargoHabTwoAuton(controlsProcessor);
 
-		AutonTask rightFullSend = new RightRocketHabTwoAuton(controlsProcessor);
+		AutonTask rightRocket = new RightRocketHabTwoAuton(controlsProcessor);
 		AutonTask rightCargo = new RightCargoHabTwoAuton(controlsProcessor);
 
-		leftCargo.run();
+		switch (autonTask) {
+			case 0:
+				leftCargo.run();
+				break;
+			case 1:
+				rightCargo.run();
+				break;
+			case 2:
+				leftRocket.run();
+				break;
+			case 3:
+				rightRocket.run();
+				break;
+		}
 	}
 
 	/**
