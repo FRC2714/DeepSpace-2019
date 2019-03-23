@@ -808,7 +808,12 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public boolean isFinished() {
 				return true;
-			}	
+			}
+
+			@Override
+			public void end() {
+				System.out.println("Set to X: " + odometer.getCurrentX() + " | Y: " + odometer.getCurrentY());
+			}
 		};
 
 		new SubsystemCommand(this.registeredCommands, "cancel_all") {

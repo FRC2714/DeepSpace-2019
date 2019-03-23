@@ -131,6 +131,7 @@ public class Robot extends TimedRobot {
 				// Oh no! Plz stop Brisket
 				append("cancel_all -p", this.launchpad.getButtonInstance(7, 0));
 				append("cancel_all -p", this.launchpad.getButtonInstance(8, 0));
+
 			}
 		};
 
@@ -195,7 +196,7 @@ public class Robot extends TimedRobot {
 
 		AutonTask testAuton = new TestTask(controlsProcessor);
 
-		rightCargo.run();
+		rightFullSend.run();
 	}
 
 	/**
