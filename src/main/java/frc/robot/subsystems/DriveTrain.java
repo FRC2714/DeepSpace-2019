@@ -110,8 +110,6 @@ public class DriveTrain extends SubsystemModule {
 		rMotor0.setSmartCurrentLimit(40);
 		rMotor1.setSmartCurrentLimit(40);
 		rMotor2.setSmartCurrentLimit(40);
-
-
 	}
 
 	// Instantiate odometer and link in encoders and navX
