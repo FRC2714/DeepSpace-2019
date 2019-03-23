@@ -32,8 +32,8 @@ public class Robot extends TimedRobot {
 	 * 			  Rocket = 1
 	 */
 
-	private int autonSide;
-	private int autonMode;
+	private int autonSide = 1;
+	private int autonMode = 1;
 
 	// Initialize subsystems
 	private DriveTrain drivetrain;
@@ -50,22 +50,6 @@ public class Robot extends TimedRobot {
 	// Init and Periodic functions
 	@Override
 	public void robotInit() {
-		
-		if (autonSide == 0) { // Left
-			if (autonMode == 0) { // Left Side Cargo
-				drivetrain.addForwardSpline(0,0,90,10,-3.25,23,10,6,3,12,0,0);
-			} else if (autonMode == 1) { // Left Side Rocket
-				drivetrain.addBackwardsSpline(0,0,270,7,-4.75,18,270,7,12,10,0,8);
-				drivetrain.addBackwardsSpline(-4.75,18,270,1,-4.5,24.5,236,2,12,8,8,0);
-			}
-		} else if (autonSide == 1) { // Right
-			if (autonMode == 0) { // Right Side Cargo
-				drivetrain.addForwardSpline(0,0,90,10,3.25,23,170,6,3,12,0,0);
-			} else if (autonMode == 1) { // Right Side Rocket
-				drivetrain.addBackwardsSpline(0,0,270,7,4.75,18,270,7,12,10,0,8);
-				drivetrain.addBackwardsSpline(4.75,18,270,1,4.5,24.5,304,2,12,8,8,0);
-			}
-		}
 
 		// Controls processor only gets created ONCE when code is run
 		controlsProcessor = new ControlsProcessor(10000000, 2) {
@@ -173,6 +157,22 @@ public class Robot extends TimedRobot {
 		controlsProcessor.start();
 		
 		arm.init();
+
+		if (autonSide == 0) { // Left
+			if (autonMode == 0) { // Left Side Cargo
+				drivetrain.addForwardSpline(0,0,90,10,-3.25,23,10,6,3,12,0,0);
+			} else if (autonMode == 1) { // Left Side Rocket
+				drivetrain.addBackwardsSpline(0,0,270,7,-4.75,18,270,7,12,10,0,8);
+				drivetrain.addBackwardsSpline(-4.75,18,270,1,-4.5,24.5,236,2,12,8,8,0);
+			}
+		} else if (autonSide == 1) { // Right
+			if (autonMode == 0) { // Right Side Cargo
+				drivetrain.addForwardSpline(0,0,90,10,3.25,23,170,6,3,12,0,0);
+			} else if (autonMode == 1) { // Right Side Rocket
+				drivetrain.addBackwardsSpline(0,0,270,7,4.75,18,270,7,12,10,0,8);
+				drivetrain.addBackwardsSpline(4.75,18,270,1,4.5,24.5,304,2,12,8,8,0);
+			}
+		}
 	}
 
 	/**
