@@ -347,7 +347,7 @@ public class DriveTrain extends SubsystemModule {
 	}
 
 	// Output encoder values
-	private void getEncoderValues() {
+	public void getEncoderValues() {
 		System.out.println("LE: " + leftShaftEncoder.getDistance() + " RE: " + rightShaftEncoder.getDistance());
 	}
 

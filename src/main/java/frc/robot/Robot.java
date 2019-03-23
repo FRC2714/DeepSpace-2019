@@ -193,7 +193,9 @@ public class Robot extends TimedRobot {
 		AutonTask rightFullSend = new RightRocketHabTwoAuton(controlsProcessor);
 		AutonTask rightCargo = new RightCargoHabTwoAuton(controlsProcessor);
 
-		leftCargo.run();
+		AutonTask testAuton = new TestTask(controlsProcessor);
+
+		rightCargo.run();
 	}
 
 	/**
