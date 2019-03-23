@@ -7,9 +7,6 @@ import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.CounterBase.EncodingType;
-import frc.robot.RobotMap;
 import frc.robot.util.ControlsProcessor;
 import frc.robot.util.SubsystemCommand;
 import frc.robot.util.SubsystemModule;
@@ -54,21 +51,23 @@ public class Arm extends SubsystemModule {
 		shoulderPID = shoulderMotor.getPIDController();
 		wristPID = wristMotor.getPIDController();
 
-		shoulderPID.setP();
-		shoulderPID.setI();
+		shoulderPID.setP(0.01);
+		// shoulderPID.setI();
 
 		wristPID.setP(0.00525);
 
 		// Coverts motor rotations to inches
-		shoulderEncoder.setPositionConversionFactor(1/4);
+		shoulderEncoder.setPositionConversionFactor(1/5);
 
 		// Converts motor rotations to degrees
 		wristEncoder.setPositionConversionFactor(18/7);
 	}
 
 	public double convertShoulderAngleToInches(double desiredAngle) {
-		final double shoulderToMotor = ;
-		final double shoulderToLeadscrew = ;
+		desiredAngle = Math.toRadians(desiredAngle);
+
+		final double shoulderToMotor = 14.163;
+		final double shoulderToLeadscrew = 7.949;
 
 		double length = Math.pow(shoulderToMotor, 2) + Math.pow(shoulderToLeadscrew, 2);
 		length -= 2 * shoulderToMotor * shoulderToLeadscrew * Math.cos(desiredAngle);
@@ -77,13 +76,24 @@ public class Arm extends SubsystemModule {
 		return length;
 	}
 
+	public double convertLeadscrewLengthToAngle(double length) {
+		final double shoulderToMotor = 14.163;
+		final double shoulderToLeadscrew = 7.949;
+
+		double angle = Math.pow(length, 2) - Math.pow(shoulderToMotor, 2) - Math.pow(shoulderToLeadscrew, 2);
+		angle /= -2 * shoulderToMotor * shoulderToLeadscrew;
+		angle = Math.toDegrees(Math.acos(angle));
+
+		return angle;
+	}
+
 	/**
 	 * @return the required feedforward for the shoulder to stay in place
 	 */
 	public double getShoulderFeedforward(double currentShoulderAngle) {
 		double loadedShoulderAngle = 47.0;
 		double angleDelta = Math.abs(loadedShoulderAngle - currentShoulderAngle);
-		double shoulderFeedforward = ;
+		double shoulderFeedforward = 0;
 
 		return shoulderFeedforward * Math.cos(Math.toRadians(angleDelta));
 	}
@@ -100,7 +110,7 @@ public class Arm extends SubsystemModule {
 
 	@Override
 	public void run() {
-		shoulderPID.setFF(getShoulderFeedforward(shoulderEncoder.getPosition()));
+		// shoulderPID.setFF(getShoulderFeedforward(convertLeadscrewLengthToAngle(shoulderEncoder.getPosition())));
 	}
 
 	@Override
