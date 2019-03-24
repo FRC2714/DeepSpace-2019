@@ -16,18 +16,20 @@ public class RightRocketHabTwoAuton extends AutonTask {
 
 		queueTask("hatch_intake -p");
 		queueTask("hatch_true -p");
+
 		queueTask("add_backwards_spline -s 0,0,270,7,4.75,18,270,7,12,10,0,8");
 		queueTask("add_backwards_spline -s 4.75,18,270,1,4.5,23.5,304,2,12,8,8,0");
 		queueTask("start_path -s");
-//		queueTask("upper_score -s");
+
+		queueTask("upper_score -s");
 		queueTask("auton_vision_align -s 4.6");
-//		queueTask("extake -s");
+		queueTask("extake -s");
 
 		queueTask("set_current_position -s 7.2,16.5");
 
 		queueTask("add_backwards_spline -s 7.2,16.5,304,2,4.5,18.5,270,4,10,8,0,0");
 		queueTask("start_path -s");
-//		queueTask("station_position -s");
+		queueTask("station_position -s");
 
 		queueTask("set_current_position -s 4.5,18.5");
 		queueTask("add_forwards_spline -s 4.5,18.5,270,6,8,-2,268,6,3,10,0,0");
