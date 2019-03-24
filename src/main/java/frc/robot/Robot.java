@@ -31,6 +31,8 @@ public class Robot extends TimedRobot {
 	 * autonMode: Cargo	 = 0
 	 * 			  Rocket = 1
 	 */
+	private Auton_Side auton_side;
+	private Auton_Mode auton_mode;
 
 	private int autonSide = 1;
 	private int autonMode = 1;
@@ -293,5 +295,15 @@ public class Robot extends TimedRobot {
 
 		drivetrain.init();
 		climber.init();
+	}
+
+	enum Auton_Side{
+		LEFT,
+		RIGHT
+	}
+
+	enum Auton_Mode{
+		CARGO,
+		ROCKET
 	}
 }
