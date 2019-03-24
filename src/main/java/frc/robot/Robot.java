@@ -203,6 +203,7 @@ public class Robot extends TimedRobot {
 				break;
 		}
 
+
 	}
 
 	/**
@@ -250,18 +251,39 @@ public class Robot extends TimedRobot {
 		AutonTask rightRocket = new RightRocketHabTwoAuton(controlsProcessor);
 		AutonTask rightCargo = new RightCargoHabTwoAuton(controlsProcessor);
 
-		if (autonSide == 0) { // Left
-			if (autonMode == 0) { // Left Side Cargo
-				leftCargo.run();
-			} else if (autonMode == 1) { // Left Side Rocket
-				leftRocket.run();
-			}
-		} else if (autonSide == 1) { // Right
-			if (autonMode == 0) { // Right Side Cargo
-				rightCargo.run();
-			} else if (autonMode == 1) { // Right Side Rocket
-				rightRocket.run();
-			}
+
+//		if (autonSide == 0) { // Left
+//			if (autonMode == 0) { // Left Side Cargo
+//				leftCargo.run();
+//			} else if (autonMode == 1) { // Left Side Rocket
+//				leftRocket.run();
+//			}
+//		} else if (autonSide == 1) { // Right
+//			if (autonMode == 0) { // Right Side Cargo
+//				rightCargo.run();
+//			} else if (autonMode == 1) { // Right Side Rocket
+//				rightRocket.run();
+//			}
+//		}
+
+		switch (auton_side){
+			case LEFT:
+				startAuton(leftCargo, leftRocket);
+				break;
+			case RIGHT:
+				startAuton(rightCargo, rightRocket);
+				break;
+		}
+	}
+
+	private void startAuton(AutonTask cargoAuton, AutonTask rocketAuton) {
+		switch (auton_mode){
+			case CARGO:
+				cargoAuton.run();
+				break;
+			case ROCKET:
+				rocketAuton.run();
+				break;
 		}
 	}
 
