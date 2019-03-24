@@ -162,28 +162,44 @@ public class Robot extends TimedRobot {
 		
 		arm.init();
 
-		if (auton_side.equals(Auton_Side.LEFT)) { // Left
-			if (autonMode == 0) { // Left Side Cargo
-				drivetrain.addForwardSpline(0,0,90,10,-3.25,23,10,6,3,12,0,0);
-			} else if (autonMode == 1) { // Left Side Rocket
-				drivetrain.addBackwardsSpline(0,0,270,7,-4.75,18,270,7,12,10,0,8);
-				drivetrain.addBackwardsSpline(-4.75,18,270,1,-4.5,24.5,236,2,12,8,8,0);
-			}
-		} else if (autonSide == 1) { // Right
-			if (autonMode == 0) { // Right Side Cargo
-				drivetrain.addForwardSpline(0,0,90,10,3.25,23,170,6,3,12,0,0);
-			} else if (autonMode == 1) { // Right Side Rocket
-				drivetrain.addBackwardsSpline(0,0,270,7,4.75,18,270,7,12,10,0,8);
-				drivetrain.addBackwardsSpline(4.75,18,270,1,4.5,24.5,304,2,12,8,8,0);
-			}
-		}
+//		if (auton_side.equals(Auton_Side.LEFT)) { // Left
+//			if (autonMode == 0) { // Left Side Cargo
+//				drivetrain.addForwardSpline(0,0,90,10,-3.25,23,10,6,3,12,0,0);
+//			} else if (autonMode == 1) { // Left Side Rocket
+//				drivetrain.addBackwardsSpline(0,0,270,7,-4.75,18,270,7,12,10,0,8);
+//				drivetrain.addBackwardsSpline(-4.75,18,270,1,-4.5,24.5,236,2,12,8,8,0);
+//			}
+//		} else if (autonSide == 1) { // Right
+//			if (autonMode == 0) { // Right Side Cargo
+//				drivetrain.addForwardSpline(0,0,90,10,3.25,23,170,6,3,12,0,0);
+//			} else if (autonMode == 1) { // Right Side Rocket
+//				drivetrain.addBackwardsSpline(0,0,270,7,4.75,18,270,7,12,10,0,8);
+//				drivetrain.addBackwardsSpline(4.75,18,270,1,4.5,24.5,304,2,12,8,8,0);
+//			}
+//		}
 
 		switch (auton_side){
 			case LEFT:
-				
+				switch (auton_mode){
+					case CARGO:
+						drivetrain.addForwardSpline(0,0,90,10,-3.25,23,10,6,3,12,0,0);
+						break;
+					case ROCKET:
+						drivetrain.addBackwardsSpline(0,0,270,7,-4.75,18,270,7,12,10,0,8);
+						drivetrain.addBackwardsSpline(-4.75,18,270,1,-4.5,24.5,236,2,12,8,8,0);
+						break;
+				}
 				break;
 			case RIGHT:
-
+				switch (auton_mode){
+					case CARGO:
+						drivetrain.addForwardSpline(0,0,90,10,3.25,23,170,6,3,12,0,0);
+						break;
+					case ROCKET:
+						drivetrain.addBackwardsSpline(0,0,270,7,-4.75,18,270,7,12,10,0,8);
+						drivetrain.addBackwardsSpline(-4.75,18,270,1,-4.5,24.5,236,2,12,8,8,0);
+						break;
+				}
 				break;
 		}
 
