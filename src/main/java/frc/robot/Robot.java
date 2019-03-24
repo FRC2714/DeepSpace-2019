@@ -52,6 +52,8 @@ public class Robot extends TimedRobot {
 	// Init and Periodic functions
 	@Override
 	public void robotInit() {
+		auton_side = Auton_Side.RIGHT;
+		auton_mode = Auton_Mode.ROCKET;
 
 		// Controls processor only gets created ONCE when code is run
 		controlsProcessor = new ControlsProcessor(10000000, 2) {
@@ -160,7 +162,7 @@ public class Robot extends TimedRobot {
 		
 		arm.init();
 
-		if (autonSide == 0) { // Left
+		if (auton_side.equals(Auton_Side.LEFT)) { // Left
 			if (autonMode == 0) { // Left Side Cargo
 				drivetrain.addForwardSpline(0,0,90,10,-3.25,23,10,6,3,12,0,0);
 			} else if (autonMode == 1) { // Left Side Rocket
@@ -175,6 +177,16 @@ public class Robot extends TimedRobot {
 				drivetrain.addBackwardsSpline(4.75,18,270,1,4.5,24.5,304,2,12,8,8,0);
 			}
 		}
+
+		switch (auton_side){
+			case LEFT:
+				
+				break;
+			case RIGHT:
+
+				break;
+		}
+
 	}
 
 	/**
