@@ -1,6 +1,11 @@
-# 2019Competition
+# 2019Competition [![Build Status](https://travis-ci.org/FRC2714/2019Competition.svg?branch=spline-generation)](https://travis-ci.org/FRC2714/2019Competition)
 
 <img src="https://github.com/FRC2714/2019Competition/blob/master/pictures/logo%20for%20github.svg" width="200" height="200" />
+
+
+Each subsystem contains unique commands defined internally within 
+the subsystem class itself. This allows for better organization of commands 
+relative to their mechanisms. 
 
 ## Subsystems
 
