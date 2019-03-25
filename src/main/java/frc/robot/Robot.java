@@ -234,6 +234,22 @@ public class Robot extends TimedRobot {
 	}
 
 	/**
+	 * Represents the side that the autonomous starts from.
+	 */
+	enum Auton_Side{
+		LEFT,
+		RIGHT
+	}
+
+	/**
+	 * Represents the task focused on during autonomous.
+	 */
+	enum Auton_Mode{
+		CARGO,
+		ROCKET
+	}
+
+	/**
 	 * Runs at the beginning of auton mode
 	 */
 	@Override
@@ -347,13 +363,5 @@ public class Robot extends TimedRobot {
 		climber.init();
 	}
 
-	enum Auton_Side{
-		LEFT,
-		RIGHT
-	}
 
-	enum Auton_Mode{
-		CARGO,
-		ROCKET
-	}
 }
