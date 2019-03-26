@@ -727,6 +727,46 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
+		new SubsystemCommand(this.registeredCommands, "navx_turn_to_angle"){
+			double requestedDelta;
+			double finalRequestedAngle;
+
+			PID headingController = new PID(0, 0, 0, 0);
+			@Override
+			public void initialize() {
+				try{
+					requestedDelta = Double.parseDouble(this.args[0]);
+				} catch(Exception foo) {
+					System.out.println("Oof, forgot to enter an argument?");
+				}
+				finalRequestedAngle = odometer.getHeadingAngle() + requestedDelta;
+				System.out.println("NavX Turn to Angle Command Aim:- " + finalRequestedAngle);
+				headingController.setOutputLimits(-0.6, 0.6);
+				headingController.setSetpoint(finalRequestedAngle);
+			}
+
+			@Override
+			public void execute() {
+				double errorCorrection = headingController.getOutput(odometer.getHeadingAngle());
+				if(Math.abs(odometer.getHeadingAngle() - finalRequestedAngle) > 20){
+					lMotor0.set(errorCorrection);
+					rMotor0.set(-errorCorrection);
+				}
+			}
+
+			@Override
+			public boolean isFinished() {
+				return Math.abs(odometer.getHeadingAngle() - finalRequestedAngle) > 20;
+			}
+
+			@Override
+			public void end() {
+				System.out.println("Finished turn to angle, expected angle was " + finalRequestedAngle +
+						" and your actual angle was " + odometer.getHeadingAngle() +
+						". Error of " + (Math.abs(odometer.getHeadingAngle() - finalRequestedAngle) > 20));
+			}
+		};
+
 
 		new SubsystemCommand(this.registeredCommands, "auton_vision_align"){
 			double counter;
