@@ -129,6 +129,7 @@ public class Robot extends TimedRobot {
 				// Oh no! Plz stop Brisket
 				append("cancel_all -p", this.launchpad.getButtonInstance(7, 0));
 				append("cancel_all -p", this.launchpad.getButtonInstance(8, 0));
+
 			}
 		};
 
@@ -191,7 +192,9 @@ public class Robot extends TimedRobot {
 		AutonTask rightFullSend = new RightRocketHabTwoAuton(controlsProcessor);
 		AutonTask rightCargo = new RightCargoHabTwoAuton(controlsProcessor);
 
-		leftCargo.run();
+		AutonTask testAuton = new TestTask(controlsProcessor);
+
+		rightFullSend.run();
 	}
 
 	/**
@@ -222,6 +225,8 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
+//		drivetrain.getEncoderValues();
+//		SmartDashboard.putNumber("Gyro", drivetrain.odometer.getHeadingAngle());
 	}
 
 	/**

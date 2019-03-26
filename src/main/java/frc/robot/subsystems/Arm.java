@@ -66,12 +66,21 @@ public class Arm extends SubsystemModule {
 
 	/**
 	 * Sets the arm to the desired overall position
-	 * @param shoulderAngle the desired shoulder angle in degrees
+	 * @param leadscrewLength the desired shoulder angle in degrees
 	 * @param wristAngle the desired wrist angle in degrees
 	 */
 	public void goToPosition(double leadscrewLength, double wristAngle) {
 		shoulderPID.setReference(leadscrewLength, ControlType.kPosition);
 		wristPID.setReference(wristAngle, ControlType.kPosition);
+	}
+
+	public boolean atPosition(double leadscrewLength) {
+		if(Math.abs(shoulderEncoder.getPosition() - leadscrewLength) < 0.1) {
+			System.out.println("Shoulder Length: " + shoulderEncoder.getPosition());
+			return true;
+		}
+		return false;
+//		return Math.abs(shoulderEncoder.getPosition() - leadscrewLength) < 0.1;
 	}
 
 	@Override
@@ -148,7 +157,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return true;
+				return atPosition(shoulderAngle);
 			}
 
 			@Override
@@ -172,7 +181,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return true;
+				return atPosition(shoulderAngle);
 			}
 
 			@Override
@@ -196,7 +205,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return true;
+				return atPosition(shoulderAngle);
 			}
 
 			@Override
@@ -220,7 +229,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return true;
+				return atPosition(shoulderAngle);
 			}
 
 			@Override
@@ -249,7 +258,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return true;
+				return atPosition(shoulderAngle);
 			}
 
 			@Override
@@ -278,7 +287,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return true;
+				return atPosition(shoulderAngle);
 			}
 
 			@Override
@@ -288,6 +297,7 @@ public class Arm extends SubsystemModule {
 		new SubsystemCommand(this.registeredCommands, "upper_score") {
 			double shoulderAngle;
 			double wristAngle;
+			long startTime;
 
 			@Override
 			public void initialize() {
@@ -300,6 +310,7 @@ public class Arm extends SubsystemModule {
 				}
 
 				goToPosition(shoulderAngle, wristAngle);
+				startTime = System.nanoTime();
 			}
 
 			@Override
@@ -307,16 +318,20 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return true;
+				return System.nanoTime() - startTime > 1e9;
 			}
 
 			@Override
-			public void end() {}
+			public void end() {
+//				System.out.println("Upper Score isFinished? : " + atPosition(shoulderAngle) );
+
+			}
 		};
 
 		new SubsystemCommand(this.registeredCommands, "flex_score") {
 			double shoulderAngle;
 			double wristAngle;
+			long startTime;
 
 			@Override
 			public void initialize() {
@@ -326,8 +341,33 @@ public class Arm extends SubsystemModule {
 					wristAngle = 285;
 				} else {
 					shoulderAngle = 13;
-					wristAngle = 40;
+					wristAngle = 65;
 				}
+
+				goToPosition(shoulderAngle, wristAngle);
+				startTime = System.nanoTime();
+			}
+
+			@Override
+			public void execute() {}
+
+			@Override
+			public boolean isFinished() {
+				return System.nanoTime() - startTime > 1e9;
+			}
+
+			@Override
+			public void end() {}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "auton_hatch") {
+			double shoulderAngle;
+			double wristAngle;
+
+			@Override
+			public void initialize() {
+				shoulderAngle = 3;
+				wristAngle = 110;
 
 				goToPosition(shoulderAngle, wristAngle);
 			}
@@ -337,7 +377,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return true;
+				return atPosition(shoulderAngle);
 			}
 
 			@Override
@@ -366,7 +406,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return System.nanoTime() - timer >= 1000000000;
+				return System.nanoTime() - timer >= 0.25e9;
 			}
 
 			@Override
