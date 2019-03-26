@@ -120,6 +120,7 @@ public class Robot extends TimedRobot {
 				append("driver_control -p", this.rightStick);
 				append("vision_align -s", this.lb);
 				append("break_mode -s", this.rb);
+				append("auton_hatch -s", this.a);
 
 				// Climber
 				append("climber_up -s", this.launchpad.getButtonInstance(0, 0));
@@ -225,8 +226,8 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
-		drivetrain.getEncoderValues();
-		SmartDashboard.putNumber("Gyro", drivetrain.odometer.getHeadingAngle());
+//		drivetrain.getEncoderValues();
+//		SmartDashboard.putNumber("Gyro", drivetrain.odometer.getHeadingAngle());
 	}
 
 	/**
