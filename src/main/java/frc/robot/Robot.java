@@ -172,13 +172,12 @@ public class Robot extends TimedRobot {
 						drivetrain.addForwardSpline(0,0,90,10,3.25,23,170,6,3,12,0,0);
 						break;
 					case ROCKET:
-						System.out.println("GENERATING RIGHT ROCKET PATH");
+						System.out.println("GENERATING RIGHT ROCKET SPLINE");
 						drivetrain.addBackwardsSpline(0,0,270,2,0,8,270,2,5,5,0,0);
 						break;
 					case TEST:
 						System.out.println("GENERATING RIGHT TEST SPLINE ");
-						// drivetrain.addForwardSpline(0,0,90,2,0,8,90,2,10,5,0,0);
-						drivetrain.addForwardSpline(0,0,90,5,5,14,90,5,10,12,0,0);
+						drivetrain.addBackwardsSpline(0,0,270,2,0,5,270,2,5,5,0,0);
 						break;
 				}
 				break;
