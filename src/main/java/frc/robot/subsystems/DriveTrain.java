@@ -314,25 +314,18 @@ public class DriveTrain extends SubsystemModule {
 			double xFinal, double yFinal, double thetaFinal, double lFinal, double maxAcceleration,
 			double maxVelocity, double startVelocity, double endVelocity) {
 
-		setAngularOffset(-180);
-
 		thetaInitial = Math.toRadians(thetaInitial);
 		thetaFinal = Math.toRadians(thetaFinal);
 
-		double x2 = lInitial * Math.cos(thetaInitial) + xInitial;
-		double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal;
-		double y2 = lInitial * Math.sin(thetaInitial) + yInitial;
-		double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal;
+		double x2 = lInitial * Math.cos(thetaInitial + Math.PI) + xInitial;
+		double x3 = lFinal * Math.cos(thetaFinal) + xFinal;
+		double y2 = lInitial * Math.sin(thetaInitial + Math.PI) + yInitial;
+		double y3 = lFinal * Math.sin(thetaFinal) + yFinal;
 
 		System.out.println("Backwards Spline Generating");
 
 		drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
 				maxAcceleration, maxVelocity, startVelocity, endVelocity, false);
-	}
-
-	public void setAngularOffset(double angle) {
-		odometer.setOffset(angle);
-		navX.zeroYaw();
 	}
 
 	@Override

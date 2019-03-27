@@ -172,9 +172,6 @@ public class Robot extends TimedRobot {
 						drivetrain.addForwardSpline(0,0,90,10,3.25,23,170,6,3,12,0,0);
 						break;
 					case ROCKET:
-					
-						// drivetrain.setAngularOffset(-180);
-						
 						System.out.println("GENERATING RIGHT ROCKET PATH");
 						drivetrain.addBackwardsSpline(0,0,270,2,0,8,270,2,5,5,0,0);
 						break;
