@@ -764,7 +764,7 @@ public class DriveTrain extends SubsystemModule {
 
 
 		new SubsystemCommand(this.registeredCommands, "auton_vision_align"){
-
+			double counter;
 			boolean isAboveMax = false;
 			double maxBlobArea = 6;
 			double currentBlobArea;
@@ -772,6 +772,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void initialize() {
+				counter = 0;
 				System.out.println("INITIALIZED VISION ALIGN");
 				limelightTable.getEntry("ledMode").setNumber(3);
 				limelightTable.getEntry("camMode").setNumber(0);
@@ -808,18 +809,25 @@ public class DriveTrain extends SubsystemModule {
 				// System.out.println("power: " + power);
 
 				if (currentBlobArea <= maxBlobArea) {
+					counter = 0;
 					closedLoopArcade(power * maxVelocity, -pivot);
+				} else {
+					counter++;
 				}
 
-				isAboveMax = currentBlobArea > maxBlobArea;
-				System.out.println("RUNNING VISION ALIGN POWER : " + power + " IS ABOVE MAX? : " + isAboveMax);
+				if (counter > 10) {
+					isAboveMax = currentBlobArea > maxBlobArea;
+				}
+//				System.out.println("RUNNING VISION ALIGN POWER : " + power + " IS ABOVE MAX? : " + isAboveMax);
+
 
 			}
 
 			@Override
 			public boolean isFinished() {
+
 				// System.out.println("Boolean : " + (currentBlobArea > maxBlobArea));
-					return isAboveMax || ((System.nanoTime() - startingTime) > 3000000000.0);
+					return ((System.nanoTime() - startingTime) > 2e9) || isAboveMax;
 			}
 
 			@Override
@@ -827,7 +835,25 @@ public class DriveTrain extends SubsystemModule {
 				// limelightTable.getEntry("camMode").setNumber(1);
 				closedLoopArcade(0, 0);
 				// limelightTable.getEntry("ledMode").setNumber(1);
-				System.out.println("x: " + odometer.getCurrentX() + " y: " + odometer.getCurrentY() + " thetaF: " + odometer.getHeadingAngle());
+				System.out.println("VISION ALIGN FINAL POSITIONS x: " + odometer.getCurrentX() + " y: " + odometer.getCurrentY() + " thetaF: " + odometer.getHeadingAngle() + " COUNTER = " + counter);
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "set_current_position") {
+			@Override
+			public void initialize() {
+				odometer.setCurrentPosition(Double.parseDouble(this.args[0]), Double.parseDouble(this.args[1]));
+				// System.out.println("SET POSITIONS: " + " X = " + odometer.getCurrentX() + " Y = " + odometer.getCurrentY());	
+			}
+
+			@Override
+			public boolean isFinished() {
+				return true;
+			}
+
+			@Override
+			public void end() {
+				System.out.println("Set to X: " + odometer.getCurrentX() + " | Y: " + odometer.getCurrentY());
 			}
 		};
 

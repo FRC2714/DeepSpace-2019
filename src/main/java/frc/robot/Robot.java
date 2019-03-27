@@ -103,13 +103,11 @@ public class Robot extends TimedRobot {
 				append("middle_score -p", this.launchpad.getButtonInstance(7, 6));
 				append("upper_score -p", this.launchpad.getButtonInstance(6, 4));
 				append("upper_score -p", this.launchpad.getButtonInstance(7, 4));
-				append("cargo_station_score -p", this.launchpad.getButtonInstance(6, 2));
-				append("cargo_station_score -p", this.launchpad.getButtonInstance(7, 2));
+				append("flex_score -p", this.launchpad.getButtonInstance(6, 2));
+				append("flex_score -p", this.launchpad.getButtonInstance(7, 2));
 
 				// Extake buttons
-				// append("extake -s", this.launchpad.getButtonInstance(0, 1));
 				append("extake -s", this.launchpad.getButtonInstance(0, 2));
-				// append("extake -s", this.launchpad.getButtonInstance(1, 1));
 				append("extake -s", this.launchpad.getButtonInstance(1, 2));
 
 				// Jog
@@ -134,8 +132,6 @@ public class Robot extends TimedRobot {
 				append("cancel_all -p", this.launchpad.getButtonInstance(7, 0));
 				append("cancel_all -p", this.launchpad.getButtonInstance(8, 0));
 
-				//test
-				append("debug_print -s", this.a);
 			}
 		};
 
@@ -252,21 +248,6 @@ public class Robot extends TimedRobot {
 
 		AutonTask testAuton = new TestTask(controlsProcessor);
 
-
-//		if (autonSide == 0) { // Left
-//			if (autonMode == 0) { // Left Side Cargo
-//				leftCargo.run();
-//			} else if (autonMode == 1) { // Left Side Rocket
-//				leftRocket.run();
-//			}
-//		} else if (autonSide == 1) { // Right
-//			if (autonMode == 0) { // Right Side Cargo
-//				rightCargo.run();
-//			} else if (autonMode == 1) { // Right Side Rocket
-//				rightRocket.run();
-//			}
-//		}
-
 		switch (auton_side){
 			case LEFT:
 				startAuton(leftCargo, leftRocket, testAuton);
@@ -321,6 +302,8 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
+//		drivetrain.getEncoderValues();
+//		SmartDashboard.putNumber("Gyro", drivetrain.odometer.getHeadingAngle());
 	}
 
 	/**

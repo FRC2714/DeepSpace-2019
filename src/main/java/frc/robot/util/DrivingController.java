@@ -65,8 +65,12 @@ public abstract class DrivingController {
 		updateVariables();
 
 		// Move to the next point in the spline
-		if(iterator < controlPath.size() - 1) { this.iterator++; }
-		else { pathFinished = true; }
+		if(iterator < controlPath.size() - 1) {
+			this.iterator++;
+		}
+		else {
+			pathFinished = true;
+		}
 
 		// Use tangential correction and velocity control cascaded to control velocity and position.
 		double orthogonalError = controlPath.get(iterator).getOrthogonalDisplacement(currentX, currentY);

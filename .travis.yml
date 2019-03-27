@@ -1,3 +1,4 @@
+
 language: java
 jdk:
   - openjdk11
@@ -5,3 +6,14 @@ jobs:
   include:
     - stage: build
       script: ./gradlew build
+
+    - stage: test
+      script: git fetch --unshallow && ./gradlew sonarqube -Dsonar.projectKey=FRC2714_2019Competition -Dsonar.organization=frc2714 -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=b11be615bbbfd72908fa3aefbae26fa4e82bd86a
+
+#      script: git fetch --unshallow --quiet
+
+addons:
+  sonarcloud:
+    organization: "frc2714" # the key of the org you chose at step #3
+    token:
+      secure: b11be615bbbfd72908fa3aefbae26fa4e82bd86a
