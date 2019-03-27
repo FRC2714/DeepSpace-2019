@@ -671,8 +671,6 @@ public class DriveTrain extends SubsystemModule {
 				drivingController.setIsFinished(false);
 				enable();
 				System.out.println("starting path");
-
-				System.out.println(drivingController.getControlPath());
 			}
 
 			@Override
