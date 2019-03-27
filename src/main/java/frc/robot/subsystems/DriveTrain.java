@@ -313,6 +313,8 @@ public class DriveTrain extends SubsystemModule {
 			double xFinal, double yFinal, double thetaFinal, double lFinal, double maxAcceleration,
 			double maxVelocity, double startVelocity, double endVelocity) {
 
+		setAngularOffset(-180);
+
 		thetaInitial = Math.toRadians(thetaInitial);
 		thetaFinal = Math.toRadians(thetaFinal);
 
@@ -325,6 +327,11 @@ public class DriveTrain extends SubsystemModule {
 
 		drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
 				maxAcceleration, maxVelocity, startVelocity, endVelocity, false);
+	}
+
+	public void setAngularOffset(double angle) {
+		odometer.setOffset(angle);
+		navX.zeroYaw();
 	}
 
 	@Override
@@ -669,12 +676,15 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 				drivingController.setIsFinished(false);
-				enable();
+				// enable();
 				System.out.println("starting path");
+				System.out.println(drivingController.getControlPath());
 			}
 
 			@Override
-			public void execute() { }
+			public void execute() {
+
+			 }
 
 			@Override
 			public boolean isFinished() {
@@ -766,7 +776,7 @@ public class DriveTrain extends SubsystemModule {
 			double requestedDelta;
 			double finalRequestedAngle;
 
-			PID headingController = new PID(0, 0, 0, 0);
+			PID headingController = new PID(0.01, 0, 0, 0);
 			@Override
 			public void initialize() {
 				try{
@@ -783,9 +793,9 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void execute() {
 				double errorCorrection = headingController.getOutput(odometer.getHeadingAngle());
-				if(Math.abs(odometer.getHeadingAngle() - finalRequestedAngle) > 20){
+				if(Math.abs(odometer.getHeadingAngle() - finalRequestedAngle) > 5){
 					lMotor0.set(errorCorrection);
-					rMotor0.set(-errorCorrection);
+					rMotor0.set(errorCorrection);
 				}
 			}
 
@@ -796,9 +806,11 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
+				lMotor0.set(0);
+				rMotor0.set(0);
 				System.out.println("Finished turn to angle, expected angle was " + finalRequestedAngle +
 						" and your actual angle was " + odometer.getHeadingAngle() +
-						". Error of " + (Math.abs(odometer.getHeadingAngle() - finalRequestedAngle) > 20));
+						". Error of " + (Math.abs(odometer.getHeadingAngle() - finalRequestedAngle)));
 			}
 		};
 
