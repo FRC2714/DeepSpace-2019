@@ -22,21 +22,8 @@ import frc.robot.util.ControlsProcessor;
 */
 public class Robot extends TimedRobot {
 
-	/**
-	 * Autons:
-	 * 
-	 * autonSide: Left	 = 0
-	 * 			  Right	 = 1
-	 * 
-	 * autonMode: Cargo	 = 0
-	 * 			  Rocket = 1
-	 * 			  Test	 = 2
-	 */
 	private Auton_Side auton_side;
 	private Auton_Mode auton_mode;
-
-	private int autonSide = 1;
-	private int autonMode = 1;
 
 	// Initialize subsystems
 	private DriveTrain drivetrain;
@@ -45,7 +32,6 @@ public class Robot extends TimedRobot {
 
 	// Initialize auton mode selector
 	private Command autonomousCommand;
-	private SendableChooser<Command> autoChooser;
 
 	// Initialize robot control systems
 	private ControlsProcessor controlsProcessor;
@@ -165,22 +151,6 @@ public class Robot extends TimedRobot {
 		controlsProcessor.start();
 		
 		arm.init();
-
-//		if (auton_side.equals(Auton_Side.LEFT)) { // Left
-//			if (autonMode == 0) { // Left Side Cargo
-//				drivetrain.addForwardSpline(0,0,90,10,-3.25,23,10,6,3,12,0,0);
-//			} else if (autonMode == 1) { // Left Side Rocket
-//				drivetrain.addBackwardsSpline(0,0,270,7,-4.75,18,270,7,12,10,0,8);
-//				drivetrain.addBackwardsSpline(-4.75,18,270,1,-4.5,24.5,236,2,12,8,8,0);
-//			}
-//		} else if (autonSide == 1) { // Right
-//			if (autonMode == 0) { // Right Side Cargo
-//				drivetrain.addForwardSpline(0,0,90,10,3.25,23,170,6,3,12,0,0);
-//			} else if (autonMode == 1) { // Right Side Rocket
-//				drivetrain.addBackwardsSpline(0,0,270,7,4.75,18,270,7,12,10,0,8);
-//				drivetrain.addBackwardsSpline(4.75,18,270,1,4.5,24.5,304,2,12,8,8,0);
-//			}
-//		}
 
 		switch (auton_side){
 			case LEFT:
