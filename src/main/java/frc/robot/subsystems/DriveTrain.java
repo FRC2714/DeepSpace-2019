@@ -111,6 +111,8 @@ public class DriveTrain extends SubsystemModule {
 		rMotor0.setSmartCurrentLimit(40);
 		rMotor1.setSmartCurrentLimit(40);
 		rMotor2.setSmartCurrentLimit(40);
+
+		drivingController.clearControlPath();
 	}
 
 	// Instantiate odometer and link in encoders and navX
@@ -194,7 +196,6 @@ public class DriveTrain extends SubsystemModule {
 		rMotor0.set(0);
 
 		disable();
-		drivingController.clearControlPath();
 	}
 
 	/**
@@ -289,6 +290,49 @@ public class DriveTrain extends SubsystemModule {
 
 	public double getMaxVelocity(){
 		return maxVelocity;
+	}
+
+	public void addForwardSpline(double xInitial, double yInitial, double thetaInitial, double lInitial,
+			double xFinal, double yFinal, double thetaFinal, double lFinal, double maxAcceleration,
+			double maxVelocity, double startVelocity, double endVelocity) {
+
+		thetaInitial = Math.toRadians(thetaInitial);
+		thetaFinal = Math.toRadians(thetaFinal);
+
+		double x2 = lInitial * Math.cos(thetaInitial) + xInitial;
+		double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal;
+		double y2 = lInitial * Math.sin(thetaInitial) + yInitial;
+		double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal;
+
+		System.out.println("Forward Spline Generating");
+
+		drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
+				maxAcceleration, maxVelocity, startVelocity, endVelocity, true);
+	}
+
+	public void addBackwardsSpline(double xInitial, double yInitial, double thetaInitial, double lInitial,
+			double xFinal, double yFinal, double thetaFinal, double lFinal, double maxAcceleration,
+			double maxVelocity, double startVelocity, double endVelocity) {
+
+		setAngularOffset(-180);
+
+		thetaInitial = Math.toRadians(thetaInitial);
+		thetaFinal = Math.toRadians(thetaFinal);
+
+		double x2 = lInitial * Math.cos(thetaInitial) + xInitial;
+		double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal;
+		double y2 = lInitial * Math.sin(thetaInitial) + yInitial;
+		double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal;
+
+		System.out.println("Backwards Spline Generating");
+
+		drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
+				maxAcceleration, maxVelocity, startVelocity, endVelocity, false);
+	}
+
+	public void setAngularOffset(double angle) {
+		odometer.setOffset(angle);
+		navX.zeroYaw();
 	}
 
 	@Override
@@ -430,7 +474,6 @@ public class DriveTrain extends SubsystemModule {
 				getEncoderValues();
 				System.out.println("Heading Angle: " + odometer.getHeadingAngle());
 				System.out.println("X : Y = " + odometer.getCurrentX() + " : " + odometer.getCurrentY());
-				// System.out.println(navX.getYaw());
 			}
 
 			@Override
@@ -634,13 +677,15 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 				drivingController.setIsFinished(false);
-				enable();
+				// enable();
 				System.out.println("starting path");
+				System.out.println(drivingController.getControlPath());
 			}
 
 			@Override
 			public void execute() {
-			}
+
+			 }
 
 			@Override
 			public boolean isFinished() {
@@ -732,7 +777,8 @@ public class DriveTrain extends SubsystemModule {
 			double requestedDelta;
 			double finalRequestedAngle;
 
-			PID headingController = new PID(0.005, 0, 0, 0);
+			PID headingController = new PID(0.01, 0, 0, 0);
+
 			@Override
 			public void initialize() {
 				try{
@@ -751,8 +797,9 @@ public class DriveTrain extends SubsystemModule {
 				double errorCorrection = headingController.getOutput(odometer.getHeadingAngle());
 				SmartDashboard.putNumber("Error in Heading = " , (Math.abs(odometer.getHeadingAngle() - finalRequestedAngle)));
 				SmartDashboard.putNumber("Error Correction", errorCorrection);
-					lMotor0.set(-errorCorrection);
-					rMotor0.set(-errorCorrection);
+				lMotor0.set(-errorCorrection);
+				rMotor0.set(-errorCorrection);
+
 			}
 
 			@Override
@@ -763,6 +810,7 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void end() {
 				closedLoopArcade(0,0);
+				
 				System.out.println("Finished turn to angle, expected angle was " + finalRequestedAngle +
 						" and your actual angle was " + odometer.getHeadingAngle() +
 						". Error of " + (Math.abs(odometer.getHeadingAngle() - finalRequestedAngle)));

@@ -15,7 +15,11 @@ public class TestTask extends AutonTask {
 //		queueTask("add_forwards_spline -s 0,0,90,2,-3.182,13.567,180.03699761861517,2,5,5,0,0"); //Simple L curve
 //		queueTask("add_forwards_spline -s 0,0,90,2,-19.279,0.012,264.5935014165078,2,5,5,0,0"); Start next to hab 1, end up in opposite loading station area
 //		queueTask("start_path -s");
-		queueTask("navx_turn_to_angle -s -90");
+// 		queueTask("navx_turn_to_angle -s -90");
+// 		queueTask("add_forwards_spline -s 0,0,90,2,0,8,90,2,10,5,0,0");
+// 		queueTask("add_forwards_spline -s 0,0,90,3,3,8,90,3,10,5,0,0");
+		
+		queueTask("start_path -s");
 
 	}
 }

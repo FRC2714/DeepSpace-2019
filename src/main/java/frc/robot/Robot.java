@@ -22,6 +22,9 @@ import frc.robot.util.ControlsProcessor;
 */
 public class Robot extends TimedRobot {
 
+	private Auton_Side auton_side;
+	private Auton_Mode auton_mode;
+
 	// Initialize subsystems
 	private DriveTrain drivetrain;
 	private Arm arm;
@@ -29,7 +32,6 @@ public class Robot extends TimedRobot {
 
 	// Initialize auton mode selector
 	private Command autonomousCommand;
-	private SendableChooser<Command> autoChooser;
 
 	// Initialize robot control systems
 	private ControlsProcessor controlsProcessor;
@@ -37,8 +39,8 @@ public class Robot extends TimedRobot {
 	// Init and Periodic functions
 	@Override
 	public void robotInit() {
-		autoChooser = new SendableChooser<>();
-		SmartDashboard.putData("Autonomous Mode Selector", autoChooser);
+		auton_side = Auton_Side.RIGHT;
+		auton_mode = Auton_Mode.ROCKET;
 
 		// Controls processor only gets created ONCE when code is run
 		controlsProcessor = new ControlsProcessor(10000000, 2) {
@@ -130,7 +132,6 @@ public class Robot extends TimedRobot {
 				append("cancel_all -p", this.launchpad.getButtonInstance(7, 0));
 				append("cancel_all -p", this.launchpad.getButtonInstance(8, 0));
 
-				append("navx_turn_to_angle -s -90",this.a);
 
 			}
 		};
@@ -147,6 +148,46 @@ public class Robot extends TimedRobot {
 		controlsProcessor.start();
 		
 		arm.init();
+
+		drivetrain.drivingController.clearControlPath();
+
+		switch (auton_side){
+			case LEFT:
+				switch (auton_mode){
+					case CARGO:
+						drivetrain.addForwardSpline(0,0,90,10,-3.25,23,10,6,3,12,0,0);
+						break;
+					case ROCKET:
+						drivetrain.addBackwardsSpline(0,0,270,7,-4.75,18,270,7,12,10,0,8);
+						drivetrain.addBackwardsSpline(-4.75,18,270,1,-4.5,24.5,236,2,12,8,8,0);
+						break;
+					case TEST:
+						drivetrain.addForwardSpline(0,0,90,2,0,8,90,2,10,5,0,0);
+						break;
+				}
+				break;
+			case RIGHT:
+				switch (auton_mode){
+					case CARGO:
+						drivetrain.addForwardSpline(0,0,90,10,3.25,23,170,6,3,12,0,0);
+						break;
+					case ROCKET:
+					
+						// drivetrain.setAngularOffset(-180);
+						
+						System.out.println("GENERATING RIGHT ROCKET PATH");
+						drivetrain.addBackwardsSpline(0,0,270,2,0,8,270,2,5,5,0,0);
+						break;
+					case TEST:
+						System.out.println("GENERATING RIGHT TEST SPLINE ");
+						// drivetrain.addForwardSpline(0,0,90,2,0,8,90,2,10,5,0,0);
+						drivetrain.addForwardSpline(0,0,90,5,5,14,90,5,10,12,0,0);
+						break;
+				}
+				break;
+		}
+
+
 	}
 
 	/**
@@ -177,6 +218,23 @@ public class Robot extends TimedRobot {
 	}
 
 	/**
+	 * Represents the side that the autonomous starts from.
+	 */
+	enum Auton_Side{
+		LEFT,
+		RIGHT
+	}
+
+	/**
+	 * Represents the task focused on during autonomous.
+	 */
+	enum Auton_Mode{
+		CARGO,
+		ROCKET,
+		TEST
+	}
+
+	/**
 	 * Runs at the beginning of auton mode
 	 */
 	@Override
@@ -188,15 +246,38 @@ public class Robot extends TimedRobot {
 
 		generalInit();
 		
-		AutonTask leftFullSend = new LeftRocketHabTwoAuton(controlsProcessor);
+		AutonTask leftRocket = new LeftRocketHabTwoAuton(controlsProcessor);
 		AutonTask leftCargo = new LeftCargoHabTwoAuton(controlsProcessor);
 
-		AutonTask rightFullSend = new RightRocketHabTwoAuton(controlsProcessor);
+		AutonTask rightRocket = new RightRocketHabTwoAuton(controlsProcessor);
 		AutonTask rightCargo = new RightCargoHabTwoAuton(controlsProcessor);
 
 		AutonTask testAuton = new TestTask(controlsProcessor);
 
-		testAuton.run();
+
+		switch (auton_side){
+			case LEFT:
+				startAuton(leftCargo, leftRocket, testAuton);
+				break;
+			case RIGHT:
+				startAuton(rightCargo, rightRocket, testAuton);
+				break;
+		}
+	}
+
+	private void startAuton(AutonTask cargoAuton, AutonTask rocketAuton, AutonTask testAuton) {
+		switch (auton_mode){
+			case CARGO:
+				cargoAuton.run();
+				break;
+			case ROCKET:
+				rocketAuton.run();
+				break;
+			case TEST:
+				System.out.println("TEST CASE RUNNING IN AUTON INIT");
+				testAuton.run();
+				break;
+		}
 	}
 
 	/**
@@ -251,13 +332,15 @@ public class Robot extends TimedRobot {
 	 * Called at the start of both auton and teleop init
 	 */
 	private void generalInit() {
-		controlsProcessor.cancelAll();
-
 		if (controlsProcessor != null) {
 			controlsProcessor.enable();
 		}
-
+		
 		drivetrain.init();
 		climber.init();
+
+		controlsProcessor.cancelAll();
 	}
+
+
 }
