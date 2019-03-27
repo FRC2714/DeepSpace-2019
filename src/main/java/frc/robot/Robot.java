@@ -130,6 +130,8 @@ public class Robot extends TimedRobot {
 				append("cancel_all -p", this.launchpad.getButtonInstance(7, 0));
 				append("cancel_all -p", this.launchpad.getButtonInstance(8, 0));
 
+				append("navx_turn_to_angle -s -90",this.a);
+
 			}
 		};
 
@@ -194,7 +196,7 @@ public class Robot extends TimedRobot {
 
 		AutonTask testAuton = new TestTask(controlsProcessor);
 
-		rightFullSend.run();
+		testAuton.run();
 	}
 
 	/**

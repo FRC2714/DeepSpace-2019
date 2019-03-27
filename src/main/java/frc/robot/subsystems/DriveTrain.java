@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotMap;
 import frc.robot.util.*;
 
@@ -731,7 +732,7 @@ public class DriveTrain extends SubsystemModule {
 			double requestedDelta;
 			double finalRequestedAngle;
 
-			PID headingController = new PID(0, 0, 0, 0);
+			PID headingController = new PID(0.005, 0, 0, 0);
 			@Override
 			public void initialize() {
 				try{
@@ -748,22 +749,23 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void execute() {
 				double errorCorrection = headingController.getOutput(odometer.getHeadingAngle());
-				if(Math.abs(odometer.getHeadingAngle() - finalRequestedAngle) > 20){
-					lMotor0.set(errorCorrection);
+				SmartDashboard.putNumber("Error in Heading = " , (Math.abs(odometer.getHeadingAngle() - finalRequestedAngle)));
+				SmartDashboard.putNumber("Error Correction", errorCorrection);
+					lMotor0.set(-errorCorrection);
 					rMotor0.set(-errorCorrection);
-				}
 			}
 
 			@Override
 			public boolean isFinished() {
-				return Math.abs(odometer.getHeadingAngle() - finalRequestedAngle) > 20;
+				return false;
 			}
 
 			@Override
 			public void end() {
+				closedLoopArcade(0,0);
 				System.out.println("Finished turn to angle, expected angle was " + finalRequestedAngle +
 						" and your actual angle was " + odometer.getHeadingAngle() +
-						". Error of " + (Math.abs(odometer.getHeadingAngle() - finalRequestedAngle) > 20));
+						". Error of " + (Math.abs(odometer.getHeadingAngle() - finalRequestedAngle)));
 			}
 		};
 
