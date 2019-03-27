@@ -72,4 +72,8 @@ public class MotionPose {
     public double distanceCalc(double x1, double x2, double y1, double y2) {
         return Math.pow((Math.pow(x2 - x1, 2)) + (Math.pow(y2 - y1, 2)), 0.5);
     }
+
+    public String toString() {
+        return "X = " + x + " Y = " + y + " Angle = " + angle + " Vel = " + velocity;
+    }
 }
