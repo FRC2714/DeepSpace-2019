@@ -57,7 +57,7 @@ public class Arm extends SubsystemModule {
 		shoulderPID.setP(0.6);
 		shoulderPID.setI(0.00007);
 
-		wristPID.setP(0.1);
+		wristPID.setP(0.2);
 
 		// Converts motor rotations to degrees
 		shoulderEncoder.setPositionConversionFactor(1.0/7);
@@ -218,7 +218,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				shoulderAngle = 0.3;
+				shoulderAngle = 0.8;
 				wristAngle = 86;
 
 				goToPosition(shoulderAngle, wristAngle);
@@ -243,8 +243,8 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void initialize() {
 				if(intake.getCargoState()) {
-					shoulderAngle = 5.5;
-					wristAngle = 198;
+					shoulderAngle = 6;
+					wristAngle = 205;
 				} else {
 					shoulderAngle = 0.3;
 					wristAngle = 86;
@@ -272,11 +272,11 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void initialize() {
 				if(intake.getCargoState()) {
-					shoulderAngle = 9.7;
-					wristAngle = 213;
+					shoulderAngle = 10.5;
+					wristAngle = 230;
 				} else {
 					shoulderAngle = 6.8;
-					wristAngle = 143;
+					wristAngle = 133;
 				}
 
 				goToPosition(shoulderAngle, wristAngle);
@@ -323,7 +323,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void end() {
-//				System.out.println("Upper Score isFinished? : " + atPosition(shoulderAngle) );
+				// System.out.println("Upper Score isFinished? : " + atPosition(shoulderAngle) );
 
 			}
 		};
