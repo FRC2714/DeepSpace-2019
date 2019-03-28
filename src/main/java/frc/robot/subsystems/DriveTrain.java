@@ -766,7 +766,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
-		new SubsystemCommand(this.registeredCommands, "navx_turn_to_angle"){
+		new SubsystemCommand(this.registeredCommands, "turn_to_angle"){
 			double requestedDelta;
 			double finalRequestedAngle;
 
