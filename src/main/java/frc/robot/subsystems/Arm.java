@@ -99,7 +99,7 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void execute() {
 				position += 0.05;
-				goToPosition(position, wristEncoder.getPosition()); //Shoulder previously +3.5
+				goToPosition(position, wristEncoder.getPosition());
 			}
 
 			@Override
@@ -108,10 +108,7 @@ public class Arm extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-				System.out.println("Shoulder Length: " + shoulderEncoder.getPosition());
-				System.out.println("Wrist Angle: " + wristEncoder.getPosition());
-			}
+			public void end() {}
 		};
 
 		new SubsystemCommand(this.registeredCommands, "jog_down") {
@@ -125,7 +122,7 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void execute() {
 				position -= 0.05;
-				goToPosition(position, wristEncoder.getPosition()); //Shoulder previously +3.5
+				goToPosition(position, wristEncoder.getPosition());
 			}
 
 			@Override
@@ -134,10 +131,7 @@ public class Arm extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-				System.out.println("Shoulder Length: " + shoulderEncoder.getPosition());
-				System.out.println("Wrist Angle: " + wristEncoder.getPosition());
-			}
+			public void end() {}
 		};
 
 		new SubsystemCommand(this.registeredCommands, "start_position") {
@@ -322,10 +316,7 @@ public class Arm extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-//				System.out.println("Upper Score isFinished? : " + atPosition(shoulderAngle) );
-
-			}
+			public void end() {}
 		};
 
 		new SubsystemCommand(this.registeredCommands, "flex_score") {
@@ -354,6 +345,36 @@ public class Arm extends SubsystemModule {
 			@Override
 			public boolean isFinished() {
 				return System.nanoTime() - startTime > 1e9;
+			}
+
+			@Override
+			public void end() {}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "delayed_to_position") {
+			double shoulderAngle;
+			double wristAngle;
+
+			long endTime;
+
+			@Override
+			public void initialize() {
+				shoulderAngle = Double.parseDouble(this.args[0]);
+				wristAngle = Double.parseDouble(this.args[1]);
+
+				endTime = (long)(Double.parseDouble(this.args[2]) * 1e9) + System.nanoTime();
+
+				while(System.nanoTime() < endTime);
+
+				goToPosition(shoulderAngle, wristAngle);
+			}
+
+			@Override
+			public void execute() {}
+
+			@Override
+			public boolean isFinished() {
+				return atPosition(shoulderAngle);
 			}
 
 			@Override

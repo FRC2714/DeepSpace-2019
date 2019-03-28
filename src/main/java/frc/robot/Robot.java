@@ -173,7 +173,7 @@ public class Robot extends TimedRobot {
 						break;
 					case ROCKET:
 						System.out.println("GENERATING RIGHT ROCKET SPLINE");
-						drivetrain.addBackwardsSpline(0,0,270,2,0,8,270,2,5,5,0,0);
+						drivetrain.addBackwardsSpline(0,0,270,7,5.3,25.5,270,5,18,12,0,0);
 						break;
 					case TEST:
 						System.out.println("GENERATING RIGHT TEST SPLINE ");
@@ -242,14 +242,13 @@ public class Robot extends TimedRobot {
 
 		generalInit();
 		
-		AutonTask leftRocket = new LeftRocketHabTwoAuton(controlsProcessor);
-		AutonTask leftCargo = new LeftCargoHabTwoAuton(controlsProcessor);
+		AutonTask leftRocket = new LeftRocket(controlsProcessor);
+		AutonTask rightRocket = new RightRocket(controlsProcessor);
 
-		AutonTask rightRocket = new RightRocketHabTwoAuton(controlsProcessor);
-		AutonTask rightCargo = new RightCargoHabTwoAuton(controlsProcessor);
+		AutonTask leftCargo = new LeftCargo(controlsProcessor);
+		AutonTask rightCargo = new RightCargo(controlsProcessor);
 
 		AutonTask testAuton = new TestTask(controlsProcessor);
-
 
 		switch (auton_side){
 			case LEFT:
