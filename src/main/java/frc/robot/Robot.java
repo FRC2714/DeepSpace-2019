@@ -40,7 +40,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		auton_side = Auton_Side.RIGHT;
-		auton_mode = Auton_Mode.TEST;
+		auton_mode = Auton_Mode.ROCKET;
 
 		// Controls processor only gets created ONCE when code is run
 		controlsProcessor = new ControlsProcessor(10000000, 2) {
@@ -132,6 +132,7 @@ public class Robot extends TimedRobot {
 				append("cancel_all -p", this.launchpad.getButtonInstance(7, 0));
 				append("cancel_all -p", this.launchpad.getButtonInstance(8, 0));
 
+
 			}
 		};
 
@@ -147,6 +148,8 @@ public class Robot extends TimedRobot {
 		controlsProcessor.start();
 		
 		arm.init();
+
+		drivetrain.drivingController.clearControlPath();
 
 		switch (auton_side){
 			case LEFT:
@@ -169,13 +172,12 @@ public class Robot extends TimedRobot {
 						drivetrain.addForwardSpline(0,0,90,10,3.25,23,170,6,3,12,0,0);
 						break;
 					case ROCKET:
-						drivetrain.addBackwardsSpline(0,0,270,7,-4.75,18,270,7,12,10,0,8);
-						drivetrain.addBackwardsSpline(-4.75,18,270,1,-4.5,24.5,236,2,12,8,8,0);
+						System.out.println("GENERATING RIGHT ROCKET SPLINE");
+						drivetrain.addBackwardsSpline(0,0,270,7,5.3,25.5,270,5,18,12,0,0);
 						break;
 					case TEST:
 						System.out.println("GENERATING RIGHT TEST SPLINE ");
-						// drivetrain.addForwardSpline(0,0,90,2,0,8,90,2,10,5,0,0);
-						drivetrain.addForwardSpline(0,0,90,5,5,14,90,5,10,12,0,0);
+						drivetrain.addBackwardsSpline(0,0,270,2,0,5,270,2,5,5,0,0);
 						break;
 				}
 				break;
@@ -240,11 +242,11 @@ public class Robot extends TimedRobot {
 
 		generalInit();
 		
-		AutonTask leftRocket = new LeftRocketHabTwoAuton(controlsProcessor);
-		AutonTask leftCargo = new LeftCargoHabTwoAuton(controlsProcessor);
+		AutonTask leftRocket = new LeftRocket(controlsProcessor);
+		AutonTask rightRocket = new RightRocket(controlsProcessor);
 
-		AutonTask rightRocket = new RightRocketHabTwoAuton(controlsProcessor);
-		AutonTask rightCargo = new RightCargoHabTwoAuton(controlsProcessor);
+		AutonTask leftCargo = new LeftCargo(controlsProcessor);
+		AutonTask rightCargo = new RightCargo(controlsProcessor);
 
 		AutonTask testAuton = new TestTask(controlsProcessor);
 
@@ -253,7 +255,6 @@ public class Robot extends TimedRobot {
 				startAuton(leftCargo, leftRocket, testAuton);
 				break;
 			case RIGHT:
-				
 				startAuton(rightCargo, rightRocket, testAuton);
 				break;
 		}

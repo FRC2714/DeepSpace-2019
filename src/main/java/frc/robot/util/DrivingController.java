@@ -6,7 +6,7 @@ public abstract class DrivingController {
 
 	/**
 	 * Controls the magnitude of angular correction
-	 * Corrects both the anglular and perpendicular error
+	 * Corrects both the angular and perpendicular error
 	 */
 	// Samson control was originally at 0.25 * 0.6
 	private PID samsonControl = new PID(0.06, 0.0001, 0.0);
@@ -28,7 +28,8 @@ public abstract class DrivingController {
 	/**
 	 * Populates an array list from the SplineFactory
 	 */
-	private ArrayList<MotionPose> controlPath = new ArrayList<MotionPose>();
+	private ArrayList<MotionPose> currentPath = new ArrayList<MotionPose>(0);
+	private ArrayList<MotionPose> nextPath = new ArrayList<MotionPose>(0); 
 	private int iterator = 0;
 
 	protected double currentX;
@@ -49,7 +50,7 @@ public abstract class DrivingController {
 	 */
 	public DrivingController(double period) {
 		this.period = period;
-
+		
 		this.samsonControl.setMaxIOutput(0.15);
 	}
 
@@ -58,26 +59,23 @@ public abstract class DrivingController {
 	 * Run function for Driving Controller uses distance and angle controllers
 	 */
 	public void run() {
-		// Test
-		// System.out.println(System.nanoTime());
 
 		// Update using abstracted functions from the calling class
 		updateVariables();
 
 		// Move to the next point in the spline
-		if(iterator < controlPath.size() - 1) {
+		if(iterator < currentPath.size() - 1) {
 			this.iterator++;
-		}
-		else {
+		} else {
 			pathFinished = true;
 		}
 
 		// Use tangential correction and velocity control cascaded to control velocity and position.
-		double orthogonalError = controlPath.get(iterator).getOrthogonalDisplacement(currentX, currentY);
-		double tangentialError = controlPath.get(iterator).getTangentialDisplacement(currentX, currentY);
-		double angularError = controlPath.get(iterator).getAngularDisplacement(currentAngle);
+		double orthogonalError = currentPath.get(iterator).getOrthogonalDisplacement(currentX, currentY);
+		double tangentialError = currentPath.get(iterator).getTangentialDisplacement(currentX, currentY);
+		double angularError = currentPath.get(iterator).getAngularDisplacement(currentAngle);
 
-		double refVelocity = controlPath.get(iterator).velocity;
+		double refVelocity = currentPath.get(iterator).velocity;
 
 		double samsonCorrection2;
 
@@ -89,7 +87,6 @@ public abstract class DrivingController {
 		}
 		
 		double samsonCorrection3 = k3 * angularError;
-
 		double samsonSum = samsonCorrection2 + samsonCorrection3;
 
 		samsonOutput = samsonControl.getOutput(samsonSum, 0);
@@ -99,8 +96,6 @@ public abstract class DrivingController {
 
 		// Both +
 		driveRobot(refVelocity + tangentialOutput, samsonOutput);
-		// System.out.println(samsonOutput);
-
 	}
 
 	// Abstract functions to move and get position of the robot
@@ -130,36 +125,52 @@ public abstract class DrivingController {
 			startVelocity, endVelocity, forwards);
 		System.out.println("Forwards : " + forwards);
 	
-		controlPath.addAll(nextSpline.getSpline());
-
-		// for (MotionPose i : controlPath) {
-		// 	System.out.println("Velocity: " + i.velocity);
-		// }
-
+		nextPath.addAll(nextSpline.getSpline());
 	}
 
 	public double getAngleValues(){
 		return currentAngle;
-		
 	}
 
 	/**
 	 * Move to next motion pose in the sequence
 	 */
 	public void next() {
-		if(iterator < controlPath.size()) { this.iterator++; }
+		if(iterator < currentPath.size() - 1) { this.iterator++; }
 	}
 
 	public int getIterator() {
 		return iterator;
 	}
 
+	public int getSize() {
+		return currentPath.size();
+	}
+
 	public void clearControlPath(){
-		controlPath.clear();
+		currentPath.clear();
 	}
 
 	public ArrayList<MotionPose> getControlPath(){
-		return controlPath;
+		return currentPath;
+	}
+
+	public void startNextPath() {
+		currentPath.clear();
+		currentPath.addAll(nextPath);
+		
+		nextPath.clear();
+
+		iterator = 0;
+		setIsFinished(false);
+	}
+
+	public void disableTangentialCorrection() {
+		tangentialControl.setP(0);
+	}
+
+	public void enableTangentialCorrection() {
+		tangentialControl.setP(0.4);
 	}
 
 	/**

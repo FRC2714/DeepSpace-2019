@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import javax.sound.midi.Soundbank;
+
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
@@ -14,6 +16,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotMap;
 import frc.robot.util.*;
 
@@ -72,7 +75,7 @@ public class DriveTrain extends SubsystemModule {
 	//limelight
 	NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
 
-	// Drivetrain initializations
+	// Drivetrain initialization
 	public DriveTrain(ControlsProcessor controlsProcessor) {
 		registerCommands();
 
@@ -162,7 +165,7 @@ public class DriveTrain extends SubsystemModule {
 	 */
 	@Override
 	public void init() {
-		System.out.println("resetting");
+		System.out.println("Resetting");
 		navX.reset();
 		navX.zeroYaw();
 		
@@ -316,10 +319,10 @@ public class DriveTrain extends SubsystemModule {
 		thetaInitial = Math.toRadians(thetaInitial);
 		thetaFinal = Math.toRadians(thetaFinal);
 
-		double x2 = lInitial * Math.cos(thetaInitial) + xInitial;
-		double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal;
-		double y2 = lInitial * Math.sin(thetaInitial) + yInitial;
-		double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal;
+		double x2 = lInitial * Math.cos(thetaInitial + Math.PI) + xInitial;
+		double x3 = lFinal * Math.cos(thetaFinal) + xFinal;
+		double y2 = lInitial * Math.sin(thetaInitial + Math.PI) + yInitial;
+		double y3 = lFinal * Math.sin(thetaFinal) + yFinal;
 
 		System.out.println("Backwards Spline Generating");
 
@@ -408,9 +411,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void execute() {
-
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
@@ -432,9 +433,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void execute() {
-
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
@@ -442,9 +441,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-
-			}
+			public void end() {}
 		};
 
 		new SubsystemCommand(this.registeredCommands, "debug_print") {
@@ -478,6 +475,7 @@ public class DriveTrain extends SubsystemModule {
 
 			}
 		};
+
 		new SubsystemCommand(this.registeredCommands, "add_forwards_spline") {
 
 			@Override
@@ -556,9 +554,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void execute() {
-
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
@@ -566,9 +562,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-
-			}
+			public void end() {}
 		};
 
 		new SubsystemCommand(this.registeredCommands, "add_backwards_spline") {
@@ -597,13 +591,10 @@ public class DriveTrain extends SubsystemModule {
 				drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
 						Double.parseDouble(this.args[8]), Double.parseDouble(this.args[9]),
 						Double.parseDouble(this.args[10]), Double.parseDouble(this.args[11]), false);
-
 			}
 
 			@Override
-			public void execute() {
-
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
@@ -611,70 +602,20 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-			}
-		};
-
-		new SubsystemCommand(this.registeredCommands, "add_backwards_spline_dynamic") {
-
-			@Override
-			public void initialize() {
-
-				System.out.println("Current X : " + odometer.getCurrentX() + " || Current Y : " + odometer.getCurrentY());
-				System.out.println("DYNAMIC HEADING ANGLE:- " + odometer.getHeadingAngle());
-
-				double xInitial = odometer.getCurrentX();
-				double xFinal = Double.parseDouble(this.args[1]);
-
-				double yInitial = odometer.getCurrentY();
-				double yFinal = Double.parseDouble(this.args[2]);
-
-				double thetaInitial = odometer.getHeadingAngle();
-				double thetaFinal = Double.parseDouble(this.args[3]);
-				System.out.println("Theta Final:- " + this.args[3]);
-
-				double lInitial = Double.parseDouble(this.args[0]);
-				double lFinal = Double.parseDouble(this.args[4]);
-
-				thetaInitial = Math.toRadians(thetaInitial);
-				thetaFinal = Math.toRadians(thetaFinal);
-
-				double x2 = lInitial * Math.cos(thetaInitial) + xInitial;
-				double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal;
-				double y2 = lInitial * Math.sin(thetaInitial) + yInitial;
-				double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal;
-
-				drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
-						Double.parseDouble(this.args[5]), Double.parseDouble(this.args[6]),
-						Double.parseDouble(this.args[7]), Double.parseDouble(this.args[8]), false);
-			}
-
-			@Override
-			public void execute() {
-
-			}
-
-			@Override
-			public boolean isFinished() {
-				return true;
-			}
-
-			@Override
-			public void end() {
-			}
+			public void end() {}
 		};
 
 		new SubsystemCommand(this.registeredCommands, "start_path") {
 
 			@Override
 			public void initialize() {
-				drivingController.setIsFinished(false);
+				drivingController.startNextPath();
 				enable();
 				System.out.println("starting path");
 			}
 
 			@Override
-			public void execute() { }
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
@@ -690,14 +631,54 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
-		new SubsystemCommand(this.registeredCommands, "wait") {
+		new SubsystemCommand(this.registeredCommands, "start_vision_path") {
+			int visionStart;
+			double startOffset;
 
+			@Override
+			public void initialize() {
+				visionStart = (int)(Double.parseDouble(this.args[0]) / controlsProcessor.getControlsPeriod());
+				System.out.println("Vision Start: " + visionStart);
+				startOffset = odometer.getOffset();
+
+				limelightTable.getEntry("ledMode").setNumber(3);
+				limelightTable.getEntry("camMode").setNumber(0);
+
+				drivingController.startNextPath();
+				enable();
+			}
+
+			@Override
+			public void execute() {
+				if(drivingController.getIterator() + visionStart >= drivingController.getSize()) {
+					double angularOffset = limelightTable.getEntry("tx").getDouble(0) * 0.75;
+					
+					drivingController.disableTangentialCorrection();
+					odometer.setOffset(angularOffset + startOffset);
+				}
+			}
+
+			@Override
+			public boolean isFinished() {
+				return limelightTable.getEntry("ta").getDouble(0) > Double.parseDouble(this.args[1]);
+			}
+
+			@Override
+			public void end() {
+				drivingController.enableTangentialCorrection();
+				disable();
+				closedLoopArcade(0, 0);
+				odometer.setOffset(startOffset);
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "wait") {
 			Timer waitTimer = new Timer();
+
 			@Override
 			public void initialize() {
 				waitTimer.reset();
 				waitTimer.start();
-
 			}
 
 			@Override
@@ -711,6 +692,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void end() {
+				System.out.println("Timer done");
 			}
 		};
 
@@ -737,16 +719,6 @@ public class DriveTrain extends SubsystemModule {
 					power = -controlsProcessor.getLeftJoystick();
 
 				closedLoopArcade(power*(maxVelocity/2), -pivot);
-
-				// if (tx > 0){
-				// 	System.out.println("Turning Right Pivot: " + pivot);
-				// 	closedLoopTank((power * maxVelocity) + pivot, (power * maxVelocity));
-				// } else if (tx < 0){
-				// 	System.out.println("Turning Left Pivot: " + pivot);
-				// 	closedLoopTank((power * maxVelocity), (power * maxVelocity) - pivot);
-				// }
-
-
 			}
 
 			@Override
@@ -759,6 +731,50 @@ public class DriveTrain extends SubsystemModule {
 				limelightTable.getEntry("camMode").setNumber(1);
 				limelightTable.getEntry("ledMode").setNumber(1);
 				closedLoopArcade(0, 0);
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "turn_to_angle"){
+			double requestedDelta;
+			double finalRequestedAngle;
+
+			PID headingController = new PID(0.01, 0, 0, 0);
+
+			@Override
+			public void initialize() {
+				try{
+					requestedDelta = Double.parseDouble(this.args[0]);
+				} catch(Exception foo) {
+					System.out.println("Oof, forgot to enter an argument?");
+				}
+				finalRequestedAngle = odometer.getHeadingAngle() + requestedDelta;
+				System.out.println("NavX Turn to Angle Command Aim:- " + finalRequestedAngle);
+				headingController.setOutputLimits(-0.6, 0.6);
+				headingController.setSetpoint(finalRequestedAngle);
+			}
+
+			@Override
+			public void execute() {
+				double errorCorrection = headingController.getOutput(odometer.getHeadingAngle());
+				SmartDashboard.putNumber("Error in Heading = " , (Math.abs(odometer.getHeadingAngle() - finalRequestedAngle)));
+				SmartDashboard.putNumber("Error Correction", errorCorrection);
+				lMotor0.set(-errorCorrection);
+				rMotor0.set(-errorCorrection);
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {
+				closedLoopArcade(0,0);
+				
+				System.out.println("Finished turn to angle, expected angle was " + finalRequestedAngle +
+						" and your actual angle was " + odometer.getHeadingAngle() +
+						". Error of " + (Math.abs(odometer.getHeadingAngle() - finalRequestedAngle)));
 			}
 		};
 
@@ -818,16 +834,13 @@ public class DriveTrain extends SubsystemModule {
 				if (counter > 10) {
 					isAboveMax = currentBlobArea > maxBlobArea;
 				}
-//				System.out.println("RUNNING VISION ALIGN POWER : " + power + " IS ABOVE MAX? : " + isAboveMax);
-
-
+				// System.out.println("RUNNING VISION ALIGN POWER : " + power + " IS ABOVE MAX? : " + isAboveMax);
 			}
 
 			@Override
 			public boolean isFinished() {
-
 				// System.out.println("Boolean : " + (currentBlobArea > maxBlobArea));
-					return ((System.nanoTime() - startingTime) > 2e9) || isAboveMax;
+				return ((System.nanoTime() - startingTime) > 2e9) || isAboveMax;
 			}
 
 			@Override
@@ -875,7 +888,5 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void end() {}
 		};
-
 	}
-
 }
