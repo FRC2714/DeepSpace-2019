@@ -652,13 +652,13 @@ public class DriveTrain extends SubsystemModule {
 				double tx = limelightTable.getEntry("tx").getDouble(0);
 
 				if(drivingController.isFinished()) {
-					double power = 0.3 / currentBlobArea;
+					double magnitude = 0.3 / currentBlobArea;
 					double pivot = tx * 0.05;
 
-					if(power > 0.2)
-						power = 0.2;
+					if(magnitude > 0.2)
+					magnitude = 0.2;
 					
-					closedLoopArcade(power * maxVelocity, -pivot);
+					closedLoopArcade(magnitude * maxVelocity, -pivot);
 				} else if(drivingController.getIterator() + visionStart >= drivingController.getSize()) {
 					angularOffset -= Math.signum(tx);
 
