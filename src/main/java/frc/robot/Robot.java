@@ -40,7 +40,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		auton_side = Auton_Side.RIGHT;
-		auton_mode = Auton_Mode.TEST;
+		auton_mode = Auton_Mode.ROCKET;
 
 		// Controls processor only gets created ONCE when code is run
 		controlsProcessor = new ControlsProcessor(10000000, 2) {

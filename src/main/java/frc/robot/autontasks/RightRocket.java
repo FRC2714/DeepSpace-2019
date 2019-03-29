@@ -20,10 +20,14 @@ public class RightRocket extends AutonTask {
 //		queueTask("delayed_to_position -p 6.8,192,2");
 
 		queueTask("turn_to_angle_setpoint -s 300");
-		queueTask("auton_vision_align -s 3.8");
+		queueTask("upper_score -p");
 
-//	  queueTask("upper_score -p");
+		queueTask("auton_vision_align -s 3.8");
+		queueTask("extake -s");
 		queueTask("straight_back -s");
+
+		queueTask("turn_to_angle_setpoint -s 270");
+		queueTask("auton_hatch -p");
 
 //
 //		queueTask("extake -s");
