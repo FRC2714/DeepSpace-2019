@@ -40,7 +40,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		auton_side = Auton_Side.RIGHT;
-		auton_mode = Auton_Mode.ROCKET;
+		auton_mode = Auton_Mode.TEST;
 
 		// Controls processor only gets created ONCE when code is run
 		controlsProcessor = new ControlsProcessor(10000000, 2) {
@@ -173,11 +173,11 @@ public class Robot extends TimedRobot {
 						break;
 					case ROCKET:
 						System.out.println("GENERATING RIGHT ROCKET SPLINE");
-						drivetrain.addBackwardsSpline(0,0,270,7,5.3,25.5,270,5,18,12,0,0);
+						drivetrain.addBackwardsSpline(0,0,270,7,5.8,24.7,270,5,18,12,0,0);
 						break;
 					case TEST:
 						System.out.println("GENERATING RIGHT TEST SPLINE ");
-						drivetrain.addBackwardsSpline(0,0,270,2,0,5,270,2,5,5,0,0);
+//						drivetrain.addBackwardsSpline(0,0,270,2,0,5,270,2,5,5,0,0);
 						break;
 				}
 				break;

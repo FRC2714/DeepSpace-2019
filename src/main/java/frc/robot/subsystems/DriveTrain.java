@@ -670,9 +670,9 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 				drivingController.setIsFinished(false);
-				// enable();
+				 enable();
 				System.out.println("starting path");
-				System.out.println(drivingController.getControlPath());
+//				System.out.println(drivingController.getControlPath());
 			}
 
 			@Override
@@ -810,6 +810,67 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
+		new SubsystemCommand(this.registeredCommands, "turn_to_angle_setpoint"){
+			double finalRequestedAngle;
+
+			PID headingController = new PID(0.01, 0, 0, 0);
+
+			@Override
+			public void initialize() {
+				finalRequestedAngle = Double.parseDouble(this.args[0]);
+				System.out.println("NavX Turn to Angle Command Aim:- " + finalRequestedAngle);
+				headingController.setOutputLimits(-0.6, 0.6);
+				headingController.setSetpoint(finalRequestedAngle);
+			}
+
+			@Override
+			public void execute() {
+				double errorCorrection = headingController.getOutput(odometer.getHeadingAngle());
+				SmartDashboard.putNumber("Error in Heading = " , (Math.abs(odometer.getHeadingAngle() - finalRequestedAngle)));
+				SmartDashboard.putNumber("Error Correction", errorCorrection);
+				lMotor0.set(-errorCorrection);
+				rMotor0.set(-errorCorrection);
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				return Math.abs(odometer.getHeadingAngle() - finalRequestedAngle) < 2;
+			}
+
+			@Override
+			public void end() {
+				closedLoopArcade(0,0);
+
+				System.out.println("Finished turn to angle, expected angle was " + finalRequestedAngle +
+						" and your actual angle was " + odometer.getHeadingAngle() +
+						". Error of " + (Math.abs(odometer.getHeadingAngle() - finalRequestedAngle)));
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "straight_back"){
+			long startTime;
+
+			@Override
+			public void initialize() {
+				startTime = System.nanoTime();
+				closedLoopTank(-7, -7);
+			}
+
+			@Override
+			public void execute() { }
+
+			@Override
+			public boolean isFinished() {
+				return (System.nanoTime() - startTime) > 0.5 * 1e9;
+			}
+
+			@Override
+			public void end() {
+				closedLoopTank(0, 0);
+				System.out.println("ENDED STRAIGHT BACK SET TO 0");
+			}
+		};
 
 		new SubsystemCommand(this.registeredCommands, "auton_vision_align"){
 			double counter;
@@ -886,6 +947,34 @@ public class DriveTrain extends SubsystemModule {
 				System.out.println("VISION ALIGN FINAL POSITIONS x: " + odometer.getCurrentX() + " y: " + odometer.getCurrentY() + " thetaF: " + odometer.getHeadingAngle() + " COUNTER = " + counter);
 			}
 		};
+
+		new SubsystemCommand(this.registeredCommands, "target_align"){
+			double tx;
+
+			@Override
+			public void initialize() {
+
+			}
+
+			@Override
+			public void execute() {
+				double tx = limelightTable.getEntry("tx").getDouble(0);
+				double kP = 0.05;
+				double pivot = tx * kP;
+				closedLoopArcade(0,-pivot);
+			}
+
+			@Override
+			public boolean isFinished() {
+				return tx < 2;
+			}
+
+			@Override
+			public void end() {
+				closedLoopTank(0,0);
+			}
+		};
+
 
 		new SubsystemCommand(this.registeredCommands, "set_current_position") {
 			@Override
