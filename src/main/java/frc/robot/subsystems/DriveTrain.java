@@ -665,6 +665,37 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
+		new SubsystemCommand(this.registeredCommands, "add_backwards_line") {
+
+			@Override
+			public void initialize() {
+
+				double xInitial = Double.parseDouble(this.args[0]);
+				double yInitial = Double.parseDouble(this.args[1]);
+				double xFinal = Double.parseDouble(this.args[2]);
+				double yFinal = Double.parseDouble(this.args[3]);
+
+				drivingController.addSpline(xInitial, xInitial, xFinal, xFinal, yInitial, yInitial, yFinal, yFinal,
+						Double.parseDouble(this.args[4]), Double.parseDouble(this.args[5]),
+						Double.parseDouble(this.args[6]), Double.parseDouble(this.args[7]), false);
+
+			}
+
+			@Override
+			public void execute() {
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				return true;
+			}
+
+			@Override
+			public void end() {
+			}
+		};
+
 		new SubsystemCommand(this.registeredCommands, "start_path") {
 
 			@Override
@@ -690,6 +721,34 @@ public class DriveTrain extends SubsystemModule {
 			public void end() {
 				disable();
 				closedLoopArcade(0, 0);
+				System.out.println("x : y" + odometer.getCurrentX() + " : " + odometer.getCurrentY() + "Final Heading : " + odometer.getHeadingAngle());
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "start_endless_path") {
+
+			@Override
+			public void initialize() {
+				drivingController.setIsFinished(false);
+				enable();
+				System.out.println("starting path");
+//				System.out.println(drivingController.getControlPath());
+			}
+
+			@Override
+			public void execute() {
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				// System.out.println("driving controller finished? " + ":" + drivingController.isFinished());
+				return drivingController.isFinished();
+			}
+
+			@Override
+			public void end() {
+				disable();
 				System.out.println("x : y" + odometer.getCurrentX() + " : " + odometer.getCurrentY() + "Final Heading : " + odometer.getHeadingAngle());
 			}
 		};
@@ -807,6 +866,7 @@ public class DriveTrain extends SubsystemModule {
 				System.out.println("Finished turn to angle, expected angle was " + finalRequestedAngle +
 						" and your actual angle was " + odometer.getHeadingAngle() +
 						". Error of " + (Math.abs(odometer.getHeadingAngle() - finalRequestedAngle)));
+				System.out.println("Final turn to angle X: " + odometer.getCurrentX() + " Y: " + odometer.getCurrentY());
 			}
 		};
 
@@ -854,7 +914,7 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 				startTime = System.nanoTime();
-				closedLoopTank(-7, -7);
+				closedLoopTank(-4, -4);
 			}
 
 			@Override

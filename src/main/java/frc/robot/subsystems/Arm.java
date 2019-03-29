@@ -42,8 +42,8 @@ public class Arm extends SubsystemModule {
 		shoulderMotor.enableVoltageCompensation(12.0);
 		wristMotor.enableVoltageCompensation(12.0);
 
-		shoulderMotor.setSmartCurrentLimit(60);
-		wristMotor.setSmartCurrentLimit(60);
+		shoulderMotor.setSmartCurrentLimit(80);
+		wristMotor.setSmartCurrentLimit(80);
 
 		// Set SparkMax CAN periods
 		shoulderMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
@@ -299,7 +299,7 @@ public class Arm extends SubsystemModule {
 					wristAngle = 135;
 				} else {
 					shoulderAngle = 11.6;
-					wristAngle = 192;
+					wristAngle = 185;
 				}
 
 				goToPosition(shoulderAngle, wristAngle);
@@ -367,12 +367,12 @@ public class Arm extends SubsystemModule {
 
 				System.out.println("Final Period: " + finalPeriod);
 				
-				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
 			public void execute() {
 				if(currentPeriod == finalPeriod) {
+//					System.out.println("Current Period: " + currentPeriod);
 					goToPosition(shoulderAngle, wristAngle);
 					currentPeriod++;
 				} else {
@@ -435,7 +435,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return System.nanoTime() - timer >= 0.5 * 1e9;
+				return System.nanoTime() - timer >= 0.75 * 1e9;
 			}
 
 			@Override
