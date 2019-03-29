@@ -629,7 +629,8 @@ public class DriveTrain extends SubsystemModule {
 		};
 
 		new SubsystemCommand(this.registeredCommands, "start_vision_path") {
-			int visionStart = Integer.parseInt(this.args[0]);
+			int visionStart;
+			double currentBlobArea;
 			double startOffset;
 			double angularOffset;
 
@@ -648,23 +649,32 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void execute() {
-				if(drivingController.getIterator() + visionStart >= drivingController.getSize()) {
-					angularOffset = limelightTable.getEntry("tx").getDouble(0);
-					angularOffset *= -1;
-					angularOffset += startOffset;
+				double tx = limelightTable.getEntry("tx").getDouble(0);
+
+				if(drivingController.isFinished()) {
+					double power = 0.3 / currentBlobArea;
+					double pivot = tx * 0.05;
+
+					if(power > 0.2)
+						power = 0.2;
+					
+					closedLoopArcade(power * maxVelocity, -pivot);
+				} else if(drivingController.getIterator() + visionStart >= drivingController.getSize()) {
+					angularOffset += -1 * Math.signum(tx);
 
 					/**
 					 * Makes the robot think it is facing angularOffset degrees
 					 * further away from the vision target so that the robot
 					 * corrects its angle to be towards the target
 					 */
-					odometer.setOffset(angularOffset);
+					odometer.setOffset(angularOffset + startOffset);
 				}
 			}
 
 			@Override
 			public boolean isFinished() {
-				return drivingController.isFinished();
+				currentBlobArea = limelightTable.getEntry("ta").getDouble(0);
+				return drivingController.isFinished() && currentBlobArea > Double.parseDouble(this.args[1]);
 			}
 
 			@Override
@@ -676,13 +686,12 @@ public class DriveTrain extends SubsystemModule {
 		};
 
 		new SubsystemCommand(this.registeredCommands, "wait") {
-
 			Timer waitTimer = new Timer();
+
 			@Override
 			public void initialize() {
 				waitTimer.reset();
 				waitTimer.start();
-
 			}
 
 			@Override
@@ -695,8 +704,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-			}
+			public void end() {}
 		};
 
 		new SubsystemCommand(this.registeredCommands, "vision_align"){
@@ -722,14 +730,6 @@ public class DriveTrain extends SubsystemModule {
 					power = -controlsProcessor.getLeftJoystick();
 
 				closedLoopArcade(power*(maxVelocity/2), -pivot);
-
-				// if (tx > 0){
-				// 	System.out.println("Turning Right Pivot: " + pivot);
-				// 	closedLoopTank((power * maxVelocity) + pivot, (power * maxVelocity));
-				// } else if (tx < 0){
-				// 	System.out.println("Turning Left Pivot: " + pivot);
-				// 	closedLoopTank((power * maxVelocity), (power * maxVelocity) - pivot);
-				// }
 			}
 
 			@Override
@@ -801,16 +801,13 @@ public class DriveTrain extends SubsystemModule {
 				if (counter > 10) {
 					isAboveMax = currentBlobArea > maxBlobArea;
 				}
-//				System.out.println("RUNNING VISION ALIGN POWER : " + power + " IS ABOVE MAX? : " + isAboveMax);
-
-
+				// System.out.println("RUNNING VISION ALIGN POWER : " + power + " IS ABOVE MAX? : " + isAboveMax);
 			}
 
 			@Override
 			public boolean isFinished() {
-
 				// System.out.println("Boolean : " + (currentBlobArea > maxBlobArea));
-					return ((System.nanoTime() - startingTime) > 2e9) || isAboveMax;
+				return ((System.nanoTime() - startingTime) > 2e9) || isAboveMax;
 			}
 
 			@Override
@@ -858,7 +855,5 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void end() {}
 		};
-
 	}
-
 }
