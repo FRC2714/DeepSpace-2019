@@ -6,7 +6,7 @@ public abstract class DrivingController {
 
 	/**
 	 * Controls the magnitude of angular correction
-	 * Corrects both the anglular and perpendicular error
+	 * Corrects both the angular and perpendicular error
 	 */
 	// Samson control was originally at 0.25 * 0.6
 	private PID samsonControl = new PID(0.06, 0.0001, 0.0);
@@ -131,16 +131,10 @@ public abstract class DrivingController {
 		System.out.println("Forwards : " + forwards);
 	
 		controlPath.addAll(nextSpline.getSpline());
-
-		// for (MotionPose i : controlPath) {
-		// 	System.out.println("Velocity: " + i.velocity);
-		// }
-
 	}
 
 	public double getAngleValues(){
 		return currentAngle;
-		
 	}
 
 	/**
@@ -152,6 +146,10 @@ public abstract class DrivingController {
 
 	public int getIterator() {
 		return iterator;
+	}
+
+	public int getSize() {
+		return controlPath.size();
 	}
 
 	public void clearControlPath(){
