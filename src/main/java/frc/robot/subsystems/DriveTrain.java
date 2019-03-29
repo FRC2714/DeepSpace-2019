@@ -660,7 +660,7 @@ public class DriveTrain extends SubsystemModule {
 					
 					closedLoopArcade(power * maxVelocity, -pivot);
 				} else if(drivingController.getIterator() + visionStart >= drivingController.getSize()) {
-					angularOffset += -1 * Math.signum(tx);
+					angularOffset -= Math.signum(tx);
 
 					/**
 					 * Makes the robot think it is facing angularOffset degrees
