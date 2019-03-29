@@ -354,8 +354,8 @@ public class Arm extends SubsystemModule {
 			double shoulderAngle;
 			double wristAngle;
 
-			long currentPeriod;
-			long finalPeriod;
+			int currentPeriod;
+			int finalPeriod;
 
 			@Override
 			public void initialize() {
@@ -363,8 +363,10 @@ public class Arm extends SubsystemModule {
 				wristAngle = Double.parseDouble(this.args[1]);
 
 				currentPeriod = 0;
-				finalPeriod = Math.round((Double.parseDouble(this.args[2]) / controlsProcessor.getCommandPeriod()));
+				finalPeriod = (int)(Double.parseDouble(this.args[2]) / controlsProcessor.getCommandPeriod());
 
+				System.out.println("Final Period: " + finalPeriod);
+				
 				goToPosition(shoulderAngle, wristAngle);
 			}
 
@@ -433,7 +435,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return System.nanoTime() - timer >= 0.25e9;
+				return System.nanoTime() - timer >= 0.5 * 1e9;
 			}
 
 			@Override

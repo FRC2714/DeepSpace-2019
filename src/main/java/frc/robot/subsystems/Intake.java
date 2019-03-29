@@ -42,7 +42,7 @@ public class Intake extends SubsystemModule {
 
 	// Number of current values stored
 	private final int numberOfCargoCurrents = 50;
-	private final int numberOfPumpCurrents = 100;
+	private final int numberOfPumpCurrents = 20;
 
 	// Intake States - Public so Arm can access the states for state-based logic
 	private boolean cargoState;
