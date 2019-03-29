@@ -3,13 +3,13 @@ package frc.robot.autontasks;
 import frc.robot.util.AutonTask;
 import frc.robot.util.ControlsProcessor;
 
-public class LeftCargoHabTwoAuton extends AutonTask {
+public class LeftCargo extends AutonTask {
 	/**
 	 * Accepts the object of the running controlsProcessor to modify
 	 *
 	 * @param controlsProcessor
 	 */
-	public LeftCargoHabTwoAuton(ControlsProcessor controlsProcessor) {
+	public LeftCargo(ControlsProcessor controlsProcessor) {
 		super(controlsProcessor);
 
 		queueTask("valve_off -p");
