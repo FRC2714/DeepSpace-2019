@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import javax.sound.midi.Soundbank;
+
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
@@ -630,13 +632,12 @@ public class DriveTrain extends SubsystemModule {
 
 		new SubsystemCommand(this.registeredCommands, "start_vision_path") {
 			int visionStart;
-			double currentBlobArea;
 			double startOffset;
-			double angularOffset;
 
 			@Override
 			public void initialize() {
-				visionStart = Integer.parseInt(this.args[0]);
+				visionStart = (int)(Double.parseDouble(this.args[0]) / controlsProcessor.getControlsPeriod());
+				System.out.println("Vision Start: " + visionStart);
 				startOffset = odometer.getOffset();
 
 				limelightTable.getEntry("ledMode").setNumber(3);
@@ -644,42 +645,21 @@ public class DriveTrain extends SubsystemModule {
 
 				drivingController.startNextPath();
 				enable();
-				System.out.println("Vision path started");
 			}
 
 			@Override
 			public void execute() {
-				double tx = limelightTable.getEntry("tx").getDouble(0);
-
-				if(drivingController.isFinished()) {
-					// double magnitude = 0.3 / currentBlobArea;
-					// double pivot = tx * 0.05;
-
-					// if(magnitude > 0.2)
-					// magnitude = 0.2;
+				if(drivingController.getIterator() + visionStart >= drivingController.getSize()) {
+					double angularOffset = limelightTable.getEntry("tx").getDouble(0) * 0.75;
 					
-					// closedLoopArcade(magnitude * maxVelocity, -pivot);
-				} else if(drivingController.getIterator() + visionStart >= drivingController.getSize()) {
-					double output = Math.signum(tx);
 					drivingController.disableTangentialCorrection();
-
-					if(Math.signum(angularOffset) != output)
-						angularOffset = output * 0.4;
-					else
-						angularOffset += Math.signum(tx) * 0.1;
-
-					/**
-					 * Makes the robot think it is facing angularOffset degrees
-					 * further away from the vision target so that the robot
-					 * corrects its angle to be towards the target
-					 */
 					odometer.setOffset(angularOffset + startOffset);
 				}
 			}
 
 			@Override
 			public boolean isFinished() {
-				return drivingController.isFinished();
+				return limelightTable.getEntry("ta").getDouble(0) > Double.parseDouble(this.args[1]);
 			}
 
 			@Override
