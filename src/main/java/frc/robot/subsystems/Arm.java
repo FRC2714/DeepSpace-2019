@@ -27,11 +27,15 @@ public class Arm extends SubsystemModule {
 	private CANPIDController shoulderPID;
 	private CANPIDController wristPID;
 
+	// ControlsProcessor
+	private ControlsProcessor controlsProcessor;
+
 	// Arm initialization
 	public Arm(ControlsProcessor controlsProcessor) {
 		intake = new Intake();
 
 		controlsProcessor.registerController("Intake", intake);
+		this.controlsProcessor = controlsProcessor;
 		registerCommands();
 
 		// Enable voltage compensation for arm motors
@@ -75,12 +79,7 @@ public class Arm extends SubsystemModule {
 	}
 
 	public boolean atPosition(double leadscrewLength) {
-		if(Math.abs(shoulderEncoder.getPosition() - leadscrewLength) < 0.1) {
-			System.out.println("Shoulder Length: " + shoulderEncoder.getPosition());
-			return true;
-		}
-		return false;
-//		return Math.abs(shoulderEncoder.getPosition() - leadscrewLength) < 0.1;
+		return Math.abs(shoulderEncoder.getPosition() - leadscrewLength) < 0.1;
 	}
 
 	@Override
@@ -355,22 +354,29 @@ public class Arm extends SubsystemModule {
 			double shoulderAngle;
 			double wristAngle;
 
-			long endTime;
+			long currentPeriod;
+			long finalPeriod;
 
 			@Override
 			public void initialize() {
 				shoulderAngle = Double.parseDouble(this.args[0]);
 				wristAngle = Double.parseDouble(this.args[1]);
 
-				endTime = (long)(Double.parseDouble(this.args[2]) * 1e9) + System.nanoTime();
-
-				while(System.nanoTime() < endTime);
+				currentPeriod = 0;
+				finalPeriod = Math.round((Double.parseDouble(this.args[2]) / controlsProcessor.getCommandPeriod()));
 
 				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void execute() {}
+			public void execute() {
+				if(currentPeriod == finalPeriod) {
+					goToPosition(shoulderAngle, wristAngle);
+					currentPeriod++;
+				} else {
+					currentPeriod++;
+				}
+			}
 
 			@Override
 			public boolean isFinished() {
