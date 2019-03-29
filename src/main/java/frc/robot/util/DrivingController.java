@@ -28,8 +28,8 @@ public abstract class DrivingController {
 	/**
 	 * Populates an array list from the SplineFactory
 	 */
-	private ArrayList<MotionPose> nextPath = new ArrayList<MotionPose>(); 
-	private ArrayList<MotionPose> currentPath = new ArrayList<MotionPose>();
+	private ArrayList<MotionPose> currentPath = new ArrayList<MotionPose>(0);
+	private ArrayList<MotionPose> nextPath = new ArrayList<MotionPose>(0); 
 	private int iterator = 0;
 
 	protected double currentX;
@@ -50,7 +50,7 @@ public abstract class DrivingController {
 	 */
 	public DrivingController(double period) {
 		this.period = period;
-
+		
 		this.samsonControl.setMaxIOutput(0.15);
 	}
 
@@ -59,8 +59,6 @@ public abstract class DrivingController {
 	 * Run function for Driving Controller uses distance and angle controllers
 	 */
 	public void run() {
-		// Test
-		// System.out.println(System.nanoTime());
 
 		// Update using abstracted functions from the calling class
 		updateVariables();
@@ -68,8 +66,7 @@ public abstract class DrivingController {
 		// Move to the next point in the spline
 		if(iterator < currentPath.size() - 1) {
 			this.iterator++;
-		}
-		else {
+		} else {
 			pathFinished = true;
 		}
 
@@ -90,7 +87,6 @@ public abstract class DrivingController {
 		}
 		
 		double samsonCorrection3 = k3 * angularError;
-
 		double samsonSum = samsonCorrection2 + samsonCorrection3;
 
 		samsonOutput = samsonControl.getOutput(samsonSum, 0);
@@ -100,8 +96,6 @@ public abstract class DrivingController {
 
 		// Both +
 		driveRobot(refVelocity + tangentialOutput, samsonOutput);
-		// System.out.println(samsonOutput);
-
 	}
 
 	// Abstract functions to move and get position of the robot
@@ -142,7 +136,7 @@ public abstract class DrivingController {
 	 * Move to next motion pose in the sequence
 	 */
 	public void next() {
-		if(iterator < currentPath.size()) { this.iterator++; }
+		if(iterator < currentPath.size() - 1) { this.iterator++; }
 	}
 
 	public int getIterator() {
@@ -162,9 +156,21 @@ public abstract class DrivingController {
 	}
 
 	public void startNextPath() {
-		currentPath = nextPath;
+		currentPath.clear();
+		currentPath.addAll(nextPath);
+		
 		nextPath.clear();
+
+		iterator = 0;
 		setIsFinished(false);
+	}
+
+	public void disableTangentialCorrection() {
+		tangentialControl.setP(0);
+	}
+
+	public void enableTangentialCorrection() {
+		tangentialControl.setP(0.4);
 	}
 
 	/**

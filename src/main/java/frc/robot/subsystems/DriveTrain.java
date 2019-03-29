@@ -652,15 +652,21 @@ public class DriveTrain extends SubsystemModule {
 				double tx = limelightTable.getEntry("tx").getDouble(0);
 
 				if(drivingController.isFinished()) {
-					double magnitude = 0.3 / currentBlobArea;
-					double pivot = tx * 0.05;
+					// double magnitude = 0.3 / currentBlobArea;
+					// double pivot = tx * 0.05;
 
-					if(magnitude > 0.2)
-					magnitude = 0.2;
+					// if(magnitude > 0.2)
+					// magnitude = 0.2;
 					
-					closedLoopArcade(magnitude * maxVelocity, -pivot);
+					// closedLoopArcade(magnitude * maxVelocity, -pivot);
 				} else if(drivingController.getIterator() + visionStart >= drivingController.getSize()) {
-					angularOffset += Math.signum(tx);
+					double output = Math.signum(tx);
+					drivingController.disableTangentialCorrection();
+
+					if(Math.signum(angularOffset) != output)
+						angularOffset = output * 0.4;
+					else
+						angularOffset += Math.signum(tx) * 0.1;
 
 					/**
 					 * Makes the robot think it is facing angularOffset degrees
@@ -673,12 +679,12 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				currentBlobArea = limelightTable.getEntry("ta").getDouble(0);
-				return drivingController.isFinished() && currentBlobArea > Double.parseDouble(this.args[1]);
+				return drivingController.isFinished();
 			}
 
 			@Override
 			public void end() {
+				drivingController.enableTangentialCorrection();
 				disable();
 				closedLoopArcade(0, 0);
 				odometer.setOffset(startOffset);
@@ -704,7 +710,9 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {}
+			public void end() {
+				System.out.println("Timer done");
+			}
 		};
 
 		new SubsystemCommand(this.registeredCommands, "vision_align"){
