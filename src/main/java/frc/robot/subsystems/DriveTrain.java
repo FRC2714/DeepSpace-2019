@@ -606,13 +606,13 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				drivingController.setIsFinished(false);
+				drivingController.startNextPath();
 				enable();
 				System.out.println("starting path");
 			}
 
 			@Override
-			public void execute() { }
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
@@ -642,7 +642,7 @@ public class DriveTrain extends SubsystemModule {
 				limelightTable.getEntry("ledMode").setNumber(3);
 				limelightTable.getEntry("camMode").setNumber(0);
 
-				drivingController.setIsFinished(false);
+				drivingController.startNextPath();
 				enable();
 				System.out.println("Vision path started");
 			}
@@ -660,7 +660,7 @@ public class DriveTrain extends SubsystemModule {
 					
 					closedLoopArcade(magnitude * maxVelocity, -pivot);
 				} else if(drivingController.getIterator() + visionStart >= drivingController.getSize()) {
-					angularOffset -= Math.signum(tx);
+					angularOffset += Math.signum(tx);
 
 					/**
 					 * Makes the robot think it is facing angularOffset degrees

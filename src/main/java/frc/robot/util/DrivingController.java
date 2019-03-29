@@ -28,7 +28,8 @@ public abstract class DrivingController {
 	/**
 	 * Populates an array list from the SplineFactory
 	 */
-	private ArrayList<MotionPose> controlPath = new ArrayList<MotionPose>();
+	private ArrayList<MotionPose> nextPath = new ArrayList<MotionPose>(); 
+	private ArrayList<MotionPose> currentPath = new ArrayList<MotionPose>();
 	private int iterator = 0;
 
 	protected double currentX;
@@ -65,7 +66,7 @@ public abstract class DrivingController {
 		updateVariables();
 
 		// Move to the next point in the spline
-		if(iterator < controlPath.size() - 1) {
+		if(iterator < currentPath.size() - 1) {
 			this.iterator++;
 		}
 		else {
@@ -73,11 +74,11 @@ public abstract class DrivingController {
 		}
 
 		// Use tangential correction and velocity control cascaded to control velocity and position.
-		double orthogonalError = controlPath.get(iterator).getOrthogonalDisplacement(currentX, currentY);
-		double tangentialError = controlPath.get(iterator).getTangentialDisplacement(currentX, currentY);
-		double angularError = controlPath.get(iterator).getAngularDisplacement(currentAngle);
+		double orthogonalError = currentPath.get(iterator).getOrthogonalDisplacement(currentX, currentY);
+		double tangentialError = currentPath.get(iterator).getTangentialDisplacement(currentX, currentY);
+		double angularError = currentPath.get(iterator).getAngularDisplacement(currentAngle);
 
-		double refVelocity = controlPath.get(iterator).velocity;
+		double refVelocity = currentPath.get(iterator).velocity;
 
 		double samsonCorrection2;
 
@@ -130,7 +131,7 @@ public abstract class DrivingController {
 			startVelocity, endVelocity, forwards);
 		System.out.println("Forwards : " + forwards);
 	
-		controlPath.addAll(nextSpline.getSpline());
+		nextPath.addAll(nextSpline.getSpline());
 	}
 
 	public double getAngleValues(){
@@ -141,7 +142,7 @@ public abstract class DrivingController {
 	 * Move to next motion pose in the sequence
 	 */
 	public void next() {
-		if(iterator < controlPath.size()) { this.iterator++; }
+		if(iterator < currentPath.size()) { this.iterator++; }
 	}
 
 	public int getIterator() {
@@ -149,15 +150,21 @@ public abstract class DrivingController {
 	}
 
 	public int getSize() {
-		return controlPath.size();
+		return currentPath.size();
 	}
 
 	public void clearControlPath(){
-		controlPath.clear();
+		currentPath.clear();
 	}
 
 	public ArrayList<MotionPose> getControlPath(){
-		return controlPath;
+		return currentPath;
+	}
+
+	public void startNextPath() {
+		currentPath = nextPath;
+		nextPath.clear();
+		setIsFinished(false);
 	}
 
 	/**
