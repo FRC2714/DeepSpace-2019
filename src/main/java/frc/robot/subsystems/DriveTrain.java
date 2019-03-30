@@ -109,6 +109,8 @@ public class DriveTrain extends SubsystemModule {
 		rMotor0.setSmartCurrentLimit(40);
 		rMotor1.setSmartCurrentLimit(40);
 		rMotor2.setSmartCurrentLimit(40);
+
+		drivingController.clearControlPath();
 	}
 
 	// Instantiate odometer and link in encoders and navX
@@ -192,7 +194,6 @@ public class DriveTrain extends SubsystemModule {
 		rMotor0.set(0);
 
 		disable();
-		drivingController.clearControlPath();
 	}
 
 	/**
@@ -287,6 +288,42 @@ public class DriveTrain extends SubsystemModule {
 
 	public double getMaxVelocity(){
 		return maxVelocity;
+	}
+
+	public void addForwardSpline(double xInitial, double yInitial, double thetaInitial, double lInitial,
+			double xFinal, double yFinal, double thetaFinal, double lFinal, double maxAcceleration,
+			double maxVelocity, double startVelocity, double endVelocity) {
+
+		thetaInitial = Math.toRadians(thetaInitial);
+		thetaFinal = Math.toRadians(thetaFinal);
+
+		double x2 = lInitial * Math.cos(thetaInitial) + xInitial;
+		double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal;
+		double y2 = lInitial * Math.sin(thetaInitial) + yInitial;
+		double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal;
+
+		System.out.println("Forward Spline Generating");
+
+		drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
+				maxAcceleration, maxVelocity, startVelocity, endVelocity, true);
+	}
+
+	public void addBackwardsSpline(double xInitial, double yInitial, double thetaInitial, double lInitial,
+			double xFinal, double yFinal, double thetaFinal, double lFinal, double maxAcceleration,
+			double maxVelocity, double startVelocity, double endVelocity) {
+
+		thetaInitial = Math.toRadians(thetaInitial);
+		thetaFinal = Math.toRadians(thetaFinal);
+
+		double x2 = lInitial * Math.cos(thetaInitial) + xInitial;
+		double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal;
+		double y2 = lInitial * Math.sin(thetaInitial) + yInitial;
+		double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal;
+
+		System.out.println("Backwards Spline Generating");
+
+		drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
+				maxAcceleration, maxVelocity, startVelocity, endVelocity, false);
 	}
 
 	@Override
@@ -428,7 +465,6 @@ public class DriveTrain extends SubsystemModule {
 				getEncoderValues();
 				System.out.println("Heading Angle: " + odometer.getHeadingAngle());
 				System.out.println("X : Y = " + odometer.getCurrentX() + " : " + odometer.getCurrentY());
-				// System.out.println(navX.getYaw());
 			}
 
 			@Override
@@ -637,8 +673,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void execute() {
-			}
+			public void execute() { }
 
 			@Override
 			public boolean isFinished() {
