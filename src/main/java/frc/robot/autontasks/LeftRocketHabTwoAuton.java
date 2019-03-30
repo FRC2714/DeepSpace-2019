@@ -3,13 +3,13 @@ package frc.robot.autontasks;
 import frc.robot.util.AutonTask;
 import frc.robot.util.ControlsProcessor;
 
-public class LeftRocket extends AutonTask {
+public class LeftRocketHabTwoAuton extends AutonTask {
 	/**
 	 * Accepts the object of the running controlsProcessor to modify
 	 *
 	 * @param controlsProcessor
 	 */
-	public LeftRocket(ControlsProcessor controlsProcessor) {
+	public LeftRocketHabTwoAuton(ControlsProcessor controlsProcessor) {
 		super(controlsProcessor);
 
 		queueTask("set_angular_offset -s -180");
