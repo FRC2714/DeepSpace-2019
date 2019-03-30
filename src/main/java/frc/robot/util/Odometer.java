@@ -80,11 +80,8 @@ public abstract class Odometer {
 	 * @param offset Initial offset
 	 */
 	public void setOffset(double offset) {
-		startOffset = offset;
-	}
 
-	public double getOffset() {
-		return startOffset;
+		startOffset = offset;
 	}
 
 	public double getCurrentX() {
