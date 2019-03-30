@@ -126,7 +126,6 @@ public class Intake extends SubsystemModule {
 				pumpCurrents.remove(pumpCurrents.size() - 1);
 
 				if(Math.abs(pumpAverageCurrent) < Math.abs(pumpStateFirstAvg) - pumpCurrentDiffrence) {
-					pumpMotor.set(0.5);
 					return true;
 				} else {
 					return false;
