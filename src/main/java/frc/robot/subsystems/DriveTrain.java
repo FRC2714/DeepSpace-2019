@@ -895,7 +895,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return Math.abs(odometer.getHeadingAngle() - finalRequestedAngle) < 2;
+				return Math.abs(odometer.getHeadingAngle() - finalRequestedAngle) < 4;
 			}
 
 			@Override

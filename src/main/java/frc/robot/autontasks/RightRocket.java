@@ -26,7 +26,7 @@ public class RightRocket extends AutonTask {
 
 		queueTask("extake -s");
 		queueTask("add_backwards_line -p 6.8,21.14,3.8,24.14,5,5,0,0");
-		queueTask("add_forwards_spline -p 6.8,21.14,300,1,5.5,5,270,6,10,12,0,0");
+		queueTask("add_forwards_spline -p 6.8,21.14,300,1,5.5,5,270,6,7,12,0,0");
 
 		queueTask("start_path -s");
 		queueTask("delayed_to_position -p 3,110,2");
