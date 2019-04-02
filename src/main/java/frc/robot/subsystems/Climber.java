@@ -110,30 +110,6 @@ public class Climber extends SubsystemModule {
 			}
         };
 
-
-        new SubsystemCommand(this.registeredCommands, "climber_test"){
-
-	        @Override
-	        public void initialize() {
-		        climberMotor.set(0.4);
-	        }
-
-	        @Override
-	        public void execute() {
-	        }
-
-	        @Override
-	        public boolean isFinished() {
-		        return false;
-	        }
-
-	        @Override
-	        public void end() {
-		        climberMotor.set(0.0);
-	        }
-        };
-
-
 	    new SubsystemCommand(this.registeredCommands, "valve_off") {
 	    	double initTime;
 		    @Override
