@@ -239,7 +239,7 @@ public class Arm extends SubsystemModule {
 					shoulderAngle = 6;
 					wristAngle = 205;
 				} else {
-					shoulderAngle = 0.8;
+					shoulderAngle = 0.6;
 					wristAngle = 86;
 				}
 
