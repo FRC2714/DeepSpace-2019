@@ -27,19 +27,23 @@ public class Arm extends SubsystemModule {
 	private CANPIDController shoulderPID;
 	private CANPIDController wristPID;
 
+	// ControlsProcessor
+	private ControlsProcessor controlsProcessor;
+
 	// Arm initialization
 	public Arm(ControlsProcessor controlsProcessor) {
 		intake = new Intake();
 
 		controlsProcessor.registerController("Intake", intake);
+		this.controlsProcessor = controlsProcessor;
 		registerCommands();
 
 		// Enable voltage compensation for arm motors
 		shoulderMotor.enableVoltageCompensation(12.0);
 		wristMotor.enableVoltageCompensation(12.0);
 
-		shoulderMotor.setSmartCurrentLimit(60);
-		wristMotor.setSmartCurrentLimit(60);
+		shoulderMotor.setSmartCurrentLimit(80);
+		wristMotor.setSmartCurrentLimit(80);
 
 		// Set SparkMax CAN periods
 		shoulderMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
@@ -57,7 +61,7 @@ public class Arm extends SubsystemModule {
 		shoulderPID.setP(0.6);
 		shoulderPID.setI(0.00007);
 
-		wristPID.setP(0.2);
+		wristPID.setP(0.1);
 
 		// Converts motor rotations to degrees
 		shoulderEncoder.setPositionConversionFactor(1.0/7);
@@ -75,12 +79,7 @@ public class Arm extends SubsystemModule {
 	}
 
 	public boolean atPosition(double leadscrewLength) {
-		if(Math.abs(shoulderEncoder.getPosition() - leadscrewLength) < 0.1) {
-			System.out.println("Shoulder Length: " + shoulderEncoder.getPosition());
-			return true;
-		}
-		return false;
-//		return Math.abs(shoulderEncoder.getPosition() - leadscrewLength) < 0.1;
+		return Math.abs(shoulderEncoder.getPosition() - leadscrewLength) < 0.1;
 	}
 
 	@Override
@@ -99,7 +98,7 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void execute() {
 				position += 0.05;
-				goToPosition(position, wristEncoder.getPosition()); //Shoulder previously +3.5
+				goToPosition(position, wristEncoder.getPosition());
 			}
 
 			@Override
@@ -108,10 +107,7 @@ public class Arm extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-				System.out.println("Shoulder Length: " + shoulderEncoder.getPosition());
-				System.out.println("Wrist Angle: " + wristEncoder.getPosition());
-			}
+			public void end() {}
 		};
 
 		new SubsystemCommand(this.registeredCommands, "jog_down") {
@@ -125,7 +121,7 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void execute() {
 				position -= 0.05;
-				goToPosition(position, wristEncoder.getPosition()); //Shoulder previously +3.5
+				goToPosition(position, wristEncoder.getPosition());
 			}
 
 			@Override
@@ -134,10 +130,7 @@ public class Arm extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-				System.out.println("Shoulder Length: " + shoulderEncoder.getPosition());
-				System.out.println("Wrist Angle: " + wristEncoder.getPosition());
-			}
+			public void end() {}
 		};
 
 		new SubsystemCommand(this.registeredCommands, "start_position") {
@@ -246,7 +239,7 @@ public class Arm extends SubsystemModule {
 					shoulderAngle = 6;
 					wristAngle = 205;
 				} else {
-					shoulderAngle = 0.3;
+					shoulderAngle = 0.6;
 					wristAngle = 86;
 				}
 
@@ -322,10 +315,7 @@ public class Arm extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-				// System.out.println("Upper Score isFinished? : " + atPosition(shoulderAngle) );
-
-			}
+			public void end() {}
 		};
 
 		new SubsystemCommand(this.registeredCommands, "flex_score") {
@@ -340,7 +330,7 @@ public class Arm extends SubsystemModule {
 					shoulderAngle = 9;
 					wristAngle = 285;
 				} else {
-					shoulderAngle = 13;
+					shoulderAngle = 13.4;
 					wristAngle = 65;
 				}
 
@@ -354,6 +344,45 @@ public class Arm extends SubsystemModule {
 			@Override
 			public boolean isFinished() {
 				return System.nanoTime() - startTime > 1e9;
+			}
+
+			@Override
+			public void end() {}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "delayed_to_position") {
+			double shoulderAngle;
+			double wristAngle;
+
+			int currentPeriod;
+			int finalPeriod;
+
+			@Override
+			public void initialize() {
+				shoulderAngle = Double.parseDouble(this.args[0]);
+				wristAngle = Double.parseDouble(this.args[1]);
+
+				currentPeriod = 0;
+				finalPeriod = (int)(Double.parseDouble(this.args[2]) / controlsProcessor.getCommandPeriod());
+
+				System.out.println("Final Period: " + finalPeriod);
+
+			}
+
+			@Override
+			public void execute() {
+				if(currentPeriod == finalPeriod) {
+//					System.out.println("Current Period: " + currentPeriod);
+					goToPosition(shoulderAngle, wristAngle);
+					currentPeriod++;
+				} else {
+					currentPeriod++;
+				}
+			}
+
+			@Override
+			public boolean isFinished() {
+				return atPosition(shoulderAngle);
 			}
 
 			@Override
@@ -390,7 +419,7 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void initialize() {
 				timer = System.nanoTime();
-				
+
 				intake.pumpMotor.set(0);
 
 				if(!intake.getHatchState())
@@ -406,7 +435,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return System.nanoTime() - timer >= 0.25e9;
+				return System.nanoTime() - timer >= 0.75 * 1e9;
 			}
 
 			@Override

@@ -4,6 +4,7 @@ import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
@@ -13,6 +14,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotMap;
 import frc.robot.util.*;
 
@@ -315,10 +317,10 @@ public class DriveTrain extends SubsystemModule {
 		thetaInitial = Math.toRadians(thetaInitial);
 		thetaFinal = Math.toRadians(thetaFinal);
 
-		double x2 = lInitial * Math.cos(thetaInitial) + xInitial;
-		double x3 = lFinal * Math.cos(thetaFinal + Math.PI) + xFinal;
-		double y2 = lInitial * Math.sin(thetaInitial) + yInitial;
-		double y3 = lFinal * Math.sin(thetaFinal + Math.PI) + yFinal;
+		double x2 = lInitial * Math.cos(thetaInitial + Math.PI) + xInitial;
+		double x3 = lFinal * Math.cos(thetaFinal) + xFinal;
+		double y2 = lInitial * Math.sin(thetaInitial + Math.PI) + yInitial;
+		double y3 = lFinal * Math.sin(thetaFinal) + yFinal;
 
 		System.out.println("Backwards Spline Generating");
 
@@ -663,17 +665,51 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
+		new SubsystemCommand(this.registeredCommands, "add_backwards_line") {
+
+			@Override
+			public void initialize() {
+				System.out.println("Position Starting backwards line = " + "(" + odometer.getCurrentX()
+						+ ", " + odometer.getCurrentY() + ")");
+
+				double xInitial = Double.parseDouble(this.args[0]);
+				double yInitial = Double.parseDouble(this.args[1]);
+				double xFinal = Double.parseDouble(this.args[2]);
+				double yFinal = Double.parseDouble(this.args[3]);
+
+				drivingController.addSpline(xInitial, xInitial, xFinal, xFinal, yInitial, yInitial, yFinal, yFinal,
+						Double.parseDouble(this.args[4]), Double.parseDouble(this.args[5]),
+						Double.parseDouble(this.args[6]), Double.parseDouble(this.args[7]), false);
+
+			}
+
+			@Override
+			public void execute() { }
+
+			@Override
+			public boolean isFinished() {
+				return true;
+			}
+
+			@Override
+			public void end() {
+			}
+		};
+
 		new SubsystemCommand(this.registeredCommands, "start_path") {
 
 			@Override
 			public void initialize() {
 				drivingController.setIsFinished(false);
-				enable();
+				 enable();
 				System.out.println("starting path");
+//				System.out.println(drivingController.getControlPath());
 			}
 
 			@Override
-			public void execute() { }
+			public void execute() {
+
+			 }
 
 			@Override
 			public boolean isFinished() {
@@ -685,6 +721,34 @@ public class DriveTrain extends SubsystemModule {
 			public void end() {
 				disable();
 				closedLoopArcade(0, 0);
+				System.out.println("x : y" + odometer.getCurrentX() + " : " + odometer.getCurrentY() + "Final Heading : " + odometer.getHeadingAngle());
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "start_endless_path") {
+
+			@Override
+			public void initialize() {
+				drivingController.setIsFinished(false);
+				enable();
+				System.out.println("starting path");
+//				System.out.println(drivingController.getControlPath());
+			}
+
+			@Override
+			public void execute() {
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				// System.out.println("driving controller finished? " + ":" + drivingController.isFinished());
+				return drivingController.isFinished();
+			}
+
+			@Override
+			public void end() {
+				disable();
 				System.out.println("x : y" + odometer.getCurrentX() + " : " + odometer.getCurrentY() + "Final Heading : " + odometer.getHeadingAngle());
 			}
 		};
@@ -761,6 +825,88 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
+		new SubsystemCommand(this.registeredCommands, "turn_to_angle"){
+			double requestedDelta;
+			double finalRequestedAngle;
+
+			PID headingController = new PID(0.01, 0, 0, 0);
+
+			@Override
+			public void initialize() {
+				try{
+					requestedDelta = Double.parseDouble(this.args[0]);
+				} catch(Exception foo) {
+					System.out.println("Oof, forgot to enter an argument?");
+				}
+				finalRequestedAngle = odometer.getHeadingAngle() + requestedDelta;
+				System.out.println("NavX Turn to Angle Command Aim:- " + finalRequestedAngle);
+				headingController.setOutputLimits(-0.6, 0.6);
+				headingController.setSetpoint(finalRequestedAngle);
+			}
+
+			@Override
+			public void execute() {
+				double errorCorrection = headingController.getOutput(odometer.getHeadingAngle());
+				SmartDashboard.putNumber("Error in Heading = " , (Math.abs(odometer.getHeadingAngle() - finalRequestedAngle)));
+				SmartDashboard.putNumber("Error Correction", errorCorrection);
+				lMotor0.set(-errorCorrection);
+				rMotor0.set(-errorCorrection);
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {
+				closedLoopArcade(0,0);
+				
+				System.out.println("Finished turn to angle, expected angle was " + finalRequestedAngle +
+						" and your actual angle was " + odometer.getHeadingAngle() +
+						". Error of " + (Math.abs(odometer.getHeadingAngle() - finalRequestedAngle)));
+				System.out.println("Final turn to angle X: " + odometer.getCurrentX() + " Y: " + odometer.getCurrentY());
+			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "turn_to_angle_setpoint"){
+			double finalRequestedAngle;
+
+			PID headingController = new PID(0.01, 0, 0, 0);
+
+			@Override
+			public void initialize() {
+				finalRequestedAngle = Double.parseDouble(this.args[0]);
+				System.out.println("NavX Turn to Angle Command Aim:- " + finalRequestedAngle);
+				headingController.setOutputLimits(-0.6, 0.6);
+				headingController.setSetpoint(finalRequestedAngle);
+			}
+
+			@Override
+			public void execute() {
+				double errorCorrection = headingController.getOutput(odometer.getHeadingAngle());
+				SmartDashboard.putNumber("Error in Heading = " , (Math.abs(odometer.getHeadingAngle() - finalRequestedAngle)));
+				SmartDashboard.putNumber("Error Correction", errorCorrection);
+				lMotor0.set(-errorCorrection);
+				rMotor0.set(-errorCorrection);
+
+			}
+
+			@Override
+			public boolean isFinished() {
+				return Math.abs(odometer.getHeadingAngle() - finalRequestedAngle) < 4;
+			}
+
+			@Override
+			public void end() {
+				closedLoopArcade(0,0);
+
+				System.out.println("Finished turn to angle, expected angle was " + finalRequestedAngle +
+						" and your actual angle was " + odometer.getHeadingAngle() +
+						". Error of " + (Math.abs(odometer.getHeadingAngle() - finalRequestedAngle)));
+			}
+		};
 
 		new SubsystemCommand(this.registeredCommands, "auton_vision_align"){
 			double counter;
@@ -837,6 +983,34 @@ public class DriveTrain extends SubsystemModule {
 				System.out.println("VISION ALIGN FINAL POSITIONS x: " + odometer.getCurrentX() + " y: " + odometer.getCurrentY() + " thetaF: " + odometer.getHeadingAngle() + " COUNTER = " + counter);
 			}
 		};
+
+		new SubsystemCommand(this.registeredCommands, "target_align"){
+			double tx;
+
+			@Override
+			public void initialize() {
+
+			}
+
+			@Override
+			public void execute() {
+				double tx = limelightTable.getEntry("tx").getDouble(0);
+				double kP = 0.05;
+				double pivot = tx * kP;
+				closedLoopArcade(0,-pivot);
+			}
+
+			@Override
+			public boolean isFinished() {
+				return tx < 2;
+			}
+
+			@Override
+			public void end() {
+				closedLoopTank(0,0);
+			}
+		};
+
 
 		new SubsystemCommand(this.registeredCommands, "set_current_position") {
 			@Override

@@ -3,9 +3,9 @@ package frc.robot.autontasks;
 import frc.robot.util.AutonTask;
 import frc.robot.util.ControlsProcessor;
 
-public class LeftCargoHatchAuton extends AutonTask {
+public class LeftCargo extends AutonTask {
 
-    public LeftCargoHatchAuton(ControlsProcessor controlsProcessor) {
+    public LeftCargo(ControlsProcessor controlsProcessor) {
         super(controlsProcessor);
         
         //Two splines
