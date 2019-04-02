@@ -133,8 +133,6 @@ public class Robot extends TimedRobot {
 				append("cancel_all -p", this.launchpad.getButtonInstance(8, 0));
 
 				append("hatch_intake -p", this.a);
-
-
 			}
 		};
 
@@ -160,8 +158,9 @@ public class Robot extends TimedRobot {
 						drivetrain.addForwardSpline(0,0,90,10,-3.25,23,10,6,3,12,0,0);
 						break;
 					case ROCKET:
-						drivetrain.addBackwardsSpline(0,0,270,7,-4.75,18,270,7,12,10,0,8);
-						drivetrain.addBackwardsSpline(-4.75,18,270,1,-4.5,24.5,236,2,12,8,8,0);
+//			
+						drivetrain.addBackwardsSpline(0,0,270,7,5.5,25,270,5,6,12,0,0);
+
 						break;
 					case TEST:
 						drivetrain.addForwardSpline(0,0,90,2,0,8,90,2,10,5,0,0);
@@ -175,7 +174,7 @@ public class Robot extends TimedRobot {
 						break;
 					case ROCKET:
 						System.out.println("GENERATING RIGHT ROCKET SPLINE");
-						drivetrain.addBackwardsSpline(0,0,270,7,4.5,22.7,270,5,6,12,0,0);
+						drivetrain.addBackwardsSpline(0,0,270,7,5.5,25,270,5,6,12,0,0);
 						break;
 					case TEST:
 						System.out.println("GENERATING RIGHT TEST SPLINE ");

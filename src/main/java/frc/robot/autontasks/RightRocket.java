@@ -19,22 +19,29 @@ public class RightRocket extends AutonTask {
 		queueTask("start_path -s");
 		queueTask("delayed_to_position -p 5,100,1.5");
 
-		queueTask("turn_to_angle_setpoint -s 290");
+		queueTask("turn_to_angle_setpoint -s 300");
 
-		queueTask("auton_vision_align -s 3.4");
+		queueTask("auton_vision_align -s 4");
 		queueTask("upper_score -p");
 
 		queueTask("extake -s");
-		queueTask("add_backwards_line -p 6.8,21.14,3.8,24.14,5,5,0,0");
-		queueTask("add_forwards_spline -p 6.8,21.14,300,1,5.5,5,270,6,7,12,0,0");
+		queueTask("add_backwards_line -p 7.2,21.4,4.2,24.4,5,5,0,0");
 
 		queueTask("start_path -s");
-		queueTask("delayed_to_position -p 3,110,2");
+
+		queueTask("turn_to_angle_setpoint -s 270");
+		queueTask("add_forwards_spline -p 4.2,24.4,270,1,6.5,5,270,6,7,12,0,0");
+
+		queueTask("set_current_position -s 4.2,24.4");
+
+		queueTask("start_path -s");
+
+		queueTask("delayed_to_position -p 0.8,86,2");
 
 //		queueTask("turn_to_angle_setpoint -s 270")
 
 		queueTask("hatch_station_intake -s");
-		queueTask("auton_vision_align -p 1.8");  // Old: 3.5
+		queueTask("auton_vision_align -p 2.4");  // Old: 3.5
 //		queueTask("add_backwards_spline -p 6,0,270,4,7.75,15.35,240,4,10,12,0,0");
 //
 //		queueTask("start_path -s");

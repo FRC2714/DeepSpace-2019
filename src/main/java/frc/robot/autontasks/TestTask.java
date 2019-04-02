@@ -10,7 +10,10 @@ public class TestTask extends AutonTask {
 		super(controlsProcessor);
 
 //		queueTask("straight_back -s");
-		queueTask("delayed_to_position -p 6.8,192,2");
+//		queueTask("delayed_to_position -p 6.8,192,2");
+//		queueTask("delayed_to_position -p 5,100,1.5");
+		queueTask("delayed_to_position -s 5,100,1.5");
+		queueTask("upper_score -s");
 
 //		queueTask("start_path -s");
 //		queueTask("add_backwards_spline -s 0,5,270,2,0,10,270,2,5,5,0,0");

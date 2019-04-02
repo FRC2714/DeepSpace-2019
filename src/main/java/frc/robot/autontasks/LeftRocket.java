@@ -12,28 +12,36 @@ public class LeftRocket extends AutonTask {
 	public LeftRocket(ControlsProcessor controlsProcessor) {
 		super(controlsProcessor);
 
-		queueTask("set_angular_offset -s -180");
 
+		queueTask("set_angular_offset -s -180");
 		queueTask("hatch_intake -p");
 		queueTask("hatch_true -p");
-		// queueTask("add_backwards_spline -s 0,0,270,7,-4.75,18,270,7,12,10,0,8");
-		// queueTask("add_backwards_spline -s -4.75,18,270,1,-4.5,24.5,236,2,12,8,8,0");
+
 		queueTask("start_path -s");
-		queueTask("upper_score -s");
-		queueTask("auton_vision_align -s 4.9");
+		queueTask("delayed_to_position -p 5,100,1.5");
+
+		queueTask("turn_to_angle_setpoint -s 300");
+
+		queueTask("auton_vision_align -s 4");
+		queueTask("upper_score -p");
+
 		queueTask("extake -s");
-		queueTask("set_current_position -s -7.2,16.5");
-		// queueTask("add_backwards_spline -s -7.2,16.5,242,1,-4.5,19.5,270,1,10,8,0,0");
-		queueTask("add_backwards_spline -s -7.2,16.5,242,1,-3.5,18.5,270,1,5,5,0,0");
+		queueTask("add_backwards_line -p 7.2,21.4,4.2,24.4,5,5,0,0");
+
 		queueTask("start_path -s");
-		queueTask("station_position -s");
 
+		queueTask("turn_to_angle_setpoint -s 270");
+		queueTask("add_forwards_spline -p 4.2,24.4,270,1,6.5,5,270,6,7,12,0,0");
 
-		// queueTask("start_path -s");
-		// queueTask("add_forwards_spline -s 4,19.7,270,2,7.1,-2,268,4,14,12,0,0");
-		// queueTask("start_path -s");
-		// queueTask("auton_vision_align -s");
-		// queueTask("add_backwards_spline -s 7.3,-4.5,268,2,8.3,10.5,240,3,10,8,0,0");
-		// queueTask("start_path -s");
+		queueTask("set_current_position -s 4.2,24.4");
+
+		queueTask("start_path -s");
+
+		queueTask("delayed_to_position -p 0.8,86,2");
+
+//		queueTask("turn_to_angle_setpoint -s 270")
+
+		queueTask("hatch_station_intake -s");
+		queueTask("auton_vision_align -p 2.4");  // Old: 3.5
 	}
 }
