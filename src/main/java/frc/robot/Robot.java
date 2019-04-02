@@ -39,7 +39,7 @@ public class Robot extends TimedRobot {
 	// Init and Periodic functions
 	@Override
 	public void robotInit() {
-		auton_side = Auton_Side.RIGHT;
+		auton_side = Auton_Side.LEFT;
 		auton_mode = Auton_Mode.ROCKET;
 
 		// Controls processor only gets created ONCE when code is run
@@ -158,9 +158,7 @@ public class Robot extends TimedRobot {
 						drivetrain.addForwardSpline(0,0,90,10,-3.25,23,10,6,3,12,0,0);
 						break;
 					case ROCKET:
-//			
-						drivetrain.addBackwardsSpline(0,0,270,7,5.5,25,270,5,6,12,0,0);
-
+						drivetrain.addBackwardsSpline(0,0,270,7,-4.5,25,270,5,6,12,0,0);
 						break;
 					case TEST:
 						drivetrain.addForwardSpline(0,0,90,2,0,8,90,2,10,5,0,0);

@@ -669,6 +669,8 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void initialize() {
+				System.out.println("Position Starting backwards line = " + "(" + odometer.getCurrentX()
+						+ ", " + odometer.getCurrentY() + ")");
 
 				double xInitial = Double.parseDouble(this.args[0]);
 				double yInitial = Double.parseDouble(this.args[1]);
@@ -682,9 +684,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void execute() {
-
-			}
+			public void execute() { }
 
 			@Override
 			public boolean isFinished() {
