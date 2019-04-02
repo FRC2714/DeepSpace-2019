@@ -908,30 +908,6 @@ public class DriveTrain extends SubsystemModule {
 			}
 		};
 
-		new SubsystemCommand(this.registeredCommands, "straight_back"){
-			long startTime;
-
-			@Override
-			public void initialize() {
-				startTime = System.nanoTime();
-				closedLoopTank(-4, -4);
-			}
-
-			@Override
-			public void execute() { }
-
-			@Override
-			public boolean isFinished() {
-				return (System.nanoTime() - startTime) > 0.5 * 1e9;
-			}
-
-			@Override
-			public void end() {
-				closedLoopTank(0, 0);
-				System.out.println("ENDED STRAIGHT BACK SET TO 0");
-			}
-		};
-
 		new SubsystemCommand(this.registeredCommands, "auton_vision_align"){
 			double counter;
 			boolean isAboveMax = false;
