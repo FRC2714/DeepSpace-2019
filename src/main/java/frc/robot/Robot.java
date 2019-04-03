@@ -40,7 +40,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		auton_side = Auton_Side.LEFT;
-		auton_mode = Auton_Mode.ROCKET;
+		auton_mode = Auton_Mode.CARGO;
 
 		// Controls processor only gets created ONCE when code is run
 		controlsProcessor = new ControlsProcessor(10000000, 2) {
@@ -155,7 +155,10 @@ public class Robot extends TimedRobot {
 			case LEFT:
 				switch (auton_mode){
 					case CARGO:
-						drivetrain.addForwardSpline(0,0,90,10,-3.25,23,10,6,3,12,0,0);
+						NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(2);
+//						drivetrain.addForwardSpline(0,0,90,10,-3.25,23,10,6,3,12,0,0);
+						drivetrain.addBackwardsSpline(0, 0, 270, 7, -6,19.9,0, 4,6,12,0,0);
+
 						break;
 					case ROCKET:
 						drivetrain.addBackwardsSpline(0,0,270,7,-4.5,25,270,5,6,12,0,0);
@@ -168,7 +171,9 @@ public class Robot extends TimedRobot {
 			case RIGHT:
 				switch (auton_mode){
 					case CARGO:
-						drivetrain.addForwardSpline(0,0,90,10,3.25,23,170,6,3,12,0,0);
+						NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
+//						drivetrain.addForwardSpline(0,0,90,10,3.25,23,170,6,3,12,0,0);
+						drivetrain.addBackwardsSpline(0, 0, 270, 7, 6,19.9,180, 4,6,12,0,0);
 						break;
 					case ROCKET:
 						System.out.println("GENERATING RIGHT ROCKET SPLINE");
@@ -287,6 +292,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void teleopInit() {
+		NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
 		NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(1);
 		NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
 		if (autonomousCommand != null)
