@@ -32,7 +32,6 @@ public class LeftCargo extends AutonTask {
 
         queueTask("start_path -s");
         queueTask("floor_cargo_position -p");
-//        queueTask("cargo_intake -p");
     }
 }
             

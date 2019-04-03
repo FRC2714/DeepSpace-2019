@@ -156,7 +156,6 @@ public class Robot extends TimedRobot {
 				switch (auton_mode){
 					case CARGO:
 						NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(2);
-//						drivetrain.addForwardSpline(0,0,90,10,-3.25,23,10,6,3,12,0,0);
 						drivetrain.addBackwardsSpline(0, 0, 270, 7, -6,19.9,0, 4,6,12,0,0);
 
 						break;
@@ -164,7 +163,7 @@ public class Robot extends TimedRobot {
 						drivetrain.addBackwardsSpline(0,0,270,7,-4.5,25,270,5,6,12,0,0);
 						break;
 					case TEST:
-						drivetrain.addForwardSpline(0,0,90,2,0,8,90,2,10,5,0,0);
+						System.out.println("GENERATING LEFT TEST SPLINE ");
 						break;
 				}
 				break;
@@ -172,7 +171,6 @@ public class Robot extends TimedRobot {
 				switch (auton_mode){
 					case CARGO:
 						NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
-//						drivetrain.addForwardSpline(0,0,90,10,3.25,23,170,6,3,12,0,0);
 						drivetrain.addBackwardsSpline(0, 0, 270, 7, 6,19.9,180, 4,6,12,0,0);
 						break;
 					case ROCKET:
@@ -181,7 +179,6 @@ public class Robot extends TimedRobot {
 						break;
 					case TEST:
 						System.out.println("GENERATING RIGHT TEST SPLINE ");
-//						drivetrain.addBackwardsSpline(0,0,270,2,0,5,270,2,5,5,0,0);
 						break;
 				}
 				break;
