@@ -12,31 +12,30 @@ public class RightCargo extends AutonTask {
 	public RightCargo(ControlsProcessor controlsProcessor) {
 		super(controlsProcessor);
 
-		queueTask("valve_off -p");
 		queueTask("hatch_intake -p");
         queueTask("hatch_true -p");
 
-        // Start position to far cargo bay
-        queueTask("start_position -s");
-		// queueTask("add_forwards_spline -s 0,0,90,10,3.25,23,170,6,3,12,0,0");
-        queueTask("start_path -s");
-        queueTask("station_position -s");
-        queueTask("auton_vision_align -p 4.3");
+		queueTask("set_angular_offset -s -180");
 
-//		queueTask("extake -s");
+		queueTask("start_path -s");
+		queueTask("delayed_to_position -p 0.6,86,1.5");
 
-//		queueTask("add_forwards_spline -s 0,0,90,7,4.75,18,90,7,12,10,0,8");
-//		queueTask("add_forwards_spline -s 4.75,18,90,3,3.25,21.3,180,3,12,8,8,0");
+		queueTask("auton_vision_align -s 3.8");
+		queueTask("add_backwards_line -p 1.0,20,5,20,10,7,0,0");
 
+		queueTask("set_current_position -s 1,20");
 
-        // Backwards spline from far cargo bay
-//		queueTask("add_backwards_spline -p -0.55,21.3,180,2,4.45,19.3,225,2,5,12,0,0");
-//		queueTask("start_path -s");
-//
-//		// Backwards spline to cargo
-//		queueTask("floor_cargo_position -s");
-//		queueTask("add_forwards_spline -p 4.45,19.3,225,4,2,1,270,10,4,12,0,0");
-//		queueTask("start_path -p");
-//		queueTask("cargo_intake -p");
+		queueTask("extake -s");
+
+		queueTask("start_path -s");
+
+		queueTask("turn_to_angle_setpoint -s 240");
+		queueTask("add_forwards_spline -p 5,20,270,3,4,2.5,270,3,7,7,0,0");
+
+		queueTask("set_current_position -s 5,20");
+
+		queueTask("start_path -s");
+		queueTask("floor_cargo_position -p");
+		queueTask("cargo_intake -p");
 	}
 }
