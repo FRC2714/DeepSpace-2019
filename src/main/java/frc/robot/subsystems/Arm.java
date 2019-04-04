@@ -79,6 +79,11 @@ public class Arm extends SubsystemModule {
 	}
 
 	public boolean atPosition(double leadscrewLength) {
+
+		if(shoulderMotor.getFault(CANSparkMax.FaultID.kHasReset)){
+			System.out.println("SPARK MAX HAS RESET --> ARM PROBLEM");
+		}
+
 		return Math.abs(shoulderEncoder.getPosition() - leadscrewLength) < 0.1;
 	}
 
@@ -211,7 +216,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				shoulderAngle = 0.8;
+				shoulderAngle = 0.3;
 				wristAngle = 86;
 
 				goToPosition(shoulderAngle, wristAngle);
@@ -239,7 +244,7 @@ public class Arm extends SubsystemModule {
 					shoulderAngle = 6;
 					wristAngle = 205;
 				} else {
-					shoulderAngle = 0.6;
+					shoulderAngle = 0.3;
 					wristAngle = 86;
 				}
 

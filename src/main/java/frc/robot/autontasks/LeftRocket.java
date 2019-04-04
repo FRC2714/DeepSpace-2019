@@ -22,7 +22,7 @@ public class LeftRocket extends AutonTask {
 
 		queueTask("turn_to_angle_setpoint -s 240");
 
-		queueTask("auton_vision_align -s 4");
+		queueTask("auton_vision_align -s 4.7");
 		queueTask("upper_score -p");
 		queueTask("add_backwards_line -p -6.75,21.4,-4.2,24.4,5,5,0,0");
 
@@ -39,7 +39,7 @@ public class LeftRocket extends AutonTask {
 		queueTask("station_position -p");
 
 		queueTask("hatch_station_intake -s");
-		queueTask("auton_vision_align -p 2.4");  // Old: 3.5
+		queueTask("auton_vision_align -p 4.2");  // Old: 3.5
 
 	}
 }
