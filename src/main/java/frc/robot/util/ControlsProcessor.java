@@ -60,7 +60,8 @@ public abstract class ControlsProcessor extends Thread {
 		
 		try {
 			// Comp IP ws://10.27.14.5:5802
-			launchpad = new WebsocketButtonPad( new URI( "ws://10.27.14.207:5802" )); // ws://10.27.14.207:5802 on driver station
+			// Prac IP ws://10.27.14.207:5802
+			launchpad = new WebsocketButtonPad( new URI( "ws://10.27.14.5:5802" ));
 			launchpad.connect();
 		} catch (Exception e) {
 			System.out.println("Websocket failure");
