@@ -23,7 +23,7 @@ public class RightRocket extends AutonTask {
 
 		queueTask("auton_vision_align -s 4.7");
 		queueTask("upper_score -p");
-		queueTask("add_backwards_line -p 7.2,21.4,4.2,24.4,5,5,0,0");
+		queueTask("add_backwards_line -p 6.75,21.4,4.2,24.4,5,5,0,0");
 
 		queueTask("extake -s");
 
