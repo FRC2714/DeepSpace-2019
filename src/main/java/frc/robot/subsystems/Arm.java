@@ -331,13 +331,13 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void initialize() {
 
-				if(intake.getCargoState()) {
+//				if(intake.getCargoState()) {
 					shoulderAngle = 9;
 					wristAngle = 285;
-				} else {
-					shoulderAngle = 13.4;
-					wristAngle = 65;
-				}
+//				} else {
+//					shoulderAngle = 13.4;
+//					wristAngle = 65;
+//				}
 
 				goToPosition(shoulderAngle, wristAngle);
 				startTime = System.nanoTime();
@@ -440,7 +440,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return System.nanoTime() - timer >= 0.75 * 1e9;
+				return System.nanoTime() - timer >= 1.0 * 1e9;
 			}
 
 			@Override

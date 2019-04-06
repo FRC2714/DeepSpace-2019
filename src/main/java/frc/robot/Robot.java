@@ -39,10 +39,10 @@ public class Robot extends TimedRobot {
 	// Init and Periodic functions
 	@Override
 	public void robotInit() {
-		auton_side = Auton_Side.LEFT;
+		auton_side = Auton_Side.RIGHT;
 		auton_mode = Auton_Mode.ROCKET;
 
-		// Controls processor only gets created ONCE when code is run
+		// Controls processor only gets created ONCE wheLn code is run
 		controlsProcessor = new ControlsProcessor(10000000, 2) {
 			@Override
 			public void registerOperatorControls() {
