@@ -79,6 +79,11 @@ public class Arm extends SubsystemModule {
 	}
 
 	public boolean atPosition(double leadscrewLength) {
+
+		if(shoulderMotor.getFault(CANSparkMax.FaultID.kHasReset)){
+			System.out.println("SPARK MAX HAS RESET --> ARM PROBLEM");
+		}
+
 		return Math.abs(shoulderEncoder.getPosition() - leadscrewLength) < 0.1;
 	}
 
@@ -211,7 +216,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				shoulderAngle = 0.8;
+				shoulderAngle = 0.3;
 				wristAngle = 86;
 
 				goToPosition(shoulderAngle, wristAngle);
@@ -239,7 +244,7 @@ public class Arm extends SubsystemModule {
 					shoulderAngle = 6;
 					wristAngle = 205;
 				} else {
-					shoulderAngle = 0.6;
+					shoulderAngle = 0.3;
 					wristAngle = 86;
 				}
 
@@ -326,13 +331,13 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void initialize() {
 
-				if(intake.getCargoState()) {
+//				if(intake.getCargoState()) {
 					shoulderAngle = 9;
 					wristAngle = 285;
-				} else {
-					shoulderAngle = 13.4;
-					wristAngle = 65;
-				}
+//				} else {
+//					shoulderAngle = 13.4;
+//					wristAngle = 65;
+//				}
 
 				goToPosition(shoulderAngle, wristAngle);
 				startTime = System.nanoTime();
@@ -435,7 +440,7 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public boolean isFinished() {
-				return System.nanoTime() - timer >= 0.75 * 1e9;
+				return System.nanoTime() - timer >= 1.0 * 1e9;
 			}
 
 			@Override

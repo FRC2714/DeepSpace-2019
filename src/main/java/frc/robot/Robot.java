@@ -175,7 +175,7 @@ public class Robot extends TimedRobot {
 						break;
 					case ROCKET:
 						System.out.println("GENERATING RIGHT ROCKET SPLINE");
-						drivetrain.addBackwardsSpline(0,0,270,7,5.5,25,270,5,6,12,0,0);
+						drivetrain.addBackwardsSpline(0,0,270,7,4.5,25,270,5,6,12,0,0);
 						break;
 					case TEST:
 						System.out.println("GENERATING RIGHT TEST SPLINE ");

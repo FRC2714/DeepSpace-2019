@@ -66,7 +66,7 @@ public class Climber extends SubsystemModule {
 			@Override
 			public boolean isFinished() {
             	//Actual highest position = 235
-				return climberEncoder.getPosition() >= 217;
+				return climberEncoder.getPosition() >= 240;
 			}
 
 			@Override

@@ -851,7 +851,6 @@ public class DriveTrain extends SubsystemModule {
 				SmartDashboard.putNumber("Error Correction", errorCorrection);
 				lMotor0.set(-errorCorrection);
 				rMotor0.set(-errorCorrection);
-
 			}
 
 			@Override
