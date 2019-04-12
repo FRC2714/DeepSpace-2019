@@ -104,13 +104,13 @@ public class DriveTrain extends SubsystemModule {
 		lMotor0.enableVoltageCompensation(12.0);
 		rMotor0.enableVoltageCompensation(12.0);
 
-		lMotor0.setSmartCurrentLimit(40);
-		lMotor1.setSmartCurrentLimit(40);
-		lMotor2.setSmartCurrentLimit(40);
+		lMotor0.setSmartCurrentLimit(50);
+		lMotor1.setSmartCurrentLimit(50);
+		lMotor2.setSmartCurrentLimit(50);
 
-		rMotor0.setSmartCurrentLimit(40);
-		rMotor1.setSmartCurrentLimit(40);
-		rMotor2.setSmartCurrentLimit(40);
+		rMotor0.setSmartCurrentLimit(50);
+		rMotor1.setSmartCurrentLimit(50);
+		rMotor2.setSmartCurrentLimit(50);
 
 		drivingController.clearControlPath();
 	}
@@ -378,9 +378,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void execute() {
-
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
@@ -409,9 +407,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void execute() {
-
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
@@ -433,9 +429,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void execute() {
-
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
@@ -443,9 +437,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-
-			}
+			public void end() {}
 		};
 
 		new SubsystemCommand(this.registeredCommands, "debug_print") {
@@ -475,9 +467,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-
-			}
+			public void end() {}
 		};
 		new SubsystemCommand(this.registeredCommands, "add_forwards_spline") {
 
@@ -510,9 +500,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void execute() {
-
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
@@ -520,9 +508,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-
-			}
+			public void end() {}
 		};
 
 
@@ -557,9 +543,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void execute() {
-
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
@@ -567,9 +551,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-
-			}
+			public void end() {}
 		};
 
 		new SubsystemCommand(this.registeredCommands, "add_backwards_spline") {
@@ -598,13 +580,10 @@ public class DriveTrain extends SubsystemModule {
 				drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
 						Double.parseDouble(this.args[8]), Double.parseDouble(this.args[9]),
 						Double.parseDouble(this.args[10]), Double.parseDouble(this.args[11]), false);
-
 			}
 
 			@Override
-			public void execute() {
-
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
@@ -612,8 +591,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-			}
+			public void end() {}
 		};
 
 		new SubsystemCommand(this.registeredCommands, "add_backwards_spline_dynamic") {
@@ -651,9 +629,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void execute() {
-
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
@@ -661,8 +637,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-			}
+			public void end() {}
 		};
 
 		new SubsystemCommand(this.registeredCommands, "add_backwards_line") {
@@ -701,9 +676,9 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 				drivingController.setIsFinished(false);
-				 enable();
+				enable();
 				System.out.println("starting path");
-//				System.out.println(drivingController.getControlPath());
+				// System.out.println(drivingController.getControlPath());
 			}
 
 			@Override
@@ -732,7 +707,7 @@ public class DriveTrain extends SubsystemModule {
 				drivingController.setIsFinished(false);
 				enable();
 				System.out.println("starting path");
-//				System.out.println(drivingController.getControlPath());
+				// System.out.println(drivingController.getControlPath());
 			}
 
 			@Override
@@ -760,7 +735,6 @@ public class DriveTrain extends SubsystemModule {
 			public void initialize() {
 				waitTimer.reset();
 				waitTimer.start();
-
 			}
 
 			@Override
@@ -829,7 +803,7 @@ public class DriveTrain extends SubsystemModule {
 			double requestedDelta;
 			double finalRequestedAngle;
 
-			PID headingController = new PID(0.01, 0, 0, 0);
+			PID headingController = new PID(0.01, 0.0001, 0, 0);
 
 			@Override
 			public void initialize() {
@@ -847,8 +821,6 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void execute() {
 				double errorCorrection = headingController.getOutput(odometer.getHeadingAngle());
-				SmartDashboard.putNumber("Error in Heading = " , (Math.abs(odometer.getHeadingAngle() - finalRequestedAngle)));
-				SmartDashboard.putNumber("Error Correction", errorCorrection);
 				lMotor0.set(-errorCorrection);
 				rMotor0.set(-errorCorrection);
 			}
@@ -871,30 +843,30 @@ public class DriveTrain extends SubsystemModule {
 
 		new SubsystemCommand(this.registeredCommands, "turn_to_angle_setpoint"){
 			double finalRequestedAngle;
+			double startTime;
 
-			PID headingController = new PID(0.01, 0, 0, 0);
+			PID headingController = new PID(0.01, 0.0001, 0, 0);
 
 			@Override
 			public void initialize() {
 				finalRequestedAngle = Double.parseDouble(this.args[0]);
-				System.out.println("NavX Turn to Angle Command Aim:- " + finalRequestedAngle);
-				headingController.setOutputLimits(-0.6, 0.6);
+				startTime = System.nanoTime();
+
+				System.out.println("Start turn_to_angle\tStart: " + odometer.getHeadingAngle() + "\tEnd: " + finalRequestedAngle);
+				headingController.setOutputLimits(-0.2, 0.2);
 				headingController.setSetpoint(finalRequestedAngle);
 			}
 
 			@Override
 			public void execute() {
 				double errorCorrection = headingController.getOutput(odometer.getHeadingAngle());
-				SmartDashboard.putNumber("Error in Heading = " , (Math.abs(odometer.getHeadingAngle() - finalRequestedAngle)));
-				SmartDashboard.putNumber("Error Correction", errorCorrection);
 				lMotor0.set(-errorCorrection);
 				rMotor0.set(-errorCorrection);
-
 			}
 
 			@Override
 			public boolean isFinished() {
-				return Math.abs(odometer.getHeadingAngle() - finalRequestedAngle) < 4;
+				return Math.abs(odometer.getHeadingAngle() - finalRequestedAngle) < 4 || System.nanoTime() - startTime > 3e9;
 			}
 
 			@Override

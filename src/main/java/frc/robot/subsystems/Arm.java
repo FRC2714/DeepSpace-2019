@@ -92,7 +92,7 @@ public class Arm extends SubsystemModule {
 
 	@Override
 	public void registerCommands() {
-		new SubsystemCommand(this.registeredCommands, "jog_up") {
+		new SubsystemCommand(this.registeredCommands, "shoulder_jog_up") {
 			double position;
 
 			@Override
@@ -115,7 +115,7 @@ public class Arm extends SubsystemModule {
 			public void end() {}
 		};
 
-		new SubsystemCommand(this.registeredCommands, "jog_down") {
+		new SubsystemCommand(this.registeredCommands, "shoulder_jog_down") {
 			double position;
 
 			@Override
@@ -127,6 +127,52 @@ public class Arm extends SubsystemModule {
 			public void execute() {
 				position -= 0.05;
 				goToPosition(position, wristEncoder.getPosition());
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "wrist_jog_up") {
+			double position;
+
+			@Override
+			public void initialize() {
+				position = wristEncoder.getPosition();
+			}
+
+			@Override
+			public void execute() {
+				position -= 0.5;
+				goToPosition(shoulderEncoder.getPosition(), position);
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "wrist_jog_down") {
+			double position;
+
+			@Override
+			public void initialize() {
+				position = wristEncoder.getPosition();
+			}
+
+			@Override
+			public void execute() {
+				position += 0.5;
+				goToPosition(shoulderEncoder.getPosition(), position);
 			}
 
 			@Override
@@ -330,17 +376,12 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void initialize() {
+				startTime = System.nanoTime();
 
-//				if(intake.getCargoState()) {
-					shoulderAngle = 9;
-					wristAngle = 285;
-//				} else {
-//					shoulderAngle = 13.4;
-//					wristAngle = 65;
-//				}
+				shoulderAngle = 9;
+				wristAngle = 285;
 
 				goToPosition(shoulderAngle, wristAngle);
-				startTime = System.nanoTime();
 			}
 
 			@Override

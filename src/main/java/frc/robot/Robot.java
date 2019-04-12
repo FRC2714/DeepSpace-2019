@@ -40,7 +40,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		auton_side = Auton_Side.RIGHT;
-		auton_mode = Auton_Mode.ROCKET;
+		auton_mode = Auton_Mode.TEST;
 
 		// Controls processor only gets created ONCE when code is run
 		controlsProcessor = new ControlsProcessor(10000000, 2) {
@@ -111,8 +111,10 @@ public class Robot extends TimedRobot {
 				append("extake -s", this.launchpad.getButtonInstance(1, 2));
 
 				// Jog
-				append("jog_up -s", this.launchpad.getButtonInstance(8, 6));
-				append("jog_down -s", this.launchpad.getButtonInstance(8, 8));
+				append("wrist_jog_up -s", this.launchpad.getButtonInstance(8, 5));
+				append("wrist_jog_down -s", this.launchpad.getButtonInstance(8, 6));
+				append("shoulder_jog_up -s", this.launchpad.getButtonInstance(8, 7));
+				append("shoulder_jog_down -s", this.launchpad.getButtonInstance(8, 8));
 
 				// Game Piece Override
 				append("cargo_true -p", this.launchpad.getButtonInstance(8, 1));
