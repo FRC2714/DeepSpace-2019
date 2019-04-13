@@ -27,6 +27,7 @@ public class RightRocket extends AutonTask {
 
 		queueTask("extake -s");
 
+
 		queueTask("start_path -s");
 
 		queueTask("turn_to_angle_setpoint -s 270");

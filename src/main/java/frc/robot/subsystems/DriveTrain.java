@@ -18,6 +18,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotMap;
 import frc.robot.util.*;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+
 @SuppressWarnings("Duplicates")
 public class DriveTrain extends SubsystemModule {
 
@@ -724,10 +728,10 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void end() {
 				disable();
-				System.out.println("x : y" + odometer.getCurrentX() + " : " + odometer.getCurrentY() + "Final Heading : " + odometer.getHeadingAngle());
+				System.out.println("Start Path Ending x : y " + odometer.getCurrentX() + " : " + odometer.getCurrentY() + "Final Heading : " + odometer.getHeadingAngle());
 			}
 		};
-
+		
 		new SubsystemCommand(this.registeredCommands, "wait") {
 
 			Timer waitTimer = new Timer();
@@ -944,6 +948,92 @@ public class DriveTrain extends SubsystemModule {
 
 				// System.out.println("Boolean : " + (currentBlobArea > maxBlobArea));
 					return ((System.nanoTime() - startingTime) > 2e9) || isAboveMax;
+			}
+
+			@Override
+			public void end() {
+				// limelightTable.getEntry("camMode").setNumber(1);
+				closedLoopArcade(0, 0);
+				lMotor0.set(0.0);
+				rMotor0.set(0.0);
+				// limelightTable.getEntry("ledMode").setNumber(1);
+				System.out.println("VISION ALIGN FINAL POSITIONS x: " + odometer.getCurrentX() + " y: " + odometer.getCurrentY() + " thetaF: " + odometer.getHeadingAngle() + " COUNTER = " + counter);
+			}
+		};
+
+		//Designed to be run in parallel with driving controller
+		new SubsystemCommand(this.registeredCommands, "spline_auton_vision_align"){
+			double counter;
+			boolean isAboveMax = false;
+			double maxBlobArea = 6;
+			double currentBlobArea;
+			double startingTime;
+			double endingVelocity;
+
+			@Override
+			public void initialize() {
+				endingVelocity = drivingController.getControlPath().get(drivingController.getControlPath().size() -1).velocity;
+				counter = 0;
+				System.out.println("INITIALIZED VISION ALIGN");
+				limelightTable.getEntry("ledMode").setNumber(3);
+				limelightTable.getEntry("camMode").setNumber(0);
+				isAboveMax = false;
+				startingTime = System.nanoTime();
+			}
+
+
+			@Override
+			public void execute() {
+				// System.out.println("Running");
+				double tx = limelightTable.getEntry("tx").getDouble(0);
+				currentBlobArea = limelightTable.getEntry("ta").getDouble(0);
+
+				double kAngleP = 0.05;
+				double kDistanceDivisor = 0.3;
+
+				if (this.args[0] != null)
+					maxBlobArea = Double.parseDouble(this.args[0]);
+
+				double power = 0;
+				if (currentBlobArea < maxBlobArea && currentBlobArea != 0)
+					power = kDistanceDivisor / currentBlobArea;
+				else
+					power = 0;
+
+				double pivot = tx * kAngleP;
+
+				// System.out.println("kDistanceDivisor: " + kDistanceDivisor + "| blobArea : " + currentBlobArea);
+
+				if (power > 0.3)
+					power = 0.3;
+
+
+				 if (counter < 20){
+				 	closedLoopTank(endingVelocity, -pivot);
+				 	counter++;
+				 	System.out.println("Spline Ending Velocity: " + endingVelocity + " || Pivot: " + -pivot);
+				 } else {
+					 System.out.println("Manual Control Vision Align : " + power + " IS ABOVE MAX? : " + isAboveMax);
+					 if (currentBlobArea <= maxBlobArea) {
+						 counter = 0;
+						 closedLoopArcade(power * maxVelocity, -pivot);
+					 } else {
+						 counter++;
+					 }
+
+					 if (counter > 10) {
+						 isAboveMax = currentBlobArea > maxBlobArea;
+					 }
+				 }
+
+
+			}
+
+			@Override
+			public boolean isFinished() {
+
+				// System.out.println("Boolean : " + (currentBlobArea > maxBlobArea));
+				return ((System.nanoTime() - startingTime) > 2e9) || isAboveMax;
 			}
 
 			@Override
