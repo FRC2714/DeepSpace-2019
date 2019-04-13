@@ -6,10 +6,31 @@ import frc.robot.util.ControlsProcessor;
 public class TestTask extends AutonTask {
 	public TestTask(ControlsProcessor controlsProcessor) {
 		super(controlsProcessor);
-		queueTask("add_forwards_spline -s 0,0,90,3,5,11,90,3,7,7,0,4");
-		queueTask("start_endless_path -s");
-		queueTask("delayed_to_position -p 0.6,86,1.0");
-		queueTask("hatch_station_intake -p");
-		queueTask("spline_auton_vision_align -p 2.9");
+
+		queueTask("hatch_intake -p");
+		queueTask("hatch_true -p");
+
+//		queueTask("add_forwards_spline -s 0,0,90,3,5,11,90,3,7,7,0,4");
+//		queueTask("start_endless_path -s");
+//		queueTask("delayed_to_position -p 0.6,86,1.0");
+//		queueTask("hatch_station_intake -p");
+//		queueTask("spline_auton_vision_align -p 2.9");
+
+
+		/*queueTask("set_angular_offset -s -180");
+		queueTask("start_path -s");
+		queueTask("delayed_to_position -p 0.6,86,1.5");
+
+		queueTask("auton_vision_align -s 3.7");
+		queueTask("add_backwards_line -p 7,17.5,4.2,21.4,10,10,0,0");
+
+		queueTask("extake -s");
+
+		queueTask("set_current_position -s 7,17.5");
+
+		queueTask("start_path -s");
+		*/
+
+
 	}
 }
