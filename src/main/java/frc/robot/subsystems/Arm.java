@@ -192,12 +192,12 @@ public class Arm extends SubsystemModule {
 			public void initialize() {
 				shoulderAngle = 0;
 				wristAngle = 0;
-
-				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void execute() {}
+			public void execute() {
+				goToPosition(shoulderAngle, wristAngle);
+			}
 
 			@Override
 			public boolean isFinished() {
@@ -216,12 +216,12 @@ public class Arm extends SubsystemModule {
 			public void initialize() {
 				shoulderAngle = 2.4;
 				wristAngle = 240;
-
-				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void execute() {}
+			public void execute() {
+				goToPosition(shoulderAngle, wristAngle);
+			}
 
 			@Override
 			public boolean isFinished() {
@@ -240,12 +240,12 @@ public class Arm extends SubsystemModule {
 			public void initialize() {
 				shoulderAngle = 1.8;
 				wristAngle = 195;
-
-				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void execute() {}
+			public void execute() {
+				goToPosition(shoulderAngle, wristAngle);
+			}
 
 			@Override
 			public boolean isFinished() {
@@ -264,12 +264,12 @@ public class Arm extends SubsystemModule {
 			public void initialize() {
 				shoulderAngle = 0.3;
 				wristAngle = 86;
-
-				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void execute() {}
+			public void execute() {
+				goToPosition(shoulderAngle, wristAngle);
+			}
 
 			@Override
 			public boolean isFinished() {
@@ -293,12 +293,12 @@ public class Arm extends SubsystemModule {
 					shoulderAngle = 0.3;
 					wristAngle = 86;
 				}
-
-				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void execute() {}
+			public void execute() {
+				goToPosition(shoulderAngle, wristAngle);
+			}
 
 			@Override
 			public boolean isFinished() {
@@ -322,12 +322,12 @@ public class Arm extends SubsystemModule {
 					shoulderAngle = 6.8;
 					wristAngle = 133;
 				}
-
-				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void execute() {}
+			public void execute() {
+				goToPosition(shoulderAngle, wristAngle);
+			}
 
 			@Override
 			public boolean isFinished() {
@@ -352,13 +352,13 @@ public class Arm extends SubsystemModule {
 					shoulderAngle = 11.6;
 					wristAngle = 192;
 				}
-
-				goToPosition(shoulderAngle, wristAngle);
 				startTime = System.nanoTime();
 			}
 
 			@Override
-			public void execute() {}
+			public void execute() {
+				goToPosition(shoulderAngle, wristAngle);
+			}
 
 			@Override
 			public boolean isFinished() {
@@ -380,12 +380,12 @@ public class Arm extends SubsystemModule {
 
 				shoulderAngle = 9;
 				wristAngle = 285;
-
-				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void execute() {}
+			public void execute() {
+				goToPosition(shoulderAngle, wristAngle);
+			}
 
 			@Override
 			public boolean isFinished() {
@@ -412,13 +412,11 @@ public class Arm extends SubsystemModule {
 				finalPeriod = (int)(Double.parseDouble(this.args[2]) / controlsProcessor.getCommandPeriod());
 
 				System.out.println("Final Period: " + finalPeriod);
-
 			}
 
 			@Override
 			public void execute() {
 				if(currentPeriod == finalPeriod) {
-//					System.out.println("Current Period: " + currentPeriod);
 					goToPosition(shoulderAngle, wristAngle);
 					currentPeriod++;
 				} else {
@@ -443,12 +441,12 @@ public class Arm extends SubsystemModule {
 			public void initialize() {
 				shoulderAngle = 3;
 				wristAngle = 110;
-
-				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void execute() {}
+			public void execute() {
+				goToPosition(shoulderAngle, wristAngle);
+			}
 
 			@Override
 			public boolean isFinished() {

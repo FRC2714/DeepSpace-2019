@@ -696,7 +696,7 @@ public class DriveTrain extends SubsystemModule {
 			public void end() {
 				disable();
 				closedLoopArcade(0, 0);
-				System.out.println("x : y" + odometer.getCurrentX() + " : " + odometer.getCurrentY() + "Final Heading : " + odometer.getHeadingAngle());
+				System.out.println("x : y " + odometer.getCurrentX() + " : " + odometer.getCurrentY() + "Final Heading : " + odometer.getHeadingAngle());
 			}
 		};
 
@@ -950,6 +950,8 @@ public class DriveTrain extends SubsystemModule {
 			public void end() {
 				// limelightTable.getEntry("camMode").setNumber(1);
 				closedLoopArcade(0, 0);
+				lMotor0.set(0.0);
+				rMotor0.set(0.0);
 				// limelightTable.getEntry("ledMode").setNumber(1);
 				System.out.println("VISION ALIGN FINAL POSITIONS x: " + odometer.getCurrentX() + " y: " + odometer.getCurrentY() + " thetaF: " + odometer.getHeadingAngle() + " COUNTER = " + counter);
 			}
