@@ -4,7 +4,6 @@ import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
-import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
@@ -969,11 +968,13 @@ public class DriveTrain extends SubsystemModule {
 			double currentBlobArea;
 			double startingTime;
 			double endingVelocity;
+			double controlCounter;
 
 			@Override
 			public void initialize() {
 				endingVelocity = drivingController.getControlPath().get(drivingController.getControlPath().size() -1).velocity;
 				counter = 0;
+				controlCounter = 0;
 				System.out.println("INITIALIZED VISION ALIGN");
 				limelightTable.getEntry("ledMode").setNumber(3);
 				limelightTable.getEntry("camMode").setNumber(0);
@@ -1007,24 +1008,25 @@ public class DriveTrain extends SubsystemModule {
 				if (power > 0.3)
 					power = 0.3;
 
+				if (drivingController.isFinished()) {
+					if (controlCounter < 20) {
+						closedLoopArcade(endingVelocity, -pivot);
+						controlCounter++;
+						System.out.println("Spline Ending Velocity: " + endingVelocity + " || Pivot: " + -pivot + " Counter = " + controlCounter);
+					} else {
+						System.out.println("Manual Control Vision Align : " + power + " IS ABOVE MAX? : " + isAboveMax);
+						if (currentBlobArea <= maxBlobArea) {
+							counter = 0;
+							closedLoopArcade(power * maxVelocity, -pivot);
+						} else {
+							counter++;
+						}
 
-				 if (counter < 20){
-				 	closedLoopTank(endingVelocity, -pivot);
-				 	counter++;
-				 	System.out.println("Spline Ending Velocity: " + endingVelocity + " || Pivot: " + -pivot);
-				 } else {
-					 System.out.println("Manual Control Vision Align : " + power + " IS ABOVE MAX? : " + isAboveMax);
-					 if (currentBlobArea <= maxBlobArea) {
-						 counter = 0;
-						 closedLoopArcade(power * maxVelocity, -pivot);
-					 } else {
-						 counter++;
-					 }
-
-					 if (counter > 10) {
-						 isAboveMax = currentBlobArea > maxBlobArea;
-					 }
-				 }
+						if (counter > 10) {
+							isAboveMax = currentBlobArea > maxBlobArea;
+						}
+					}
+				}
 
 
 			}
@@ -1033,7 +1035,7 @@ public class DriveTrain extends SubsystemModule {
 			public boolean isFinished() {
 
 				// System.out.println("Boolean : " + (currentBlobArea > maxBlobArea));
-				return ((System.nanoTime() - startingTime) > 2e9) || isAboveMax;
+				return isAboveMax;
 			}
 
 			@Override
