@@ -182,7 +182,7 @@ public class Robot extends TimedRobot {
 					case TEST:
 						System.out.println("GENERATING RIGHT TEST SPLINE ");
 //						drivetrain.addBackwardsSpline(0,0,270,2,5,20,306.75338685111194,2,12,12,0,0);
-						drivetrain.addForwardSpline(0,0,90,3,6.177,9.287,61.53248023742344,2,5,5,0,0);
+						drivetrain.addForwardSpline(0,0,90,3,6,8.5,61.53248023742344,2,7,10,0,2.5);
 						break;
 				}
 				break;

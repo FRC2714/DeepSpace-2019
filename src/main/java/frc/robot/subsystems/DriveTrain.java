@@ -1014,7 +1014,7 @@ public class DriveTrain extends SubsystemModule {
 						controlCounter++;
 						System.out.println("Spline Ending Velocity: " + endingVelocity + " || Pivot: " + -pivot + " Counter = " + controlCounter);
 					} else {
-						System.out.println("Manual Control Vision Align : " + power + " IS ABOVE MAX? : " + isAboveMax);
+						System.out.println("Manual Control Vision Align : " + power + " IS ABOVE MAX? : " + isAboveMax + " AboveMaxCounter = " + counter);
 						if (currentBlobArea <= maxBlobArea) {
 							counter = 0;
 							closedLoopArcade(power * maxVelocity, -pivot);

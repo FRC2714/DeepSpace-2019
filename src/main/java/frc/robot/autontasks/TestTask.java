@@ -31,6 +31,16 @@ public class TestTask extends AutonTask {
 		queueTask("start_path -s");
 		*/
 
+		queueTask("start_endless_path -s");
+		queueTask("spline_auton_vision_align -p 3.6");
+		queueTask("delayed_to_position -p 0.6,86,1.0");
+
+		queueTask("extake -s");
+		queueTask("add_backwards_spline -p 7.8,11,55.5,3,7.8,0,90,4,10,10,0,0");
+
+		queueTask("set_current_position -s 7.8,11");
+
+		queueTask("start_path -s");
 
 	}
 }
