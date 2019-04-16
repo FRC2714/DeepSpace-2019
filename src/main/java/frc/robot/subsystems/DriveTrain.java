@@ -4,7 +4,6 @@ import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
-import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
@@ -17,6 +16,10 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotMap;
 import frc.robot.util.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 @SuppressWarnings("Duplicates")
 public class DriveTrain extends SubsystemModule {
@@ -104,13 +107,13 @@ public class DriveTrain extends SubsystemModule {
 		lMotor0.enableVoltageCompensation(12.0);
 		rMotor0.enableVoltageCompensation(12.0);
 
-		lMotor0.setSmartCurrentLimit(40);
-		lMotor1.setSmartCurrentLimit(40);
-		lMotor2.setSmartCurrentLimit(40);
+		lMotor0.setSmartCurrentLimit(50);
+		lMotor1.setSmartCurrentLimit(50);
+		lMotor2.setSmartCurrentLimit(50);
 
-		rMotor0.setSmartCurrentLimit(40);
-		rMotor1.setSmartCurrentLimit(40);
-		rMotor2.setSmartCurrentLimit(40);
+		rMotor0.setSmartCurrentLimit(50);
+		rMotor1.setSmartCurrentLimit(50);
+		rMotor2.setSmartCurrentLimit(50);
 
 		drivingController.clearControlPath();
 	}
@@ -378,9 +381,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void execute() {
-
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
@@ -409,9 +410,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void execute() {
-
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
@@ -433,9 +432,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void execute() {
-
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
@@ -443,9 +440,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-
-			}
+			public void end() {}
 		};
 
 		new SubsystemCommand(this.registeredCommands, "debug_print") {
@@ -475,9 +470,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-
-			}
+			public void end() {}
 		};
 		new SubsystemCommand(this.registeredCommands, "add_forwards_spline") {
 
@@ -510,9 +503,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void execute() {
-
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
@@ -520,9 +511,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-
-			}
+			public void end() {}
 		};
 
 
@@ -557,9 +546,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void execute() {
-
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
@@ -567,9 +554,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-
-			}
+			public void end() {}
 		};
 
 		new SubsystemCommand(this.registeredCommands, "add_backwards_spline") {
@@ -598,13 +583,10 @@ public class DriveTrain extends SubsystemModule {
 				drivingController.addSpline(xInitial, x2, x3, xFinal, yInitial, y2, y3, yFinal,
 						Double.parseDouble(this.args[8]), Double.parseDouble(this.args[9]),
 						Double.parseDouble(this.args[10]), Double.parseDouble(this.args[11]), false);
-
 			}
 
 			@Override
-			public void execute() {
-
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
@@ -612,8 +594,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-			}
+			public void end() {}
 		};
 
 		new SubsystemCommand(this.registeredCommands, "add_backwards_spline_dynamic") {
@@ -651,9 +632,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void execute() {
-
-			}
+			public void execute() {}
 
 			@Override
 			public boolean isFinished() {
@@ -661,8 +640,7 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {
-			}
+			public void end() {}
 		};
 
 		new SubsystemCommand(this.registeredCommands, "add_backwards_line") {
@@ -701,9 +679,9 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void initialize() {
 				drivingController.setIsFinished(false);
-				 enable();
+				enable();
 				System.out.println("starting path");
-//				System.out.println(drivingController.getControlPath());
+				// System.out.println(drivingController.getControlPath());
 			}
 
 			@Override
@@ -721,7 +699,7 @@ public class DriveTrain extends SubsystemModule {
 			public void end() {
 				disable();
 				closedLoopArcade(0, 0);
-				System.out.println("x : y" + odometer.getCurrentX() + " : " + odometer.getCurrentY() + "Final Heading : " + odometer.getHeadingAngle());
+				System.out.println("x : y " + odometer.getCurrentX() + " : " + odometer.getCurrentY() + "Final Heading : " + odometer.getHeadingAngle());
 			}
 		};
 
@@ -732,7 +710,7 @@ public class DriveTrain extends SubsystemModule {
 				drivingController.setIsFinished(false);
 				enable();
 				System.out.println("starting path");
-//				System.out.println(drivingController.getControlPath());
+				// System.out.println(drivingController.getControlPath());
 			}
 
 			@Override
@@ -749,7 +727,7 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void end() {
 				disable();
-				System.out.println("x : y" + odometer.getCurrentX() + " : " + odometer.getCurrentY() + "Final Heading : " + odometer.getHeadingAngle());
+				System.out.println("Start Path Ending x : y " + odometer.getCurrentX() + " : " + odometer.getCurrentY() + "Final Heading : " + odometer.getHeadingAngle());
 			}
 		};
 
@@ -760,7 +738,6 @@ public class DriveTrain extends SubsystemModule {
 			public void initialize() {
 				waitTimer.reset();
 				waitTimer.start();
-
 			}
 
 			@Override
@@ -829,7 +806,7 @@ public class DriveTrain extends SubsystemModule {
 			double requestedDelta;
 			double finalRequestedAngle;
 
-			PID headingController = new PID(0.01, 0, 0, 0);
+			PID headingController = new PID(0.01, 0.0001, 0, 0);
 
 			@Override
 			public void initialize() {
@@ -847,8 +824,6 @@ public class DriveTrain extends SubsystemModule {
 			@Override
 			public void execute() {
 				double errorCorrection = headingController.getOutput(odometer.getHeadingAngle());
-				SmartDashboard.putNumber("Error in Heading = " , (Math.abs(odometer.getHeadingAngle() - finalRequestedAngle)));
-				SmartDashboard.putNumber("Error Correction", errorCorrection);
 				lMotor0.set(-errorCorrection);
 				rMotor0.set(-errorCorrection);
 			}
@@ -871,30 +846,30 @@ public class DriveTrain extends SubsystemModule {
 
 		new SubsystemCommand(this.registeredCommands, "turn_to_angle_setpoint"){
 			double finalRequestedAngle;
+			double startTime;
 
-			PID headingController = new PID(0.01, 0, 0, 0);
+			PID headingController = new PID(0.01, 0.0001, 0, 0);
 
 			@Override
 			public void initialize() {
 				finalRequestedAngle = Double.parseDouble(this.args[0]);
-				System.out.println("NavX Turn to Angle Command Aim:- " + finalRequestedAngle);
-				headingController.setOutputLimits(-0.6, 0.6);
+				startTime = System.nanoTime();
+
+				System.out.println("Start turn_to_angle\tStart: " + odometer.getHeadingAngle() + "\tEnd: " + finalRequestedAngle);
+				headingController.setOutputLimits(-0.2, 0.2);
 				headingController.setSetpoint(finalRequestedAngle);
 			}
 
 			@Override
 			public void execute() {
 				double errorCorrection = headingController.getOutput(odometer.getHeadingAngle());
-				SmartDashboard.putNumber("Error in Heading = " , (Math.abs(odometer.getHeadingAngle() - finalRequestedAngle)));
-				SmartDashboard.putNumber("Error Correction", errorCorrection);
 				lMotor0.set(-errorCorrection);
 				rMotor0.set(-errorCorrection);
-
 			}
 
 			@Override
 			public boolean isFinished() {
-				return Math.abs(odometer.getHeadingAngle() - finalRequestedAngle) < 4;
+				return Math.abs(odometer.getHeadingAngle() - finalRequestedAngle) < 4 || System.nanoTime() - startTime > 3e9;
 			}
 
 			@Override
@@ -978,6 +953,97 @@ public class DriveTrain extends SubsystemModule {
 			public void end() {
 				// limelightTable.getEntry("camMode").setNumber(1);
 				closedLoopArcade(0, 0);
+				lMotor0.set(0.0);
+				rMotor0.set(0.0);
+				// limelightTable.getEntry("ledMode").setNumber(1);
+				System.out.println("VISION ALIGN FINAL POSITIONS x: " + odometer.getCurrentX() + " y: " + odometer.getCurrentY() + " thetaF: " + odometer.getHeadingAngle() + " COUNTER = " + counter);
+			}
+		};
+
+		//Designed to be run in parallel with driving controller
+		new SubsystemCommand(this.registeredCommands, "spline_auton_vision_align"){
+			double counter;
+			boolean isAboveMax = false;
+			double maxBlobArea = 6;
+			double currentBlobArea;
+			double startingTime;
+			double endingVelocity;
+			double controlCounter;
+
+			@Override
+			public void initialize() {
+				endingVelocity = drivingController.getControlPath().get(drivingController.getControlPath().size() -1).velocity;
+				counter = 0;
+				controlCounter = 0;
+				System.out.println("INITIALIZED VISION ALIGN");
+				limelightTable.getEntry("ledMode").setNumber(3);
+				limelightTable.getEntry("camMode").setNumber(0);
+				isAboveMax = false;
+				startingTime = System.nanoTime();
+			}
+
+
+			@Override
+			public void execute() {
+				// System.out.println("Running");
+				double tx = limelightTable.getEntry("tx").getDouble(0);
+				currentBlobArea = limelightTable.getEntry("ta").getDouble(0);
+
+				double kAngleP = 0.05;
+				double kDistanceDivisor = 0.3;
+
+				if (this.args[0] != null)
+					maxBlobArea = Double.parseDouble(this.args[0]);
+
+				double power = 0;
+				if (currentBlobArea < maxBlobArea && currentBlobArea != 0)
+					power = kDistanceDivisor / currentBlobArea;
+				else
+					power = 0;
+
+				double pivot = tx * kAngleP;
+
+				// System.out.println("kDistanceDivisor: " + kDistanceDivisor + "| blobArea : " + currentBlobArea);
+
+				if (power > 0.3)
+					power = 0.3;
+
+				if (drivingController.isFinished()) {
+					if (controlCounter < 20) {
+						closedLoopArcade(endingVelocity, -pivot);
+						controlCounter++;
+						System.out.println("Spline Ending Velocity: " + endingVelocity + " || Pivot: " + -pivot + " Counter = " + controlCounter);
+					} else {
+						System.out.println("Manual Control Vision Align : " + power + " IS ABOVE MAX? : " + isAboveMax + " AboveMaxCounter = " + counter);
+						if (currentBlobArea <= maxBlobArea) {
+							counter = 0;
+							closedLoopArcade(power * maxVelocity, -pivot);
+						} else {
+							counter++;
+						}
+
+						if (counter > 10) {
+							isAboveMax = currentBlobArea > maxBlobArea;
+						}
+					}
+				}
+
+
+			}
+
+			@Override
+			public boolean isFinished() {
+
+				// System.out.println("Boolean : " + (currentBlobArea > maxBlobArea));
+				return isAboveMax;
+			}
+
+			@Override
+			public void end() {
+				// limelightTable.getEntry("camMode").setNumber(1);
+				closedLoopArcade(0, 0);
+				lMotor0.set(0.0);
+				rMotor0.set(0.0);
 				// limelightTable.getEntry("ledMode").setNumber(1);
 				System.out.println("VISION ALIGN FINAL POSITIONS x: " + odometer.getCurrentX() + " y: " + odometer.getCurrentY() + " thetaF: " + odometer.getHeadingAngle() + " COUNTER = " + counter);
 			}

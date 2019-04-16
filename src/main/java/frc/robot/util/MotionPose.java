@@ -2,7 +2,7 @@ package frc.robot.util;
 
 public class MotionPose {
 
-    double angle, velocity, x, y;
+    public double angle, velocity, x, y;
 
     /**
      * Creates a MotionPose with this reference frame

@@ -80,8 +80,16 @@ public class Arm extends SubsystemModule {
 
 	public boolean atPosition(double leadscrewLength) {
 
-		if(shoulderMotor.getFault(CANSparkMax.FaultID.kHasReset)){
-			System.out.println("SPARK MAX HAS RESET --> ARM PROBLEM");
+		if(wristMotor.getStickyFault(CANSparkMax.FaultID.kHasReset)){
+			System.out.println("RESET FAULT --> WRIST PROBLEM");
+		}
+
+		if(wristMotor.getStickyFault(CANSparkMax.FaultID.kSensorFault)){
+			System.out.println("SENSOR FAULT --> WRIST PROBLEM");
+		}
+
+		if(wristMotor.getStickyFault(CANSparkMax.FaultID.kMotorFault)){
+			System.out.println("MOTOR FAULT --> WRIST PROBLEM");
 		}
 
 		return Math.abs(shoulderEncoder.getPosition() - leadscrewLength) < 0.1;
@@ -92,7 +100,7 @@ public class Arm extends SubsystemModule {
 
 	@Override
 	public void registerCommands() {
-		new SubsystemCommand(this.registeredCommands, "jog_up") {
+		new SubsystemCommand(this.registeredCommands, "shoulder_jog_up") {
 			double position;
 
 			@Override
@@ -115,7 +123,7 @@ public class Arm extends SubsystemModule {
 			public void end() {}
 		};
 
-		new SubsystemCommand(this.registeredCommands, "jog_down") {
+		new SubsystemCommand(this.registeredCommands, "shoulder_jog_down") {
 			double position;
 
 			@Override
@@ -138,6 +146,52 @@ public class Arm extends SubsystemModule {
 			public void end() {}
 		};
 
+		new SubsystemCommand(this.registeredCommands, "wrist_jog_up") {
+			double position;
+
+			@Override
+			public void initialize() {
+				position = wristEncoder.getPosition();
+			}
+
+			@Override
+			public void execute() {
+				position -= 0.5;
+				goToPosition(shoulderEncoder.getPosition(), position);
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "wrist_jog_down") {
+			double position;
+
+			@Override
+			public void initialize() {
+				position = wristEncoder.getPosition();
+			}
+
+			@Override
+			public void execute() {
+				position += 0.5;
+				goToPosition(shoulderEncoder.getPosition(), position);
+			}
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void end() {}
+		};
+
 		new SubsystemCommand(this.registeredCommands, "start_position") {
 			double shoulderAngle;
 			double wristAngle;
@@ -146,12 +200,12 @@ public class Arm extends SubsystemModule {
 			public void initialize() {
 				shoulderAngle = 0;
 				wristAngle = 0;
-
-				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void execute() {}
+			public void execute() {
+				goToPosition(shoulderAngle, wristAngle);
+			}
 
 			@Override
 			public boolean isFinished() {
@@ -170,12 +224,12 @@ public class Arm extends SubsystemModule {
 			public void initialize() {
 				shoulderAngle = 2.4;
 				wristAngle = 240;
-
-				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void execute() {}
+			public void execute() {
+				goToPosition(shoulderAngle, wristAngle);
+			}
 
 			@Override
 			public boolean isFinished() {
@@ -194,12 +248,12 @@ public class Arm extends SubsystemModule {
 			public void initialize() {
 				shoulderAngle = 1.8;
 				wristAngle = 195;
-
-				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void execute() {}
+			public void execute() {
+				goToPosition(shoulderAngle, wristAngle);
+			}
 
 			@Override
 			public boolean isFinished() {
@@ -218,12 +272,12 @@ public class Arm extends SubsystemModule {
 			public void initialize() {
 				shoulderAngle = 0.3;
 				wristAngle = 86;
-
-				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void execute() {}
+			public void execute() {
+				goToPosition(shoulderAngle, wristAngle);
+			}
 
 			@Override
 			public boolean isFinished() {
@@ -247,12 +301,12 @@ public class Arm extends SubsystemModule {
 					shoulderAngle = 0.3;
 					wristAngle = 86;
 				}
-
-				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void execute() {}
+			public void execute() {
+				goToPosition(shoulderAngle, wristAngle);
+			}
 
 			@Override
 			public boolean isFinished() {
@@ -276,12 +330,12 @@ public class Arm extends SubsystemModule {
 					shoulderAngle = 6.8;
 					wristAngle = 133;
 				}
-
-				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void execute() {}
+			public void execute() {
+				goToPosition(shoulderAngle, wristAngle);
+			}
 
 			@Override
 			public boolean isFinished() {
@@ -306,13 +360,13 @@ public class Arm extends SubsystemModule {
 					shoulderAngle = 11.6;
 					wristAngle = 192;
 				}
-
-				goToPosition(shoulderAngle, wristAngle);
 				startTime = System.nanoTime();
 			}
 
 			@Override
-			public void execute() {}
+			public void execute() {
+				goToPosition(shoulderAngle, wristAngle);
+			}
 
 			@Override
 			public boolean isFinished() {
@@ -330,21 +384,16 @@ public class Arm extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-
-//				if(intake.getCargoState()) {
-					shoulderAngle = 9;
-					wristAngle = 285;
-//				} else {
-//					shoulderAngle = 13.4;
-//					wristAngle = 65;
-//				}
-
-				goToPosition(shoulderAngle, wristAngle);
 				startTime = System.nanoTime();
+
+				shoulderAngle = 9;
+				wristAngle = 285;
 			}
 
 			@Override
-			public void execute() {}
+			public void execute() {
+				goToPosition(shoulderAngle, wristAngle);
+			}
 
 			@Override
 			public boolean isFinished() {
@@ -371,13 +420,11 @@ public class Arm extends SubsystemModule {
 				finalPeriod = (int)(Double.parseDouble(this.args[2]) / controlsProcessor.getCommandPeriod());
 
 				System.out.println("Final Period: " + finalPeriod);
-
 			}
 
 			@Override
 			public void execute() {
 				if(currentPeriod == finalPeriod) {
-//					System.out.println("Current Period: " + currentPeriod);
 					goToPosition(shoulderAngle, wristAngle);
 					currentPeriod++;
 				} else {
@@ -402,12 +449,12 @@ public class Arm extends SubsystemModule {
 			public void initialize() {
 				shoulderAngle = 3;
 				wristAngle = 110;
-
-				goToPosition(shoulderAngle, wristAngle);
 			}
 
 			@Override
-			public void execute() {}
+			public void execute() {
+				goToPosition(shoulderAngle, wristAngle);
+			}
 
 			@Override
 			public boolean isFinished() {
@@ -447,6 +494,27 @@ public class Arm extends SubsystemModule {
 			public void end() {
 				intake.cargoMotor.set(0);
 			}
+		};
+
+		new SubsystemCommand(this.registeredCommands, "zero_arm") {
+
+			@Override
+			public void initialize() {
+				shoulderEncoder.setPosition(0);
+				wristEncoder.setPosition(0);
+				goToPosition(0, 0);
+			}
+
+			@Override
+			public void execute() {}
+
+			@Override
+			public boolean isFinished() {
+				return true;
+			}
+
+			@Override
+			public void end() {}
 		};
 	}
 

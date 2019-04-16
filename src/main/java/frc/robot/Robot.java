@@ -40,7 +40,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		auton_side = Auton_Side.RIGHT;
-		auton_mode = Auton_Mode.ROCKET;
+		auton_mode = Auton_Mode.CARGO;
 
 		// Controls processor only gets created ONCE when code is run
 		controlsProcessor = new ControlsProcessor(10000000, 2) {
@@ -111,8 +111,10 @@ public class Robot extends TimedRobot {
 				append("extake -s", this.launchpad.getButtonInstance(1, 2));
 
 				// Jog
-				append("jog_up -s", this.launchpad.getButtonInstance(8, 6));
-				append("jog_down -s", this.launchpad.getButtonInstance(8, 8));
+				append("wrist_jog_up -s", this.launchpad.getButtonInstance(8, 5));
+				append("wrist_jog_down -s", this.launchpad.getButtonInstance(8, 6));
+				append("shoulder_jog_up -s", this.launchpad.getButtonInstance(8, 7));
+				append("shoulder_jog_down -s", this.launchpad.getButtonInstance(8, 8));
 
 				// Game Piece Override
 				append("cargo_true -p", this.launchpad.getButtonInstance(8, 1));
@@ -127,6 +129,9 @@ public class Robot extends TimedRobot {
 				append("climber_up -s", this.launchpad.getButtonInstance(0, 0));
 				append("climber_pump -p", this.launchpad.getButtonInstance(0, 0));
 				append("climber_down -s", this.launchpad.getButtonInstance(1, 0));
+
+				// Zero the arm
+				append("zero_arm -p", this.launchpad.getButtonInstance(5, 0));
 
 				// Oh no! Plz stop Brisket
 				append("cancel_all -p", this.launchpad.getButtonInstance(7, 0));
@@ -177,8 +182,14 @@ public class Robot extends TimedRobot {
 						System.out.println("GENERATING RIGHT ROCKET SPLINE");
 						drivetrain.addBackwardsSpline(0,0,270,7,4.5,25,270,5,6,12,0,0);
 						break;
+					case ROCKETLOW:
+						drivetrain.addBackwardsSpline(0,0,270,7,4.5,25,270,5,6,12,0,0);
+						break;
 					case TEST:
 						System.out.println("GENERATING RIGHT TEST SPLINE ");
+//						drivetrain.addBackwardsSpline(0,0,270,2,5,20,306.75338685111194,2,12,12,0,0);
+						drivetrain.addBackwardsSpline(0,0,270,7,4.5,25,270,5,6,12,0,0);
+//						drivetrain.addForwardSpline(0,0,90,7,5.2,9,70,2,5,6,0,4);
 						break;
 				}
 				break;
@@ -207,6 +218,7 @@ public class Robot extends TimedRobot {
 	}
 
 	/**
+	 *
 	 * Does NOTHING!
 	 */
 	@Override
@@ -228,6 +240,7 @@ public class Robot extends TimedRobot {
 	enum Auton_Mode{
 		CARGO,
 		ROCKET,
+		ROCKETLOW,
 		TEST
 	}
 
@@ -275,6 +288,7 @@ public class Robot extends TimedRobot {
 				break;
 		}
 	}
+
 
 	/**
 	 * Runs periodically during auton
