@@ -80,8 +80,16 @@ public class Arm extends SubsystemModule {
 
 	public boolean atPosition(double leadscrewLength) {
 
-		if(shoulderMotor.getFault(CANSparkMax.FaultID.kHasReset)){
-			System.out.println("SPARK MAX HAS RESET --> ARM PROBLEM");
+		if(wristMotor.getStickyFault(CANSparkMax.FaultID.kHasReset)){
+			System.out.println("RESET FAULT --> WRIST PROBLEM");
+		}
+
+		if(wristMotor.getStickyFault(CANSparkMax.FaultID.kSensorFault)){
+			System.out.println("SENSOR FAULT --> WRIST PROBLEM");
+		}
+
+		if(wristMotor.getStickyFault(CANSparkMax.FaultID.kMotorFault)){
+			System.out.println("MOTOR FAULT --> WRIST PROBLEM");
 		}
 
 		return Math.abs(shoulderEncoder.getPosition() - leadscrewLength) < 0.1;
