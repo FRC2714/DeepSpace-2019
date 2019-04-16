@@ -130,6 +130,9 @@ public class Robot extends TimedRobot {
 				append("climber_pump -p", this.launchpad.getButtonInstance(0, 0));
 				append("climber_down -s", this.launchpad.getButtonInstance(1, 0));
 
+				// Zero the arm
+				append("zero_arm -p", this.launchpad.getButtonInstance(5, 0));
+
 				// Oh no! Plz stop Brisket
 				append("cancel_all -p", this.launchpad.getButtonInstance(7, 0));
 				append("cancel_all -p", this.launchpad.getButtonInstance(8, 0));

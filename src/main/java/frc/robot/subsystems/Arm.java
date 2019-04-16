@@ -495,6 +495,26 @@ public class Arm extends SubsystemModule {
 				intake.cargoMotor.set(0);
 			}
 		};
+
+		new SubsystemCommand(this.registeredCommands, "zero_arm") {
+
+			@Override
+			public void initialize() {
+				shoulderEncoder.setPosition(0);
+				wristEncoder.setPosition(0);
+			}
+
+			@Override
+			public void execute() {}
+
+			@Override
+			public boolean isFinished() {
+				return true;
+			}
+
+			@Override
+			public void end() {}
+		};
 	}
 
 	@Override
