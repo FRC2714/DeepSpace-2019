@@ -502,6 +502,7 @@ public class Arm extends SubsystemModule {
 			public void initialize() {
 				shoulderEncoder.setPosition(0);
 				wristEncoder.setPosition(0);
+				goToPosition(0, 0);
 			}
 
 			@Override
