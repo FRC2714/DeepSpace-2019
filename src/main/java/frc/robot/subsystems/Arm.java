@@ -324,7 +324,7 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void initialize() {
 				if(intake.getCargoState()) {
-					shoulderAngle = 10.5;
+					shoulderAngle = 10.0;
 					wristAngle = 230;
 				} else {
 					shoulderAngle = 6.8;

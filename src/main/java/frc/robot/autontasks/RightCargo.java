@@ -21,7 +21,7 @@ public class RightCargo extends AutonTask {
 		queueTask("delayed_to_position -p 0.6,86,1.5");
 
 		queueTask("auton_vision_align -s 3.95");
-		queueTask("add_backwards_line -p 1.0,20,5,20,5,7,0,0");
+		queueTask("add_backwards_line -p 1.0,20,5,20,5,5,0,0");
 
 		queueTask("set_current_position -s 1,20");
 
@@ -30,7 +30,7 @@ public class RightCargo extends AutonTask {
 		queueTask("start_path -s");
 
 		queueTask("turn_to_angle_setpoint -s 270");
-		queueTask("add_forwards_spline -p 5,20,270,3,7.6,4,270,3,7,12,0,4");
+		queueTask("add_forwards_spline -s 5,20,270,3,7.6,4,270,3,7,12,0,4");
 
 		queueTask("set_current_position -s 5,20");
 
