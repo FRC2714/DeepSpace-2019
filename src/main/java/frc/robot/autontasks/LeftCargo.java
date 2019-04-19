@@ -26,7 +26,7 @@ public class LeftCargo extends AutonTask {
         queueTask("start_path -s");
 
         queueTask("turn_to_angle_setpoint -s 270");
-        queueTask("add_forwards_spline -p -5,20,270,3,-7.6,4,270,3,7,7,0,4");
+        queueTask("add_forwards_spline -p -5,21,270,3,-7.6,4,270,3,7,12,0,4");
 
         queueTask("set_current_position -s -5,21");
 
