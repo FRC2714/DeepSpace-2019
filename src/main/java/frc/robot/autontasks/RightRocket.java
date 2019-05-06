@@ -21,9 +21,9 @@ public class RightRocket extends AutonTask {
 
 		queueTask("turn_to_angle_setpoint -s 300");
 
-		queueTask("auton_vision_align -s 4.7");
+		queueTask("auton_vision_align -s 3.63");
 		queueTask("upper_score -p");
-		queueTask("add_backwards_line -p 6.75,21.4,4.2,24.4,5,5,0,0");
+		queueTask("add_backwards_line -p 6.75,21.4,4.2,24,5,5,0,0");
 
 		queueTask("extake -s");
 
@@ -31,7 +31,7 @@ public class RightRocket extends AutonTask {
 		queueTask("start_path -s");
 
 		queueTask("turn_to_angle_setpoint -s 270");
-		queueTask("add_forwards_spline -p 4.2,24.4,270,1,6.5,5.5,270,6,7,12,0,4");
+		queueTask("add_forwards_spline -p 4.2,24,270,1,6.5,5.5,270,6,7,12,0,4");
 
 		queueTask("set_current_position -s 4.2,24.4");
 

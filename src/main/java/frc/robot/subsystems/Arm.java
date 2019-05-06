@@ -324,7 +324,7 @@ public class Arm extends SubsystemModule {
 			@Override
 			public void initialize() {
 				if(intake.getCargoState()) {
-					shoulderAngle = 10.5;
+					shoulderAngle = 10.0;
 					wristAngle = 230;
 				} else {
 					shoulderAngle = 6.8;
@@ -438,7 +438,10 @@ public class Arm extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {}
+			public void end() {
+				System.out.println("Delayed to Position end (Wrist Encoder: " + wristEncoder.getPosition() +
+						" , Arm Encoder: " + shoulderEncoder.getPosition() + ")");
+			}
 		};
 
 		new SubsystemCommand(this.registeredCommands, "auton_hatch") {
