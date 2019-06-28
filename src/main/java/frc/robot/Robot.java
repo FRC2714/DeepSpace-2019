@@ -39,8 +39,8 @@ public class Robot extends TimedRobot {
 	// Init and Periodic functions
 	@Override
 	public void robotInit() {
-		auton_side = Auton_Side.LEFT;
-		auton_mode = Auton_Mode.ROCKET;
+		auton_side = Auton_Side.RIGHT;
+		auton_mode = Auton_Mode.CARGO;
 
 		// Controls processor only gets created ONCE when code is run
 		controlsProcessor = new ControlsProcessor(10000000, 2) {
@@ -265,19 +265,22 @@ public class Robot extends TimedRobot {
 		AutonTask leftCargo = new LeftCargo(controlsProcessor);
 		AutonTask rightCargo = new RightCargo(controlsProcessor);
 
+		AutonTask leftRocketLowNonExistential = new TestTask(controlsProcessor);
+		AutonTask rightRocketLow = new RightRocketLow(controlsProcessor);
+
 		AutonTask testAuton = new TestTask(controlsProcessor);
 
 		switch (auton_side){
 			case LEFT:
-				startAuton(leftCargo, leftRocket, testAuton);
+				startAuton(leftCargo, leftRocket, leftRocketLowNonExistential, testAuton);
 				break;
 			case RIGHT:
-				startAuton(rightCargo, rightRocket, testAuton);
+				startAuton(rightCargo, rightRocket, rightRocketLow, testAuton);
 				break;
 		}
 	}
 
-	private void startAuton(AutonTask cargoAuton, AutonTask rocketAuton, AutonTask testAuton) {
+	private void startAuton(AutonTask cargoAuton, AutonTask rocketAuton, AutonTask rocketLowAuton, AutonTask testAuton) {
 		switch (auton_mode){
 			case CARGO:
 				cargoAuton.run();
@@ -285,6 +288,8 @@ public class Robot extends TimedRobot {
 			case ROCKET:
 				rocketAuton.run();
 				break;
+			case ROCKETLOW:
+				rocketLowAuton.run();
 			case TEST:
 				System.out.println("TEST CASE RUNNING IN AUTON INIT");
 				testAuton.run();
