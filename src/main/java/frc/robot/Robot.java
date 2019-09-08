@@ -40,7 +40,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		auton_side = Auton_Side.LEFT;
-		auton_mode = Auton_Mode.ROCKET;
+		auton_mode = Auton_Mode.CARGO;
 
 		// Controls processor only gets created ONCE when code is run
 		controlsProcessor = new ControlsProcessor(10000000, 2) {
@@ -170,6 +170,9 @@ public class Robot extends TimedRobot {
 						System.out.println("GENERATING LEFT ROCKET SPLINE ");
 						drivetrain.addBackwardsSpline(0,0,270,7,-4.5,24,270,5,6,12,0,0);
 						break;
+					case ROCKETLOW:
+						drivetrain.addBackwardsSpline(0,0,270,7,-4.5,24,270,5,6,12,0,0);
+						break;
 					case TEST:
 						System.out.println("GENERATING LEFT TEST SPLINE ");
 						break;
@@ -265,25 +268,31 @@ public class Robot extends TimedRobot {
 		AutonTask leftCargo = new LeftCargo(controlsProcessor);
 		AutonTask rightCargo = new RightCargo(controlsProcessor);
 
+		AutonTask leftRocketLowNonExistential = new TestTask(controlsProcessor);
+		AutonTask rightRocketLow = new RightRocketLow(controlsProcessor);
+
 		AutonTask testAuton = new TestTask(controlsProcessor);
 
 		switch (auton_side){
 			case LEFT:
-				startAuton(leftCargo, leftRocket, testAuton);
+				startAuton(leftCargo, leftRocket, leftRocketLowNonExistential, testAuton);
 				break;
 			case RIGHT:
-				startAuton(rightCargo, rightRocket, testAuton);
+				startAuton(rightCargo, rightRocket, rightRocketLow, testAuton);
 				break;
 		}
 	}
 
-	private void startAuton(AutonTask cargoAuton, AutonTask rocketAuton, AutonTask testAuton) {
+	private void startAuton(AutonTask cargoAuton, AutonTask rocketAuton, AutonTask rocketLowAuton, AutonTask testAuton) {
 		switch (auton_mode){
 			case CARGO:
 				cargoAuton.run();
 				break;
 			case ROCKET:
 				rocketAuton.run();
+				break;
+			case ROCKETLOW:
+				rocketLowAuton.run();
 				break;
 			case TEST:
 				System.out.println("TEST CASE RUNNING IN AUTON INIT");
