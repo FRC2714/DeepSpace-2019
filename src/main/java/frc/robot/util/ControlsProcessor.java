@@ -39,6 +39,13 @@ public abstract class ControlsProcessor extends Thread {
 	protected JoystickButton leftStick = new JoystickButton(xbox1, 9);
 	protected JoystickButton rightStick = new JoystickButton(xbox1, 10);
 
+	protected JoystickButton cargoFloorButton = new JoystickButton(newButtonBoxA, 1);
+	protected JoystickButton stationCargoPositionButton = new JoystickButton(newButtonBoxA, 2);
+	protected JoystickButton extakeButton = new JoystickButton(newButtonBoxA, 3);
+	protected JoystickButton floorHatchButton = new JoystickButton(newButtonBoxA, 4);
+	protected JoystickButton stationHatchPositionButton = new JoystickButton(newButtonBoxA, 5);
+	protected JoystickButton setStartPositionButton = new JoystickButton(newButtonBoxA, 6);
+
 	protected WebsocketButtonPad launchpad;
 
 	// Array list that holds all of the operator controls

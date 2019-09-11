@@ -136,6 +136,7 @@ public class DriveTrain extends SubsystemModule {
 
 			this.currentAverageVelocity = (leftVelocity + rightVelocity) / 2;
 		}
+
 	};
 
 	// Instantiate point controller for autonomous driving
