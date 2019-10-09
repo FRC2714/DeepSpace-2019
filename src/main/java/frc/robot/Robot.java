@@ -117,6 +117,7 @@ public class Robot extends TimedRobot {
 				append("upper_score -p", this.launchpad.getButtonInstance(7, 4));
 				append("flex_score -p", this.launchpad.getButtonInstance(6, 2));
 				append("flex_score -p", this.launchpad.getButtonInstance(7, 2));
+				append("flex_score -p", this.flexScore);
 
 				// Extake buttons
 				append("extake -s", this.launchpad.getButtonInstance(0, 2));
@@ -347,6 +348,7 @@ public class Robot extends TimedRobot {
 		Scheduler.getInstance().run();
 //		drivetrain.getEncoderValues();
 //		SmartDashboard.putNumber("Gyro", drivetrain.odometer.getHeadingAngle());
+		SmartDashboard.putNumber("Y Value", drivetrain.odometer.getCurrentY());
 	}
 
 	/**
