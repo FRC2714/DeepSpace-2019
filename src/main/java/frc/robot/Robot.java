@@ -4,7 +4,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.autontasks.*;
 import frc.robot.subsystems.Arm;
@@ -117,7 +116,7 @@ public class Robot extends TimedRobot {
 				append("upper_score -p", this.launchpad.getButtonInstance(7, 4));
 				append("flex_score -p", this.launchpad.getButtonInstance(6, 2));
 				append("flex_score -p", this.launchpad.getButtonInstance(7, 2));
-				append("flex_score -p", this.flexScore);
+				append("flex_score -p", this.flexScoreButton);
 
 				// Extake buttons
 				append("extake -s", this.launchpad.getButtonInstance(0, 2));

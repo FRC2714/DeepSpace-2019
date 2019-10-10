@@ -6,8 +6,6 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import frc.robot.RobotMap;
 
-import frc.robot.util.WebsocketButtonPad;
-
 import java.net.URI;
 
 public abstract class ControlsProcessor extends Thread {
@@ -23,9 +21,8 @@ public abstract class ControlsProcessor extends Thread {
 
 	// Controllers and button boxes
 	protected Joystick xbox1 = new Joystick(RobotMap.p_xbox1);
-	protected Joystick newButtonBoxA = new Joystick(RobotMap.p_newButtonBoxA);
+	protected Joystick buttonBoxA = new Joystick(RobotMap.p_newButtonBoxA);
 	protected Joystick newButtonBoxB = new Joystick(RobotMap.p_newButtonBoxB);
-	protected Joystick buttonBoxA = new Joystick(RobotMap.p_buttonBox);
 
 	// xbox1 buttons
 	protected JoystickButton a = new JoystickButton(xbox1, 1);
@@ -39,14 +36,16 @@ public abstract class ControlsProcessor extends Thread {
 	protected JoystickButton leftStick = new JoystickButton(xbox1, 9);
 	protected JoystickButton rightStick = new JoystickButton(xbox1, 10);
 
-	protected JoystickButton cargoFloorButton = new JoystickButton(newButtonBoxA, 1);
-	protected JoystickButton flexScore = new JoystickButton(newButtonBoxA, 2);
-	protected JoystickButton extakeButton = new JoystickButton(newButtonBoxA, 3);
+	protected JoystickButton cargoFloorButton = new JoystickButton(buttonBoxA, 1);
+	protected JoystickButton flexScoreButton = new JoystickButton(buttonBoxA, 2);
+	protected JoystickButton extakeButton = new JoystickButton(buttonBoxA, 3);
+	protected JoystickButton climberUpButton = new JoystickButton(buttonBoxA, 4);
+	protected JoystickButton climberDownButton = new JoystickButton(buttonBoxA, 5);
 
-	protected JoystickButton stationCargoPositionButton = new JoystickButton(newButtonBoxA, 12);
-	protected JoystickButton floorHatchButton = new JoystickButton(newButtonBoxA, 4);
-	protected JoystickButton stationHatchPositionButton = new JoystickButton(newButtonBoxA, 5);
-	protected JoystickButton setStartPositionButton = new JoystickButton(newButtonBoxA, 6);
+	protected JoystickButton stationCargoPositionButton = new JoystickButton(buttonBoxA, 12);
+	protected JoystickButton floorHatchButton = new JoystickButton(buttonBoxA, 4);
+	protected JoystickButton stationHatchPositionButton = new JoystickButton(buttonBoxA, 5);
+	protected JoystickButton setStartPositionButton = new JoystickButton(buttonBoxA, 6);
 
 	protected WebsocketButtonPad launchpad;
 
