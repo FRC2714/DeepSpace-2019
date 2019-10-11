@@ -6,8 +6,6 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import frc.robot.RobotMap;
 
-import frc.robot.util.WebsocketButtonPad;
-
 import java.net.URI;
 
 public abstract class ControlsProcessor extends Thread {
@@ -23,9 +21,8 @@ public abstract class ControlsProcessor extends Thread {
 
 	// Controllers and button boxes
 	protected Joystick xbox1 = new Joystick(RobotMap.p_xbox1);
-	protected Joystick newButtonBoxA = new Joystick(RobotMap.p_newButtonBoxA);
-	protected Joystick newButtonBoxB = new Joystick(RobotMap.p_newButtonBoxB);
-	protected Joystick buttonBoxA = new Joystick(RobotMap.p_buttonBox);
+	protected Joystick buttonBoxA = new Joystick(RobotMap.p_newButtonBoxA);
+	protected Joystick buttonBoxB = new Joystick(RobotMap.p_newButtonBoxB);
 
 	// xbox1 buttons
 	protected JoystickButton a = new JoystickButton(xbox1, 1);
@@ -38,6 +35,36 @@ public abstract class ControlsProcessor extends Thread {
 	protected JoystickButton start = new JoystickButton(xbox1, 8);
 	protected JoystickButton leftStick = new JoystickButton(xbox1, 9);
 	protected JoystickButton rightStick = new JoystickButton(xbox1, 10);
+
+
+	protected JoystickButton climberUpButton = new JoystickButton(buttonBoxA, 1);
+	protected JoystickButton climberDownButton = new JoystickButton(buttonBoxA, 2);
+	protected JoystickButton upperScoreButton = new JoystickButton(buttonBoxA, 3);
+	protected JoystickButton cancelAllButton = new JoystickButton(buttonBoxA, 4);
+
+	protected JoystickButton extakeButton = new JoystickButton(buttonBoxA, 5);
+	protected JoystickButton startPositionButton = new JoystickButton(buttonBoxA, 6);
+	protected JoystickButton flexScoreButton = new JoystickButton(buttonBoxA, 7);
+	protected JoystickButton unusedButton8 = new JoystickButton(buttonBoxA, 8);
+
+	protected JoystickButton cargoStationPositionButton = new JoystickButton(buttonBoxA, 9);
+	protected JoystickButton hatchStationPositionButton = new JoystickButton(buttonBoxA, 10);
+	protected JoystickButton middleScoreButton = new JoystickButton(buttonBoxA, 11);
+	protected JoystickButton unusedButton12 = new JoystickButton(buttonBoxA, 12);
+
+	protected AxisButton cargoFloorButton = new AxisButton(buttonBoxA,0, true);
+	protected AxisButton unusedButton14 = new AxisButton(buttonBoxA, 0, false);
+	protected AxisButton lowerScoreButton = new AxisButton(buttonBoxA, 1, false);
+	protected AxisButton unusedButton16 = new AxisButton(buttonBoxA, 1, true);
+
+
+//	protected JoystickButton wristJogUpButton = new JoystickButton(buttonBoxA, 12);
+//	protected JoystickButton wristJogDownButton = new JoystickButton(buttonBoxA, 16);
+//	protected JoystickButton cargoTrueButton = new JoystickButton(buttonBoxA, 16);
+//	protected JoystickButton armJogDownButton = new JoystickButton(buttonBoxA, 13);
+//	protected JoystickButton armJogUpButton = new JoystickButton(buttonBoxA, 14);
+
+
 
 	protected WebsocketButtonPad launchpad;
 
@@ -59,7 +86,7 @@ public abstract class ControlsProcessor extends Thread {
 		this.commandDivider = commandDivider;
 		
 		try {
-			launchpad = new WebsocketButtonPad( new URI( "ws://10.27.14.5:5802" ));
+			launchpad = new WebsocketButtonPad( new URI( "ws://10.27.14.507:5802" ));
 			launchpad.connect();
 		} catch (Exception e) {
 			System.out.println("Websocket failure");

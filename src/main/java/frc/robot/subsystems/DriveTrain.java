@@ -136,6 +136,7 @@ public class DriveTrain extends SubsystemModule {
 
 			this.currentAverageVelocity = (leftVelocity + rightVelocity) / 2;
 		}
+
 	};
 
 	// Instantiate point controller for autonomous driving
@@ -181,8 +182,8 @@ public class DriveTrain extends SubsystemModule {
 		leftShaftEncoder.setDistancePerPulse(0.0007819);
 		rightShaftEncoder.setDistancePerPulse(0.00078012);
 
-		lMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
-		rMotor0.setIdleMode(CANSparkMax.IdleMode.kCoast);
+		lMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
+		rMotor0.setIdleMode(CANSparkMax.IdleMode.kBrake);
 	}
 
 	/**
