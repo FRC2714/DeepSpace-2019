@@ -22,7 +22,7 @@ public abstract class ControlsProcessor extends Thread {
 	// Controllers and button boxes
 	protected Joystick xbox1 = new Joystick(RobotMap.p_xbox1);
 	protected Joystick buttonBoxA = new Joystick(RobotMap.p_newButtonBoxA);
-	protected Joystick newButtonBoxB = new Joystick(RobotMap.p_newButtonBoxB);
+	protected Joystick buttonBoxB = new Joystick(RobotMap.p_newButtonBoxB);
 
 	// xbox1 buttons
 	protected JoystickButton a = new JoystickButton(xbox1, 1);
@@ -41,11 +41,19 @@ public abstract class ControlsProcessor extends Thread {
 	protected JoystickButton extakeButton = new JoystickButton(buttonBoxA, 3);
 	protected JoystickButton climberUpButton = new JoystickButton(buttonBoxA, 4);
 	protected JoystickButton climberDownButton = new JoystickButton(buttonBoxA, 5);
+	protected JoystickButton startPositionButton = new JoystickButton(buttonBoxA, 6);
+	protected JoystickButton stationPositionButton = new JoystickButton(buttonBoxA, 7);
+	protected JoystickButton lowerScoreButton = new JoystickButton(buttonBoxA, 8);
+	protected JoystickButton middleScoreButton = new JoystickButton(buttonBoxA, 9);
+	protected JoystickButton upperScoreButton = new JoystickButton(buttonBoxA, 10);
+	protected JoystickButton wristJogDownButton = new JoystickButton(buttonBoxA, 11);
+	protected JoystickButton wristJogUpButton = new JoystickButton(buttonBoxA, 12);
+	protected JoystickButton armJogDownButton = new JoystickButton(buttonBoxA, 13);
+	protected JoystickButton armJogUpButton = new JoystickButton(buttonBoxA, 14);
+	protected JoystickButton cancelAllButton = new JoystickButton(buttonBoxA, 15);
+	protected JoystickButton cargoTrueButton = new JoystickButton(buttonBoxA, 16);
 
-	protected JoystickButton stationCargoPositionButton = new JoystickButton(buttonBoxA, 12);
-	protected JoystickButton floorHatchButton = new JoystickButton(buttonBoxA, 4);
-	protected JoystickButton stationHatchPositionButton = new JoystickButton(buttonBoxA, 5);
-	protected JoystickButton setStartPositionButton = new JoystickButton(buttonBoxA, 6);
+
 
 	protected WebsocketButtonPad launchpad;
 
@@ -67,7 +75,7 @@ public abstract class ControlsProcessor extends Thread {
 		this.commandDivider = commandDivider;
 		
 		try {
-			launchpad = new WebsocketButtonPad( new URI( "ws://10.27.14.233:5802" ));
+			launchpad = new WebsocketButtonPad( new URI( "ws://10.27.14.507:5802" ));
 			launchpad.connect();
 		} catch (Exception e) {
 			System.out.println("Websocket failure");
