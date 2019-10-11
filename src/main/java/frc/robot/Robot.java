@@ -129,17 +129,15 @@ public class Robot extends TimedRobot {
 				append("wrist_jog_down -s", this.launchpad.getButtonInstance(8, 6));
 				append("shoulder_jog_up -s", this.launchpad.getButtonInstance(8, 7));
 				append("shoulder_jog_down -s", this.launchpad.getButtonInstance(8, 8));
-
-				append("wrist_jog_up -s", this.wristJogUpButton);
-				append("wrist_jog_down -s", this.wristJogDownButton);
-				append("shoulder_jog_up -s", this.armJogUpButton);
-				append("shoulder_jog_down -s", this.armJogDownButton);
+//				append("wrist_jog_up -s", this.wristJogUpButton);
+//				append("wrist_jog_down -s", this.wristJogDownButton);
+//				append("shoulder_jog_up -s", this.armJogUpButton);
+//				append("shoulder_jog_down -s", this.armJogDownButton);
 
 				// Game Piece Override
 				append("cargo_true -p", this.launchpad.getButtonInstance(8, 1));
 				append("hatch_true -p", this.launchpad.getButtonInstance(8, 3));
-
-				append("cargo_true -p", this.cargoTrueButton);
+//				append("cargo_true -p", this.cargoTrueButton);
 
 				// Driver controls
 				append("driver_control -p", this.rightStick);
