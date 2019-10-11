@@ -84,9 +84,6 @@ public class Robot extends TimedRobot {
 				append("station_position -p", this.launchpad.getButtonInstance(1, 5));
 				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 5));
 
-//				append("station_position -p", this.stationPositionButton);
-//				append("cargo_intake -s", this.stationPositionButton);
-
 				// Intake hatch from station
 				append("station_position -p", this.launchpad.getButtonInstance(3, 4));
 				append("hatch_station_intake -s", this.launchpad.getButtonInstance(3, 4));
@@ -120,7 +117,6 @@ public class Robot extends TimedRobot {
 				// Extake buttons
 				append("extake -s", this.launchpad.getButtonInstance(0, 2));
 				append("extake -s", this.launchpad.getButtonInstance(1, 2));
-
 				append("extake -s", this.extakeButton);
 
 				// Jog
@@ -152,7 +148,7 @@ public class Robot extends TimedRobot {
 
 				append("climber_up -s", this.climberUpButton);
 				append("climber_pump -p", this.climberUpButton);
-//				append("climber_down -s", this.climberDownButton);
+				append("climber_down -s", this.climberDownButton);
 
 				// Zero the arm
 				append("zero_arm -p", this.launchpad.getButtonInstance(5, 0));
