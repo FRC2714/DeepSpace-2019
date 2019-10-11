@@ -36,13 +36,13 @@ public abstract class ControlsProcessor extends Thread {
 	protected JoystickButton leftStick = new JoystickButton(xbox1, 9);
 	protected JoystickButton rightStick = new JoystickButton(xbox1, 10);
 
-	protected JoystickButton cargoFloorButton = new JoystickButton(buttonBoxA, 1);
-	protected JoystickButton flexScoreButton = new JoystickButton(buttonBoxA, 2);
-	protected JoystickButton extakeButton = new JoystickButton(buttonBoxA, 3);
+	protected AxisButton cargoFloorButton = new AxisButton(buttonBoxA,0, true);
+	protected JoystickButton flexScoreButton = new JoystickButton(buttonBoxA, 7);
+	protected JoystickButton extakeButton = new JoystickButton(buttonBoxA, 5);
 	protected JoystickButton climberUpButton = new JoystickButton(buttonBoxA, 4);
-	protected JoystickButton climberDownButton = new JoystickButton(buttonBoxA, 5);
-	protected JoystickButton startPositionButton = new JoystickButton(buttonBoxA, 6);
-	protected JoystickButton stationPositionButton = new JoystickButton(buttonBoxA, 7);
+//	protected JoystickButton climberDownButton = new JoystickButton(buttonBoxA, 5);
+//	protected JoystickButton startPositionButton = new JoystickButton(buttonBoxA, 6);
+//	protected JoystickButton stationPositionButton = new JoystickButton(buttonBoxA, 7);
 	protected JoystickButton lowerScoreButton = new JoystickButton(buttonBoxA, 8);
 	protected JoystickButton middleScoreButton = new JoystickButton(buttonBoxA, 9);
 	protected JoystickButton upperScoreButton = new JoystickButton(buttonBoxA, 10);
@@ -53,7 +53,7 @@ public abstract class ControlsProcessor extends Thread {
 	protected JoystickButton cancelAllButton = new JoystickButton(buttonBoxA, 15);
 	protected JoystickButton cargoTrueButton = new JoystickButton(buttonBoxA, 16);
 
-	protected AxisButton testAxisButton = new AxisButton(buttonBoxA, 0);
+	protected AxisButton testAxisButton = new AxisButton(buttonBoxA, 0, true);
 
 
 	protected WebsocketButtonPad launchpad;

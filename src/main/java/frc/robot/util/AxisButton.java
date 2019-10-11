@@ -8,14 +8,21 @@ public class AxisButton extends JoystickButton {
 
 	private Joystick joystick;
 	private int axis;
-	public AxisButton(Joystick joystick, int axis){
+	boolean isNegative;
+
+	public AxisButton(Joystick joystick, int axis, boolean isNegative){
 		super(joystick, 20);
 		this.joystick = joystick;
+		this.isNegative = isNegative;
 	}
 
 	@Override
 	public boolean get() {
-		System.out.println("True? " + joystick.getRawAxis(axis) + " " + (joystick.getRawAxis(axis) < -0.5));
-		return joystick.getRawAxis(axis) < -0.5;
+		if(isNegative) {
+			return joystick.getRawAxis(axis) < -0.5;
+		}
+		else{
+			return joystick.getRawAxis(axis) > 0.5;
+		}
 	}
 }

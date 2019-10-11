@@ -51,8 +51,6 @@ public class Robot extends TimedRobot {
 				append("start_position -p", this.launchpad.getButtonInstance(4, 1));
 				append("start_position -p", this.launchpad.getButtonInstance(4, 2));
 
-				append("start_position -p", this.startPositionButton);
-
 				// Intake cargo from ground
 				append("floor_cargo_position -p", this.launchpad.getButtonInstance(0, 7));
 				append("cargo_intake -s", this.launchpad.getButtonInstance(0, 7));
@@ -86,8 +84,8 @@ public class Robot extends TimedRobot {
 				append("station_position -p", this.launchpad.getButtonInstance(1, 5));
 				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 5));
 
-				append("station_position -p", this.stationPositionButton);
-				append("cargo_intake -s", this.stationPositionButton);
+//				append("station_position -p", this.stationPositionButton);
+//				append("cargo_intake -s", this.stationPositionButton);
 
 				// Intake hatch from station
 				append("station_position -p", this.launchpad.getButtonInstance(3, 4));
@@ -115,7 +113,6 @@ public class Robot extends TimedRobot {
 				append("flex_score -p", this.launchpad.getButtonInstance(7, 2));
 
 				append("lower_score -p", this.lowerScoreButton);
-				append("lower_score -p", this.testAxisButton);
 				append("middle_score -p", this.middleScoreButton);
 				append("upper_score -p", this.upperScoreButton);
 				append("flex_score -p", this.flexScoreButton);
@@ -155,7 +152,7 @@ public class Robot extends TimedRobot {
 
 				append("climber_up -s", this.climberUpButton);
 				append("climber_pump -p", this.climberUpButton);
-				append("climber_down -s", this.climberDownButton);
+//				append("climber_down -s", this.climberDownButton);
 
 				// Zero the arm
 				append("zero_arm -p", this.launchpad.getButtonInstance(5, 0));
