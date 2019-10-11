@@ -103,6 +103,7 @@ public class Robot extends TimedRobot {
 				append("hatch_station_intake -s", this.launchpad.getButtonInstance(4, 5));
 				append("valve_off -s", this.launchpad.getButtonInstance(4, 5));
 
+
 				// Score positions
 				append("lower_score -p", this.launchpad.getButtonInstance(6, 8));
 				append("lower_score -p", this.launchpad.getButtonInstance(7, 8));
@@ -114,6 +115,7 @@ public class Robot extends TimedRobot {
 				append("flex_score -p", this.launchpad.getButtonInstance(7, 2));
 
 				append("lower_score -p", this.lowerScoreButton);
+				append("lower_score -p", this.testAxisButton);
 				append("middle_score -p", this.middleScoreButton);
 				append("upper_score -p", this.upperScoreButton);
 				append("flex_score -p", this.flexScoreButton);

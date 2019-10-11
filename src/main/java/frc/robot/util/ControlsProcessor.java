@@ -53,6 +53,7 @@ public abstract class ControlsProcessor extends Thread {
 	protected JoystickButton cancelAllButton = new JoystickButton(buttonBoxA, 15);
 	protected JoystickButton cargoTrueButton = new JoystickButton(buttonBoxA, 16);
 
+	protected AxisButton testAxisButton = new AxisButton(buttonBoxA, 0);
 
 
 	protected WebsocketButtonPad launchpad;
