@@ -50,6 +50,7 @@ public class Robot extends TimedRobot {
 				append("start_position -p", this.launchpad.getButtonInstance(3, 2));
 				append("start_position -p", this.launchpad.getButtonInstance(4, 1));
 				append("start_position -p", this.launchpad.getButtonInstance(4, 2));
+				append("start_position -p", this.startPositionButton);
 
 				// Intake cargo from ground
 				append("floor_cargo_position -p", this.launchpad.getButtonInstance(0, 7));
@@ -60,7 +61,6 @@ public class Robot extends TimedRobot {
 				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 7));
 				append("floor_cargo_position -p", this.launchpad.getButtonInstance(1, 8));
 				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 8));
-
 				append("floor_cargo_position -p", this.cargoFloorButton);
 				append("cargo_intake -s", this.cargoFloorButton);
 
@@ -83,6 +83,8 @@ public class Robot extends TimedRobot {
 				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 4));
 				append("station_position -p", this.launchpad.getButtonInstance(1, 5));
 				append("cargo_intake -s", this.launchpad.getButtonInstance(1, 5));
+				append("station_position -p", this.cargoStationPositionButton);
+				append("cargo_intake -s", this.cargoStationPositionButton);
 
 				// Intake hatch from station
 				append("station_position -p", this.launchpad.getButtonInstance(3, 4));
@@ -97,6 +99,9 @@ public class Robot extends TimedRobot {
 				append("station_position -p", this.launchpad.getButtonInstance(4, 5));
 				append("hatch_station_intake -s", this.launchpad.getButtonInstance(4, 5));
 				append("valve_off -s", this.launchpad.getButtonInstance(4, 5));
+				append("station_position -p",  this.hatchStationPositionButton);
+				append("hatch_station_intake -s", this.hatchStationPositionButton);
+				append("valve_off -s", this.hatchStationPositionButton);
 
 
 				// Score positions
@@ -160,7 +165,6 @@ public class Robot extends TimedRobot {
 				append("cancel_all -p", this.cancelAllButton);
 
 				append("hatch_intake -p", this.a);
-
 				append("get_climber_positions -p", this.x);
 			}
 		};
