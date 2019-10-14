@@ -176,7 +176,8 @@ public class Intake extends SubsystemModule {
 			}
 
 			@Override
-			public void execute() {}
+			public void execute() {
+			}
 
 			@Override
 			public boolean isFinished() {

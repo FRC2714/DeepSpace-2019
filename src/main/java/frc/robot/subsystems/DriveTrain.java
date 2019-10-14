@@ -1100,7 +1100,7 @@ public class DriveTrain extends SubsystemModule {
 
 			@Override
 			public void initialize() {
-				controlsProcessor.cancelAll();
+//				controlsProcessor.cancelAll();
 			}
 
 			@Override
@@ -1112,7 +1112,9 @@ public class DriveTrain extends SubsystemModule {
 			}
 
 			@Override
-			public void end() {}
+			public void end() {
+				closedLoopTank(0,0);
+			}
 		};
 
 	}

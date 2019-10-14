@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -39,7 +40,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		auton_side = Auton_Side.LEFT;
-		auton_mode = Auton_Mode.ROCKET;
+		auton_mode = Auton_Mode.TEST;
 
 		// Controls processor only gets created ONCE when code is run
 		controlsProcessor = new ControlsProcessor(10000000, 2) {
@@ -51,6 +52,7 @@ public class Robot extends TimedRobot {
 				append("start_position -p", this.launchpad.getButtonInstance(4, 1));
 				append("start_position -p", this.launchpad.getButtonInstance(4, 2));
 				append("start_position -p", this.startPositionButton);
+				append("start_position -p", this.x);
 
 				// Intake cargo from ground
 				append("floor_cargo_position -p", this.launchpad.getButtonInstance(0, 7));
@@ -198,7 +200,7 @@ public class Robot extends TimedRobot {
 						drivetrain.addBackwardsSpline(0,0,270,7,-4.5,24,270,5,6,12,0,0);
 						break;
 					case TEST:
-						System.out.println("GENERATING LEFT TEST SPLINE ");
+						System.out.println("Dead Reckoning  auton");
 						break;
 				}
 				break;
@@ -281,7 +283,7 @@ public class Robot extends TimedRobot {
 	public void autonomousInit() {
 		drivetrain.odometer.reset();
 
-		NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
+		NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(1);
 		NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
 
 		generalInit();
@@ -332,6 +334,23 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousPeriodic() {
 		Scheduler.getInstance().run();
+
+//		if(DriverStation.getInstance().getMatchTime() > 12){
+//			drivetrain.closedLoopTank(-5,-5);
+//		}else {
+//			drivetrain.closedLoopTank(0,0);
+//		}
+
+//		if (drivetrain.odometer.getCurrentY() > 25 || drivetrain.odometer.getCurrentY() < -25) {
+//			drivetrain.drivingController.setIsFinished(true);
+//			drivetrain.closedLoopTank(0, 0);
+//		}
+//
+//		if(DriverStation.getInstance().getMatchTime() < 12 && drivetrain.odometer.getCurrentY() < 2){
+//			drivetrain.drivingController.setIsFinished(true);
+//			drivetrain.closedLoopTank(0,0);
+//		}
+
 	}
 
 	/**
